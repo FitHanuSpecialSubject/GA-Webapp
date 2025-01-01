@@ -32,8 +32,8 @@ npm -v
 Clone this repository and navigate to the project directory:
 
 ```bash
-git clone https://github.com/suyttthideptrai/SS2-game-theory-solver.git
-cd SS2-game-theory-solver
+git clone https://github.com/FitHanuSpecialSubject/GA-Webapp.git
+cd GA-Webapp
 ```
 
 Install dependencies using npm or Yarn:
