@@ -1,8 +1,7 @@
 import React from "react";
 import "./style.scss";
 
-export default function PlayerResult({ index, player}) {
-
+export default function PlayerResult({ index, player }) {
   return (
     <div className="grid-item-container">
       <div className="column">#{index}</div>

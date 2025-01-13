@@ -10,18 +10,20 @@ import Popup from "../../module/core/component/Popup";
 import axios from "axios";
 import ParamSettingBox from "../../module/core/component/ParamSettingBox";
 import PopupContext from "../../module/core/context/PopupContext";
-import * as XLSX from '@e965/xlsx';
+import * as XLSX from "@e965/xlsx";
 import SockJS from "sockjs-client";
 import { v4 } from "uuid";
 import { over } from "stompjs";
-import { saveAs } from 'file-saver';
+import { saveAs } from "file-saver";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
-import {getBackendAddress} from '../../utils/http_utils';
-import { createSystemInfoSheet, createParameterConfigSheet , loadProblemDataOld, loadProblemDataParallel } from '../../utils/excel_utils.js';
-
-
-
+import { getBackendAddress } from "../../utils/http_utils";
+import {
+  createSystemInfoSheet,
+  createParameterConfigSheet,
+  loadProblemDataOld,
+  loadProblemDataParallel,
+} from "../../utils/excel_utils.js";
 
 let stompClient = null;
 export default function MatchingOutputPage() {
@@ -32,7 +34,7 @@ export default function MatchingOutputPage() {
   const { displayPopup } = useContext(PopupContext);
   const [sessionCode, setSessionCode] = useState(v4());
   const [loadingMessage, setLoadingMessage] = useState(
-    "Processing to get problem insights, please wait..."
+    "Processing to get problem insights, please wait...",
   );
   const [loadingEstimatedTime, setLoadingEstimatedTime] = useState(null);
   const [loadingPercentage, setLoadingPercentage] = useState();
@@ -41,12 +43,8 @@ export default function MatchingOutputPage() {
   const [generationParam, setGenerationParam] = useState(100);
   const [maxTimeParam, setMaxTimeParam] = useState(5000);
   const [selectedSet, setSelectedSet] = useState("all");
-  const problemType = appData.problemType;  
+  const problemType = appData.problemType;
 
-
-
-
-  
   const navigateToHome = () => {
     setAppData(null);
     navigate("/");
@@ -57,25 +55,26 @@ export default function MatchingOutputPage() {
   }
   const matchesArray = appData.result.data.matches.matches;
   const leftOversArray = appData.result.data.matches.leftOvers;
-  const inputIndividuals = appData.problem.individuals
+  const inputIndividuals = appData.problem.individuals;
   const problemData = appData.problem;
   // Handle filter change
   const handleSetFilterChange = (event) => {
     setSelectedSet(event.target.value); // Cập nhật giá trị đã chọn
   };
 
-// Lọc dữ liệu theo giá trị selectedSet
-const filteredMatches = selectedSet === "all" 
-  ? matchesArray 
-  : matchesArray.filter((_, index) => {
-      const individual = inputIndividuals[index]; // Lấy cá nhân tại chỉ số index
-      return individual?.setType === (Number(selectedSet) - 1); // So sánh với setType - 1
-    });
+  // Lọc dữ liệu theo giá trị selectedSet
+  const filteredMatches =
+    selectedSet === "all"
+      ? matchesArray
+      : matchesArray.filter((_, index) => {
+          const individual = inputIndividuals[index]; // Lấy cá nhân tại chỉ số index
+          return individual?.setType === Number(selectedSet) - 1; // So sánh với setType - 1
+        });
 
   const scroll = (pos) => {
     document.body.scrollTop = pos; // For Safari
     document.documentElement.scrollTop = pos;
-  }
+  };
 
   const handleExportToExcel = async () => {
     const workbook = XLSX.utils.book_new();
@@ -93,23 +92,27 @@ const filteredMatches = selectedSet === "all"
     //   XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
     // });
     matchesArray.forEach((match, index) => {
-      let individualName = problemData.individualNames[index]
+      let individualName = problemData.individualNames[index];
 
       let individualMatches = "";
-      if (Object.values(match).length===0) {
+      if (Object.values(match).length === 0) {
         individualMatches = "There are no individual matches";
       } else {
         for (let i = 0; i < Object.values(match).length; i++) {
           let name = problemData.individualNames[Object.values(match)[i]];
           if (i === Object.values(match).length - 1) {
             individualMatches += name;
-          }else
-          individualMatches += name + ", ";
+          } else individualMatches += name + ", ";
         }
-        const row=[individualName, individualMatches, appData.result.data.setSatisfactions[index].toFixed(3)]
+        const row = [
+          individualName,
+          individualMatches,
+          appData.result.data.setSatisfactions[index].toFixed(3),
+        ];
         console.log(row);
         XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
-  }})
+      }
+    });
     // write parameter configurations to sheet 2
     const sheet2 = createParameterConfigSheet(appData);
 
@@ -185,22 +188,20 @@ const filteredMatches = selectedSet === "all"
       displayPopup(
         "Something went wrong!",
         "Get insights failed!, please contact the admin!",
-        true
+        true,
       );
     }
   };
 
   const connectWebSocket = async () => {
-    let Sock = new SockJS(
-      `${getBackendAddress()}/ws`
-    );
+    let Sock = new SockJS(`${getBackendAddress()}/ws`);
     stompClient = over(Sock);
     await stompClient.connect({}, onConnected, onError);
   };
   const onConnected = () => {
     stompClient.subscribe(
       "/session/" + sessionCode + "/progress",
-      onPrivateMessage
+      onPrivateMessage,
     );
     console.log("Connected to websocket server!");
   };
@@ -231,7 +232,6 @@ const filteredMatches = selectedSet === "all"
 
   //Get data from sever
 
-
   console.log(appData.result.data);
   const fitnessValue = appData.result.data.fitnessValue.toFixed(3);
   const usedAlgorithm = appData.result.data.algorithm;
@@ -244,22 +244,22 @@ const filteredMatches = selectedSet === "all"
   // Loop through result
 
   let fileContent = "";
-  
+
   // Success couple
   matchesArray.forEach((match, index) => {
     // Lấy individualSet từ individualSetIndices (mặc định là 0 nếu không có)
     let individualSet = appData.problem.individualSetIndices?.[index] ?? 0;
-  
+
     // Kiểm tra nếu set đã chọn không phải là "all" và không khớp với individualSet
-    if (selectedSet !== "all" && individualSet !== (Number(selectedSet) - 1)) {
+    if (selectedSet !== "all" && individualSet !== Number(selectedSet) - 1) {
       return; // Bỏ qua phần tử không thuộc set đã chọn
     }
-  
+
     // Lấy tên cá nhân
     let individualName = problemData.individualNames?.[index] || "Unknown";
-  
+
     let individualMatches = "";
-  
+
     // Kiểm tra nếu match tồn tại và có giá trị
     if (!match || Object.keys(match).length === 0) {
       individualMatches = "There are no individual matches";
@@ -270,44 +270,33 @@ const filteredMatches = selectedSet === "all"
         individualMatches += name + (i === arr.length - 1 ? "" : ", ");
       });
     }
-  
+
     // Thêm thông tin vào fileContent
     fileContent += `${individualName} -> ${individualMatches}\n`;
-  
+
     // Đẩy dữ liệu vào htmlOutput
     htmlOutput.push(
       <tr className="table-success" key={`C${index + 1}`}>
         <td>{individualName}</td>
         <td>{individualMatches}</td>
-        <td>{appData.result?.data?.setSatisfactions?.[index]?.toFixed(3) || 0}</td>
+        <td>
+          {appData.result?.data?.setSatisfactions?.[index]?.toFixed(3) || 0}
+        </td>
         <td>Set {individualSet + 1}</td> {/* Hiển thị set đúng như "Set 1" */}
-      </tr>
+      </tr>,
     );
   });
-  
-  
-
-
-
-
-  
-  
-  
-
-  
-  
-  
-  
 
   // LeftOves
   let leftoverArray = [];
   leftOversArray.forEach((individual, index) => {
     htmlLeftOvers.push(
       <tr className="table-danger" key={"L" + index}>
-        <td>{index+1}</td>
+        <td>{index + 1}</td>
         <td>{problemData.individualNames[individual]}</td>
-        <td >Set {problemData.individualSetIndices[individual] + 1}</td> {/* Hiển thị set */}
-      </tr>
+        <td>Set {problemData.individualSetIndices[individual] + 1}</td>{" "}
+        {/* Hiển thị set */}
+      </tr>,
     );
     leftoverArray.push(problemData.individualNames[individual]);
   });
@@ -323,97 +312,99 @@ const filteredMatches = selectedSet === "all"
   downloadLink.href = URL.createObjectURL(blob);
   downloadLink.download = "output.txt";
 
-    // Define your state variables here
+  // Define your state variables here
   return (
-      <div className="matching-output-page">
-        <div className="scrollPanel">
-          <button className="autoscrollButton" onClick={() => scroll(0)}>
-            &#11165;
-          </button>
-          <button className="autoscrollButton" onClick={() => scroll(document.body.scrollHeight)}>
-            &#11167;
-          </button>
-        </div>
-        <h2 id="head-title">MATCHING THEORY OUTPUT PAGE</h2>
-        <Popup
-            isShow={isShowPopup}
-            setIsShow={setIsShowPopup}
-            title={"Get detailed insights"}
-            // message={`This process can take estimated ${data.estimatedWaitingTime || 1} minute(s) and you will be redirected to another page. Do you want to continue?`}
-            message={`This process can take a while do you to continue?`}
-            okCallback={handlePopupOk}
-        />
+    <div className="matching-output-page">
+      <div className="scrollPanel">
+        <button className="autoscrollButton" onClick={() => scroll(0)}>
+          &#11165;
+        </button>
+        <button
+          className="autoscrollButton"
+          onClick={() => scroll(document.body.scrollHeight)}
+        >
+          &#11167;
+        </button>
+      </div>
+      <h2 id="head-title">MATCHING THEORY OUTPUT PAGE</h2>
+      <Popup
+        isShow={isShowPopup}
+        setIsShow={setIsShowPopup}
+        title={"Get detailed insights"}
+        // message={`This process can take estimated ${data.estimatedWaitingTime || 1} minute(s) and you will be redirected to another page. Do you want to continue?`}
+        message={`This process can take a while do you to continue?`}
+        okCallback={handlePopupOk}
+      />
 
-        {/* <Loading isLoading={isLoading} message={`Get more detailed insights. This can take estimated ${data.estimatedWaitingTime || 1} minute(s)...`} /> */}
-        <Loading
-            isLoading={isLoading}
-            percentage={loadingPercentage}
-            estimatedTime={loadingEstimatedTime}
-            message={loadingMessage}
-        />
-        <br/>
-        <p className="below-headertext">Optimal solution</p>
-        <div className="output-container">
-          <div className="param-box">
-            <ParamSettingBox
-                distributedCoreParam={distributedCoreParam}
-                setDistributedCoreParam={setDistributedCoreParam}
-                generationParam={generationParam}
-                setGenerationParam={setGenerationParam}
-                populationSizeParam={populationSizeParam}
-                setPopulationSizeParam={setPopulationSizeParam}
-                maxTimeParam={maxTimeParam}
-                setMaxTimeParam={setMaxTimeParam}
-            />
-            <div className="btn insight-btn" onClick={handleGetMoreInsights}>
-              <img src={GraphImage} alt=""/>
-              <p className="mb-0">Get more insights</p>
-            </div>
-          </div>
-
-          <div className="d-flex align-items-center justify-content-center"></div>
-          <div className="result-information">
-            <p>Problem Type: {problemType.displayName}</p>
-            <p>Fitness Value: {fitnessValue}</p>
-            <p>Used Algorithm: {usedAlgorithm}</p>
-            <p>Runtime: {runtime} ms</p>
+      {/* <Loading isLoading={isLoading} message={`Get more detailed insights. This can take estimated ${data.estimatedWaitingTime || 1} minute(s)...`} /> */}
+      <Loading
+        isLoading={isLoading}
+        percentage={loadingPercentage}
+        estimatedTime={loadingEstimatedTime}
+        message={loadingMessage}
+      />
+      <br />
+      <p className="below-headertext">Optimal solution</p>
+      <div className="output-container">
+        <div className="param-box">
+          <ParamSettingBox
+            distributedCoreParam={distributedCoreParam}
+            setDistributedCoreParam={setDistributedCoreParam}
+            generationParam={generationParam}
+            setGenerationParam={setGenerationParam}
+            populationSizeParam={populationSizeParam}
+            setPopulationSizeParam={setPopulationSizeParam}
+            maxTimeParam={maxTimeParam}
+            setMaxTimeParam={setMaxTimeParam}
+          />
+          <div className="btn insight-btn" onClick={handleGetMoreInsights}>
+            <img src={GraphImage} alt="" />
+            <p className="mb-0">Get more insights</p>
           </div>
         </div>
-        <div className="view-1" style={{display: "block"}}>
-          <div className="d-flex">
-            <Button
-                variant="success"
-                size="md"
-                style={{justifyContent: "center", margin: "auto", width: 150}}
-                onClick={handleExportToExcel}
-            >
-              Export result
-            </Button>
-          </div>
-          <h3 style={{marginBottom: 20, marginTop: 40}}>
-            THE COUPLES AFTER GALE-SHAPLEY ALGORITHM s
-          </h3>
-          <div className="filter-container">
-            <label htmlFor="setFilter">Filter by set: </label>
-            <select
-                id="setFilter"
-                value={selectedSet}
-                onChange={handleSetFilterChange}
-                style={{marginLeft: 10, marginBottom: 20}}
-            >
-              <option value="all">All</option>
-              <option value="leftovers">LEFTOVERS</option>
-              {Array.from({length: appData.problem.numberOfSets}, (_, i) => (
-                  <option key={`set-${i + 1}`} value={i + 1}>
-                    Set {i + 1}
-                  </option>
-              ))}
-            </select>
-          </div>
 
+        <div className="d-flex align-items-center justify-content-center"></div>
+        <div className="result-information">
+          <p>Problem Type: {problemType.displayName}</p>
+          <p>Fitness Value: {fitnessValue}</p>
+          <p>Used Algorithm: {usedAlgorithm}</p>
+          <p>Runtime: {runtime} ms</p>
+        </div>
+      </div>
+      <div className="view-1" style={{ display: "block" }}>
+        <div className="d-flex">
+          <Button
+            variant="success"
+            size="md"
+            style={{ justifyContent: "center", margin: "auto", width: 150 }}
+            onClick={handleExportToExcel}
+          >
+            Export result
+          </Button>
+        </div>
+        <h3 style={{ marginBottom: 20, marginTop: 40 }}>
+          THE COUPLES AFTER GALE-SHAPLEY ALGORITHM s
+        </h3>
+        <div className="filter-container">
+          <label htmlFor="setFilter">Filter by set: </label>
+          <select
+            id="setFilter"
+            value={selectedSet}
+            onChange={handleSetFilterChange}
+            style={{ marginLeft: 10, marginBottom: 20 }}
+          >
+            <option value="all">All</option>
+            <option value="leftovers">LEFTOVERS</option>
+            {Array.from({ length: appData.problem.numberOfSets }, (_, i) => (
+              <option key={`set-${i + 1}`} value={i + 1}>
+                Set {i + 1}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          <Table striped bordered hover responsive>
-            <thead>
+        <Table striped bordered hover responsive>
+          <thead>
             <tr className="table-success">
               {/* <th>#</th> */}
               <th>First Partner</th>
@@ -422,26 +413,26 @@ const filteredMatches = selectedSet === "all"
               <th>First Partner Set</th>
               {/* Thêm cột mới */}
             </tr>
-            </thead>
+          </thead>
 
-            <tbody>{htmlOutput}</tbody>
-          </Table>
+          <tbody>{htmlOutput}</tbody>
+        </Table>
 
-          <h3 style={{marginBottom: 20, marginTop: 40, textAlign: "center"}}>
-            THE LEFTOVERS AFTER GALE-SHAPLEY ALGORITHM
-          </h3>
-          <Table striped bordered hover responsive>
-            <thead>
+        <h3 style={{ marginBottom: 20, marginTop: 40, textAlign: "center" }}>
+          THE LEFTOVERS AFTER GALE-SHAPLEY ALGORITHM
+        </h3>
+        <Table striped bordered hover responsive>
+          <thead>
             <tr className="table-danger">
               <th>No.</th>
               <th>Name</th>
               <th>Set</th>
             </tr>
-            </thead>
-            <tbody>{htmlLeftOvers}</tbody>
-          </Table>
-          {/* {console.log(appData.result.data.individuals)} */}
-        </div>
+          </thead>
+          <tbody>{htmlLeftOvers}</tbody>
+        </Table>
+        {/* {console.log(appData.result.data.individuals)} */}
       </div>
+    </div>
   );
 }

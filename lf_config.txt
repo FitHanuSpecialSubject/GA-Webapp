@@ -1,0 +1,5 @@
+# Convert CRLF to LF on commit, keep LF on checkout
+git config --global core.autocrlf input
+
+# Optional: Ensure text files are marked as text
+git config --global core.eol lf

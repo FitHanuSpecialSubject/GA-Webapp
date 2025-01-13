@@ -1,6 +1,7 @@
 # Project Name
 
 Special Subject Application FE
+
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)

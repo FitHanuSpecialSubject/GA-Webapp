@@ -1,8 +1,7 @@
 export default function InsightsTable({ fitnessValues }) {
   const algorithms = Object.keys(fitnessValues);
-    const headers = algorithms.map((name) => <th key={name}>{name}</th>);
-  const rows = fitnessValues[algorithms[0]]
-        .map((_, index) => {
+  const headers = algorithms.map((name) => <th key={name}>{name}</th>);
+  const rows = fitnessValues[algorithms[0]].map((_, index) => {
     return (
       <tr key={index}>
         <td className="first-col">{index + 1}</td>
@@ -20,9 +19,7 @@ export default function InsightsTable({ fitnessValues }) {
           {headers}
         </tr>
       </thead>
-      <tbody>
-        {rows}
-      </tbody>
+      <tbody>{rows}</tbody>
     </table>
   );
 }

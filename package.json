@@ -37,15 +37,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-
     "_comment": "For maven to shutdown developement server",
-    "stop": "npx cross-port-killer 3000"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "stop": "npx cross-port-killer 3000",
+    "lint": "npx eslint ."
   },
   "browserslist": {
     "production": [
@@ -61,12 +55,15 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-private-property-in-object": "^7.24.7",
+    "@eslint/js": "^9.18.0",
     "@svgr/webpack": "^8.1.0",
     "cross-port-killer": "^1.4.0",
-    "eslint": "^8.57.1",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react": "^7.37.2",
-    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.37.4",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
     "sass": "^1.60.0",
     "sass-loader": "^16.0.2"
   },

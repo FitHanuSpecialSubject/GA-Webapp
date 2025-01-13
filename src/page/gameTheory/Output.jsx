@@ -1,46 +1,50 @@
-import React from 'react'
-import "../../module/gameTheory/css/output.scss"
-import PlayerResult from '../../module/gameTheory/component/PlayerResult'
-import ExcelImage from '../../module/core/asset/image/excel.png'
-import GraphImage from '../../module/core/asset/image/graph.png'
-import { useContext, useState } from 'react'
-import DataContext from "../../module/core/context/DataContext"
-import { useNavigate } from 'react-router-dom';
-import NothingToShow from '../../module/core/component/NothingToShow';
-import Loading from '../../module/core/component/Loading';
-import * as XLSX from '@e965/xlsx';
-import { saveAs } from 'file-saver';
-import Popup from '../../module/core/component/Popup';
-import axios from 'axios'
-import ParamSettingBox from '../../module/core/component/ParamSettingBox';
-import PopupContext from '../../module/core/context/PopupContext'
-import { createSystemInfoSheet, createParameterConfigSheet , loadProblemDataOld, loadProblemDataParallel } from '../../utils/excel_utils.js';
+import React from "react";
+import "../../module/gameTheory/css/output.scss";
+import PlayerResult from "../../module/gameTheory/component/PlayerResult";
+import ExcelImage from "../../module/core/asset/image/excel.png";
+import GraphImage from "../../module/core/asset/image/graph.png";
+import { useContext, useState } from "react";
+import DataContext from "../../module/core/context/DataContext";
+import { useNavigate } from "react-router-dom";
+import NothingToShow from "../../module/core/component/NothingToShow";
+import Loading from "../../module/core/component/Loading";
+import * as XLSX from "@e965/xlsx";
+import { saveAs } from "file-saver";
+import Popup from "../../module/core/component/Popup";
+import axios from "axios";
+import ParamSettingBox from "../../module/core/component/ParamSettingBox";
+import PopupContext from "../../module/core/context/PopupContext";
+import {
+  createSystemInfoSheet,
+  createParameterConfigSheet,
+  loadProblemDataOld,
+  loadProblemDataParallel,
+} from "../../utils/excel_utils.js";
 
+import SockJS from "sockjs-client";
+import { v4 } from "uuid";
+import { over } from "stompjs";
 
-import SockJS from 'sockjs-client';
-import { v4 } from 'uuid';
-import { over } from 'stompjs';
-
-let stompClient = null
+let stompClient = null;
 export default function OutputPage() {
   const navigate = useNavigate();
-  const { appData, setAppData } = useContext(DataContext)
+  const { appData, setAppData } = useContext(DataContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isShowPopup, setIsShowPopup] = useState(false);
-  const { displayPopup } = useContext(PopupContext)
-  const [sessionCode] = useState(v4())
-  const [loadingMessage, setLoadingMessage] = useState("Processing to get problem insights, please wait...")
-  const [loadingEstimatedTime, setLoadingEstimatedTime] = useState(null)
-  const [loadingPercentage, setLoadingPercentage] = useState()
-  const [distributedCoreParam, setDistributedCoreParam] = useState("all")
-  const [populationSizeParam, setPopulationSizeParam] = useState(1000)
-  const [generationParam, setGenerationParam] = useState(100)
-  const [maxTimeParam, setMaxTimeParam] = useState(5000)
+  const { displayPopup } = useContext(PopupContext);
+  const [sessionCode] = useState(v4());
+  const [loadingMessage, setLoadingMessage] = useState(
+    "Processing to get problem insights, please wait...",
+  );
+  const [loadingEstimatedTime, setLoadingEstimatedTime] = useState(null);
+  const [loadingPercentage, setLoadingPercentage] = useState();
+  const [distributedCoreParam, setDistributedCoreParam] = useState("all");
+  const [populationSizeParam, setPopulationSizeParam] = useState(1000);
+  const [generationParam, setGenerationParam] = useState(100);
+  const [maxTimeParam, setMaxTimeParam] = useState(5000);
 
   if (appData == null) {
-    return (
-      <NothingToShow />
-    )
+    return <NothingToShow />;
   }
 
   const handleExportToExcel = async () => {
@@ -54,35 +58,34 @@ export default function OutputPage() {
     ]);
 
     // append players data to sheet 1
-    appData.result.data.players.forEach(player => {
+    appData.result.data.players.forEach((player) => {
       const row = [player.playerName, player.strategyName, player.payoff];
       XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
-    })
-
+    });
 
     // write parameter configurations to sheet 2
     const sheet2 = createParameterConfigSheet(appData);
 
-
     // write computer specs to sheet 3
     const sheet3 = createSystemInfoSheet(appData);
 
-
     // append sheets to workbook
-    XLSX.utils.book_append_sheet(workbook, sheet1, 'Optiomal solution');
-    XLSX.utils.book_append_sheet(workbook, sheet2, 'Parameter Configurations');
-    XLSX.utils.book_append_sheet(workbook, sheet3, 'Computer Specifications');
-
+    XLSX.utils.book_append_sheet(workbook, sheet1, "Optiomal solution");
+    XLSX.utils.book_append_sheet(workbook, sheet2, "Parameter Configurations");
+    XLSX.utils.book_append_sheet(workbook, sheet3, "Computer Specifications");
 
     // write workbook to file
-    const wbout = await XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([wbout], { type: 'application/octet-stream' });
-    saveAs(blob, 'result.xlsx');
+    const wbout = await XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([wbout], { type: "application/octet-stream" });
+    saveAs(blob, "result.xlsx");
   };
 
   const handleGetMoreInsights = () => {
     setIsShowPopup(true);
-  }
+  };
 
   const handlePopupOk = async () => {
     try {
@@ -97,11 +100,14 @@ export default function OutputPage() {
         populationSize: populationSizeParam,
         generation: generationParam,
         maxTime: maxTimeParam,
-      }
-      
+      };
+
       setIsLoading(true);
-      await connectWebSocket() // connect to websocket to get the progress percentage
-      const res = await axios.post(`http://${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/api/problem-result-insights/${sessionCode}`, body);
+      await connectWebSocket(); // connect to websocket to get the progress percentage
+      const res = await axios.post(
+        `http://${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/api/problem-result-insights/${sessionCode}`,
+        body,
+      );
       setIsLoading(false);
 
       const insights = {
@@ -111,58 +117,62 @@ export default function OutputPage() {
           populationSizeParam: populationSizeParam,
           generationParam: generationParam,
           maxTimeParam: maxTimeParam,
-        }
-      }
+        },
+      };
       setAppData({ ...appData, insights });
-      closeWebSocketConnection()
-      navigate('/insights') // navigate to insights page
+      closeWebSocketConnection();
+      navigate("/insights"); // navigate to insights page
     } catch (err) {
       setIsLoading(false);
-      displayPopup("Something went wrong!", "Get insights failed!, please contact the admin!", true)
+      displayPopup(
+        "Something went wrong!",
+        "Get insights failed!, please contact the admin!",
+        true,
+      );
     }
-
-  }
+  };
 
   const connectWebSocket = async () => {
-    let Sock = new SockJS(`http://${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/ws`);
+    let Sock = new SockJS(
+      `http://${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/ws`,
+    );
     stompClient = over(Sock);
     await stompClient.connect({}, onConnected, onError);
-  }
+  };
   const onConnected = () => {
-    stompClient.subscribe('/session/' + sessionCode + '/progress', onPrivateMessage);
-    console.log('Connected to websocket server!');
-  }
+    stompClient.subscribe(
+      "/session/" + sessionCode + "/progress",
+      onPrivateMessage,
+    );
+    console.log("Connected to websocket server!");
+  };
 
   const onError = (err) => {
     console.log(err);
     // displayPopup("Something went wrong!", "Connect to server failed!, please contact the admin!", true)
-  }
+  };
 
   const closeWebSocketConnection = () => {
     if (stompClient) {
       stompClient.disconnect();
     }
-  }
+  };
 
   const onPrivateMessage = (payload) => {
     let payloadData = JSON.parse(payload.body);
 
-
     // some return data are to show the progress, some are not
     // if the data is to show the progress, then it will have the estimated time and percentage
     if (payloadData.inProgress) {
-      setLoadingEstimatedTime(payloadData.minuteLeft)
-      setLoadingPercentage(payloadData.percentage)
-    } 
+      setLoadingEstimatedTime(payloadData.minuteLeft);
+      setLoadingPercentage(payloadData.percentage);
+    }
 
-    setLoadingMessage(payloadData.message)
-
-  }
-
-
+    setLoadingMessage(payloadData.message);
+  };
 
   return (
-    <div className='output-page'>
+    <div className="output-page">
       <Popup
         isShow={isShowPopup}
         setIsShow={setIsShowPopup}
@@ -173,13 +183,15 @@ export default function OutputPage() {
       />
 
       {/* <Loading isLoading={isLoading} message={`Get more detailed insights. This can take estimated ${data.estimatedWaitingTime || 1} minute(s)...`} /> */}
-      <Loading isLoading={isLoading}
+      <Loading
+        isLoading={isLoading}
         percentage={loadingPercentage}
         estimatedTime={loadingEstimatedTime}
-        message={loadingMessage} />
+        message={loadingMessage}
+      />
       <h1 className="problem-name">{appData.problem.name}</h1>
       <br />
-      <p className='below-headertext'>Optimal solution</p>
+      <p className="below-headertext">Optimal solution</p>
       <div className="output-container">
         <div className="row">
           <div className="btn" onClick={handleExportToExcel}>
@@ -203,10 +215,12 @@ export default function OutputPage() {
             <img src={GraphImage} alt="" />
           </div>
         </div>
-
       </div>
       <br />
-      <p className='below-headertext'> Fitness value: {appData.result.data.fitnessValue}</p>
+      <p className="below-headertext">
+        {" "}
+        Fitness value: {appData.result.data.fitnessValue}
+      </p>
       <br />
 
       <div className="table-container">
@@ -222,5 +236,5 @@ export default function OutputPage() {
         ))}
       </div>
     </div>
-  )
+  );
 }
