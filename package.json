@@ -39,7 +39,8 @@
     "eject": "react-scripts eject",
     "_comment": "For maven to shutdown developement server",
     "stop": "npx cross-port-killer 3000",
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "lint-fix": "npx prettier --write ."
   },
   "browserslist": {
     "production": [

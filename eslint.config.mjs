@@ -17,6 +17,7 @@ export default [
   pluginJs.configs.recommended,
   pluginReact.configs.flat.recommended,
   {
+    // RULE COPIED FROM https://github.com/google/eslint-config-google/blob/main/index.js
     rules: {
       "prettier/prettier": ["error"],
       "no-console": "warn",
