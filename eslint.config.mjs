@@ -272,7 +272,7 @@ export default [
       // 'no-whitespace-before-property': 'off',
       // 'nonblock-statement-body-position': 'off',
       // 'object-curly-newline': 'off',
-      "object-curly-spacing": "error",
+      // "object-curly-spacing": "error",
       // 'object-property-newline': 'off',
       "one-var": [
         "error",
