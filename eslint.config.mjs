@@ -19,7 +19,7 @@ export default [
   {
     // RULE COPIED FROM https://github.com/google/eslint-config-google/blob/main/index.js
     rules: {
-      "prettier/prettier": ["error"],
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
       "no-console": "warn",
       "no-unused-vars": "error",
       // The rules below are listed in the order they appear on the eslint
