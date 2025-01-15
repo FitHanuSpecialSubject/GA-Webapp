@@ -235,7 +235,7 @@ export default [
           code: 120,
           tabWidth: 2,
           ignoreUrls: true,
-          ignorePattern: "goog\.(module|require)",
+          ignorePattern: "goog.(module|require)",
         },
       ],
       // 'max-lines': 'off',
