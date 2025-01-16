@@ -345,27 +345,28 @@ export async function exportInsights(
   computerSpecs,
   params,
 ) {
-  const workbook = XLSX.utils.book_new();
+  const workbook = new ExcelJS.Workbook();
 
   const algorithms = Object.keys(fitnessValues);
 
-  const sheet1 = XLSX.utils.aoa_to_sheet([["Iteration", ...algorithms]]);
+  const sheet1 = workbook.addWorksheet("Sheet 1");
+  sheet1.addRow(["Iteration", ...algorithms]);
 
   const totalRun = fitnessValues[algorithms[0]].length;
   for (let i = 0; i < totalRun; i++) {
     const values = Object.values(fitnessValues).map((values) => values[i]);
     const row = [i + 1, ...values];
-
-    XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
+    sheet1.addRow(row);
   }
 
   // write runtime values to the second sheet
-  const sheet2 = XLSX.utils.aoa_to_sheet([["Iteration", ...algorithms]]);
+  const sheet2 = workbook.addWorksheet("Sheet 2");
+  sheet2.addRow(["Iteration", ...algorithms]);
   for (let i = 0; i < totalRun; i++) {
     const values = Object.values(runtimes).map((value) => value[i]);
     const row = [i + 1, ...values];
 
-    XLSX.utils.sheet_add_aoa(sheet2, [row], { origin: -1 });
+    sheet2.addRow(row);
   }
 
   // write parameter configurations to the third sheet
@@ -373,7 +374,8 @@ export async function exportInsights(
     params.distributedCoreParam === "all"
       ? "All available cores"
       : params.distributedCoreParam + " cores";
-  const sheet3 = XLSX.utils.aoa_to_sheet([
+  const sheet3 = workbook.addWorksheet("Sheet 3");
+  sheet3.addRows([
     ["Number of distributed cores", numberOfCores],
     ["Population size", params.populationSizeParam],
     ["Number of crossover generation", params.generationParam],
@@ -381,7 +383,8 @@ export async function exportInsights(
   ]);
 
   // write computer specifications to the fourth sheet
-  const sheet4 = XLSX.utils.aoa_to_sheet([
+  const sheet4 = workbook.addWorksheet("Sheet 4");
+  sheet4.addRows([
     ["Operating System Family", computerSpecs?.osFamily || "unknown"],
     [
       "Operating System Manufacturer",
@@ -394,14 +397,8 @@ export async function exportInsights(
     ["Total Memory", computerSpecs?.totalMemory || "unknown"],
   ]);
 
-  // add sheets to the workbook
-  XLSX.utils.book_append_sheet(workbook, sheet1, "Fitness Values");
-  XLSX.utils.book_append_sheet(workbook, sheet2, "Runtimes");
-  XLSX.utils.book_append_sheet(workbook, sheet3, "Parameter Configurations");
-  XLSX.utils.book_append_sheet(workbook, sheet4, "Computer Specifications");
-
   // save the workbook
-  const wbout = await XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const wbout = await workbook.xlsx.writeBuffer();
   return new Blob([wbout], { type: "application/octet-stream" });
 }
 
