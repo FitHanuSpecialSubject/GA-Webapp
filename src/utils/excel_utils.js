@@ -458,10 +458,10 @@ export const getPropertyValue = (sheet, row, column) => {
 
 export const getPropertyWeight = (sheet, row, column) => {
   validateAddress(row, column);
-  let fieldAddress = XLSX.utils.encode_cell({ c: column, r: row });
+  const fieldAddress = colCache.encode(row, column);
   try {
-    let value = Number(sheet[fieldAddress].v);
-    if (!value.isNaN) {
+    const value = Number(sheet.getCell(fieldAddress).value);
+    if (!Number.isNaN(value)) {
       if (value < 0 || value > 10) {
         throw new RangeError(`Invalid value for property Weight: ${value},
           field address: ${fieldAddress},
