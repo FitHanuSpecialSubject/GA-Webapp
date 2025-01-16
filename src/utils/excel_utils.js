@@ -9,14 +9,14 @@ import colCache from "exceljs/lib/utils/col-cache";
 
 /**
  * Tạo một sheet từ thông tin cấu hình máy tính.
+ * @param {ExcelJS.Workbook} workbook - Workbook cần thêm sheet.
  * @param {Object} appData - Dữ liệu ứng dụng chứa thông tin cấu hình.
- * @returns {Object} - Sheet được tạo.
+ * @returns {void}
  */
-export const createSystemInfoSheet = (appData) => {
-  // Kiểm tra nếu appData hoặc computerSpecs không tồn tại
+export const createSystemInfoSheet = (workbook, appData) => {
   const computerSpecs = appData?.result?.data?.computerSpecs || {};
-
-  return XLSX.utils.aoa_to_sheet([
+  const sheet = workbook.addWorksheet("Computer Specifications");
+  sheet.addRows([
     ["Operating System Family", computerSpecs.osFamily || "unknown"],
     [
       "Operating System Manufacturer",
