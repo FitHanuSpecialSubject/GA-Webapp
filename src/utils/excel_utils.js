@@ -403,15 +403,14 @@ export async function exportInsights(
 }
 
 /**
- * get cell value as String
- *
- * @param sheet
- * @param address
- * @returns {string} empty String if error
+ * Get cell value as String
+ * @param {ExcelJS.Worksheet} sheet
+ * @param {string} address
+ * @returns {string} - Empty String if error
  */
 const getCellValueStr = (sheet, address) => {
   try {
-    return sheet[address]?.v?.toString() || "";
+    return sheet.getCell(address)?.value?.toString() || "";
   } catch (error) {
     console.error(
       "Error parsing string cell value, address: " +
@@ -424,18 +423,17 @@ const getCellValueStr = (sheet, address) => {
 };
 
 /**
- * get cell value as Number
- *
- * @param sheet
- * @param address
- * @returns
+ * Get cell value as Number
+ * @param {ExcelJS.Worksheet} sheet
+ * @param {string} address
+ * @returns {number}
  *
  * @throws error if error
  */
 export const getCellValueNum = (sheet, address) => {
-  let val = Number(sheet[address]?.v);
+  const val = Number(sheet.getCell(address)?.value);
   if (Number.isNaN(val)) {
-    throw TypeError("Invalid number format, cell address: " + address);
+    throw new TypeError("Invalid number format, cell address: " + address);
   }
   return val;
 };
