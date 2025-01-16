@@ -157,7 +157,7 @@ export default [
       // 'no-restricted-globals': 'off',
       // 'no-shadow': 'off',
       // 'no-shadow-restricted-names': 'off',
-      // 'no-undef': 'error', // eslint:recommended
+      "no-undef": "warn", // eslint:recommended
       // 'no-undef-init': 'off',
       // 'no-undefined': 'off',
       "no-unused-vars": ["error", { args: "none" }], // eslint:recommended
