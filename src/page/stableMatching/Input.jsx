@@ -18,7 +18,7 @@ import {
 } from "../../utils/excel_utils";
 
 export default function InputPage() {
-  //initialize from data
+  // initialize from data
   const [excelFile, setExcelFile] = useState(null);
   const [problemName, setProblemName] = useState("");
   const [setNum, setSetNum] = useState(undefined);
@@ -33,8 +33,6 @@ export default function InputPage() {
   const [characteristicsNumError, setCharacteristicsNumError] = useState("");
   const [totalIndividualsNumError, setTotalIndividualsNumError] = useState("");
   const [fitnessFunctionError, setFitnessFunctionError] = useState("");
-
-  const [setCharacteristics, setSetCharacteristics] = useState("");
   const { setAppData, setGuideSectionIndex } = useContext(DataContext);
   const { displayPopup } = useContext(PopupContext);
   const [colNums, setColNums] = useState(0);
@@ -215,7 +213,7 @@ export default function InputPage() {
       setTotalIndividualsNumError("");
     }
 
-    //fitness
+    // fitness
     if (!fitnessFunction || !validFunctionPattern.test(fitnessFunction)) {
       setFitnessFunctionError("Function value contains an invalid character");
       error = true;
@@ -276,11 +274,11 @@ export default function InputPage() {
           const rowIndividual = [`Individual_${k + 1}`];
           if (setMany[i] === true) {
             rowIndividual.push(null);
-            //Change
+            // Change
             rowIndividual.push(1);
           } else {
             rowIndividual.push(null);
-            //Change
+            // Change
             rowIndividual.push("Fill capacity > 0");
           }
           rowIndividual.push(`Requirements`);
@@ -317,11 +315,11 @@ export default function InputPage() {
           const rowIndividual = [`Individual_${k + 1}`];
           if (setMany[i] === true) {
             rowIndividual.push(null);
-            //Change
+            // Change
             rowIndividual.push(1);
           } else {
             rowIndividual.push(null);
-            //Change
+            // Change
             rowIndividual.push("Fill capacity > 0");
           }
           rowIndividual.push(`Requirements`);
@@ -398,7 +396,7 @@ export default function InputPage() {
       cell.alignment = { vertical: "middle", horizontal: "center" };
     });
 
-    // Add values to the 3th to 13th row
+    // Add values to the 3rd to 13th row
 
     const colA = [
       "Problem name",
@@ -566,13 +564,12 @@ export default function InputPage() {
     setExcelFile(event.target.files[0]);
   };
 
-  //Initialize table of individual per set
+  // Initialize table of individual per set
   const handleColumnsChange = (e) => {
     const value = e.target.value;
     setSetNum(value);
     setColNums(value);
     setSetIndividuals(Array.from({ length: value }, () => ""));
-    setSetCharacteristics(Array.from({ length: value }, () => ""));
     setSetEvaluateFunction(Array.from({ length: value }, () => ""));
     setSetMany(Array.from({ length: value }, () => ""));
   };
@@ -667,7 +664,7 @@ export default function InputPage() {
         <button className="show-guideline-btn" onClick={handleShowGuideline}>
           {showGuideline ? "Hide Guideline" : "Show Guideline"}
         </button>
-        {/*TODO: tách component cho phần này nhé, dài quá*/}
+        {/* TODO: tách component cho phần này nhé, dài quá*/}
         {showGuidelineText && (
           <div className="guideline-text">
             <h5>Step 1: Enter the name of your problem (Text)</h5>
@@ -821,7 +818,7 @@ export default function InputPage() {
           <Link
             to="/guide"
             className="guide-link"
-            onClick={(e) => setGuideSectionIndex(9)}
+            onClick={() => setGuideSectionIndex(9)}
           >
             {" "}
             Learn more on how to input to file Excel
