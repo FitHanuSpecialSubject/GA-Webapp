@@ -60,139 +60,135 @@ export const createParameterConfigSheet = (workbook, appData) => {
  * @returns {Object} - Dữ liệu bài toán
  */
 export const loadProblemDataParallel = async (workbook, sheetNumber) => {
-  try {
-    const sheetName = workbook.SheetNames[sheetNumber];
-    const sheet = workbook.Sheets[sheetName];
-    const problemName = getCellValueStr(sheet, "B1");
-    const setNum = getCellValueNum(sheet, "B2");
-    const totalNumberOfIndividuals = getCellValueNum(sheet, "B3");
-    const characteristicNum = getCellValueNum(sheet, "B4");
-    const fitnessFunction = getCellValueStr(sheet, "B5");
+  const sheetName = workbook.SheetNames[sheetNumber];
+  const sheet = workbook.Sheets[sheetName];
+  const problemName = getCellValueStr(sheet, "B1");
+  const setNum = getCellValueNum(sheet, "B2");
+  const totalNumberOfIndividuals = getCellValueNum(sheet, "B3");
+  const characteristicNum = getCellValueNum(sheet, "B4");
+  const fitnessFunction = getCellValueStr(sheet, "B5");
 
-    let currentRow = 6 + setNum;
-    let characteristics = [];
+  let currentRow = 6 + setNum;
+  let characteristics = [];
 
-    let currentColumnIndex = XLSX.utils.decode_col(
-      MATCHING.CHARACTERISTIC_START_COL,
-    );
+  let currentColumnIndex = XLSX.utils.decode_col(
+    MATCHING.CHARACTERISTIC_START_COL,
+  );
 
-    // Đọc các đặc tính từ bảng
-    for (let i = currentColumnIndex; ; i++) {
-      const cellAddress = XLSX.utils.encode_cell({ c: i, r: currentRow - 1 });
-      const cell = sheet[cellAddress];
-      // Break if cell is empty or undefined
-      if (!cell || !cell.v) {
-        break;
-      }
-      characteristics.push(cell.v);
+  // Đọc các đặc tính từ bảng
+  for (let i = currentColumnIndex; ; i++) {
+    const cellAddress = XLSX.utils.encode_cell({ c: i, r: currentRow - 1 });
+    const cell = sheet[cellAddress];
+    // Break if cell is empty or undefined
+    if (!cell || !cell.v) {
+      break;
     }
-
-    // Đọc các bộ dữ liệu (sets)
-    const individuals = [];
-    let setEvaluateFunction = [];
-    let individualSetIndices = [];
-    let individualNames = [];
-    let individualProperties = [];
-    let individualRequirements = [];
-    let individualWeights = [];
-    let individualCapacities = [];
-
-    let setNames = [];
-    let setTypes = [];
-    let individualNum = null;
-    let setType = null;
-    let setName = null;
-
-    // Load evaluate functions for each set
-    for (let j = 0; j < setNum; j++) {
-      const evaluateFunction = getCellValueStr(sheet, `B${6 + j}`);
-      setEvaluateFunction.push(evaluateFunction);
-    }
-
-    for (let g = 0; g < setNum; g++) {
-      setName = sheet[`A${currentRow}`]?.v || "";
-      setType = sheet[`B${currentRow}`]?.v || "";
-      setNames.push(setName);
-      setTypes.push(setType);
-
-      individualNum = sheet[`D${currentRow}`]?.v || 0;
-
-      for (let i = 0; i < individualNum; i++) {
-        let name = sheet[`A${currentRow + 1}`]?.v;
-        if (
-          Object.is(name, undefined) ||
-          Object.is(name, null) ||
-          Object.is(name, "")
-        ) {
-          name = `no_name_${i + 1}`;
-        }
-
-        // Validate data in good shape
-        let requirementLabel = getCellValueStr(sheet, `D${currentRow + 1}`);
-        if (requirementLabel !== REQUIREMENT_ROW_NAME) {
-          throw new Error(`Error when loading indiviudal ${name},
-            row = ${currentRow}.
-            Expected label at D${currentRow} to be ${REQUIREMENT_ROW_NAME}`);
-        }
-
-        const properties = [];
-        const requirements = [];
-        const weights = [];
-
-        let r;
-        let p;
-        let w;
-
-        let col;
-        for (let k = 0; k < characteristicNum; k++) {
-          col = k + 4;
-          r = getPropertyRequirement(sheet, currentRow, col);
-          w = getPropertyWeight(sheet, currentRow + 1, col);
-          p = getPropertyValue(sheet, currentRow + 2, col);
-          requirements.push(r);
-          weights.push(w);
-          properties.push(p);
-        }
-
-        individualNames.push(name);
-        individualSetIndices.push(g);
-        individualProperties.push(properties);
-        individualRequirements.push(requirements);
-        individualWeights.push(weights);
-
-        // Load capacity
-        const capacityValue = await sheet[`C${currentRow + 1}`]?.v;
-        if (capacityValue !== undefined && capacityValue !== null) {
-          individualCapacities.push(capacityValue);
-        }
-
-        currentRow += 3;
-      }
-
-      currentRow += 1;
-    }
-
-    return {
-      problemName,
-      characteristicNum,
-      setNum,
-      setNames,
-      setTypes,
-      totalNumberOfIndividuals,
-      individualNames,
-      characteristics,
-      individualSetIndices,
-      individualCapacities,
-      individualRequirements,
-      individualProperties,
-      individualWeights,
-      individuals,
-      fitnessFunction,
-      setEvaluateFunction,
-    };
-  } catch (error) {
-    throw error;
+    characteristics.push(cell.v);
   }
+
+  // Đọc các bộ dữ liệu (sets)
+  const individuals = [];
+  const setEvaluateFunction = [];
+  const individualSetIndices = [];
+  const individualNames = [];
+  const individualProperties = [];
+  const individualRequirements = [];
+  const individualWeights = [];
+  const individualCapacities = [];
+
+  const setNames = [];
+  const setTypes = [];
+  let individualNum = null;
+  let setType = null;
+  let setName = null;
+
+  // Load evaluate functions for each set
+  for (let j = 0; j < setNum; j++) {
+    const evaluateFunction = getCellValueStr(sheet, `B${6 + j}`);
+    setEvaluateFunction.push(evaluateFunction);
+  }
+
+  for (let g = 0; g < setNum; g++) {
+    setName = sheet[`A${currentRow}`]?.v || "";
+    setType = sheet[`B${currentRow}`]?.v || "";
+    setNames.push(setName);
+    setTypes.push(setType);
+
+    individualNum = sheet[`D${currentRow}`]?.v || 0;
+
+    for (let i = 0; i < individualNum; i++) {
+      let name = sheet[`A${currentRow + 1}`]?.v;
+      if (
+        Object.is(name, undefined) ||
+        Object.is(name, null) ||
+        Object.is(name, "")
+      ) {
+        name = `no_name_${i + 1}`;
+      }
+
+      // Validate data in good shape
+      const requirementLabel = getCellValueStr(sheet, `D${currentRow + 1}`);
+      if (requirementLabel !== REQUIREMENT_ROW_NAME) {
+        throw new Error(`Error when loading indiviudal ${name},
+          row = ${currentRow}.
+          Expected label at D${currentRow} to be ${REQUIREMENT_ROW_NAME}`);
+      }
+
+      const properties = [];
+      const requirements = [];
+      const weights = [];
+
+      let r;
+      let p;
+      let w;
+
+      let col;
+      for (let k = 0; k < characteristicNum; k++) {
+        col = k + 4;
+        r = getPropertyRequirement(sheet, currentRow, col);
+        w = getPropertyWeight(sheet, currentRow + 1, col);
+        p = getPropertyValue(sheet, currentRow + 2, col);
+        requirements.push(r);
+        weights.push(w);
+        properties.push(p);
+      }
+
+      individualNames.push(name);
+      individualSetIndices.push(g);
+      individualProperties.push(properties);
+      individualRequirements.push(requirements);
+      individualWeights.push(weights);
+
+      // Load capacity
+      const capacityValue = await sheet[`C${currentRow + 1}`]?.v;
+      if (capacityValue !== undefined && capacityValue !== null) {
+        individualCapacities.push(capacityValue);
+      }
+
+      currentRow += 3;
+    }
+
+    currentRow += 1;
+  }
+
+  return {
+    problemName,
+    characteristicNum,
+    setNum,
+    setNames,
+    setTypes,
+    totalNumberOfIndividuals,
+    individualNames,
+    characteristics,
+    individualSetIndices,
+    individualCapacities,
+    individualRequirements,
+    individualProperties,
+    individualWeights,
+    individuals,
+    fitnessFunction,
+    setEvaluateFunction,
+  };
 };
 
 /**
