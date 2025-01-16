@@ -55,13 +55,13 @@ export const createParameterConfigSheet = (workbook, appData) => {
 
 /**
  * Tải dữ liệu bài toán song song từ workbook
- * @param {Object} workbook - Workbook Excel chứa dữ liệu bài toán
+ * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
  * @param {number} sheetNumber - Số thứ tự sheet cần đọc
  * @returns {Object} - Dữ liệu bài toán
  */
 export const loadProblemDataParallel = async (workbook, sheetNumber) => {
-  const sheetName = workbook.SheetNames[sheetNumber];
-  const sheet = workbook.Sheets[sheetName];
+  const sheetName = workbook.worksheets[sheetNumber].name;
+  const sheet = workbook.getWorksheet(sheetName);
   const problemName = getCellValueStr(sheet, "B1");
   const setNum = getCellValueNum(sheet, "B2");
   const totalNumberOfIndividuals = getCellValueNum(sheet, "B3");
@@ -69,21 +69,20 @@ export const loadProblemDataParallel = async (workbook, sheetNumber) => {
   const fitnessFunction = getCellValueStr(sheet, "B5");
 
   let currentRow = 6 + setNum;
-  let characteristics = [];
+  const characteristics = [];
 
-  let currentColumnIndex = XLSX.utils.decode_col(
+  const currentColumnIndex = colCache.decode(
     MATCHING.CHARACTERISTIC_START_COL,
-  );
+  ).col;
 
   // Đọc các đặc tính từ bảng
   for (let i = currentColumnIndex; ; i++) {
-    const cellAddress = XLSX.utils.encode_cell({ c: i, r: currentRow - 1 });
-    const cell = sheet[cellAddress];
+    const cell = sheet.getCell(colCache.encode(currentRow, i));
     // Break if cell is empty or undefined
-    if (!cell || !cell.v) {
+    if (!cell || !cell.value) {
       break;
     }
-    characteristics.push(cell.v);
+    characteristics.push(cell.value);
   }
 
   // Đọc các bộ dữ liệu (sets)
@@ -109,15 +108,15 @@ export const loadProblemDataParallel = async (workbook, sheetNumber) => {
   }
 
   for (let g = 0; g < setNum; g++) {
-    setName = sheet[`A${currentRow}`]?.v || "";
-    setType = sheet[`B${currentRow}`]?.v || "";
+    setName = sheet.getCell(`A${currentRow}`)?.value || "";
+    setType = sheet.getCell(`B${currentRow}`)?.value || "";
     setNames.push(setName);
     setTypes.push(setType);
 
-    individualNum = sheet[`D${currentRow}`]?.v || 0;
+    individualNum = sheet.getCell(`D${currentRow}`)?.value || 0;
 
     for (let i = 0; i < individualNum; i++) {
-      let name = sheet[`A${currentRow + 1}`]?.v;
+      let name = sheet.getCell(`A${currentRow + 1}`)?.value;
       if (
         Object.is(name, undefined) ||
         Object.is(name, null) ||
@@ -145,9 +144,9 @@ export const loadProblemDataParallel = async (workbook, sheetNumber) => {
       let col;
       for (let k = 0; k < characteristicNum; k++) {
         col = k + 4;
-        r = getPropertyRequirement(sheet, currentRow, col);
-        w = getPropertyWeight(sheet, currentRow + 1, col);
-        p = getPropertyValue(sheet, currentRow + 2, col);
+        r = getPropertyRequirement(sheet, currentRow + 1, col);
+        w = getPropertyWeight(sheet, currentRow + 2, col);
+        p = getPropertyValue(sheet, currentRow + 3, col);
         requirements.push(r);
         weights.push(w);
         properties.push(p);
@@ -160,7 +159,7 @@ export const loadProblemDataParallel = async (workbook, sheetNumber) => {
       individualWeights.push(weights);
 
       // Load capacity
-      const capacityValue = await sheet[`C${currentRow + 1}`]?.v;
+      const capacityValue = sheet.getCell(`C${currentRow + 1}`)?.value;
       if (capacityValue !== undefined && capacityValue !== null) {
         individualCapacities.push(capacityValue);
       }
