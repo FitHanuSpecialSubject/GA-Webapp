@@ -19,9 +19,8 @@ export default [
   {
     // RULE COPIED FROM https://github.com/google/eslint-config-google/blob/main/index.js
     rules: {
-      "prettier/prettier": ["error"],
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
       "no-console": "warn",
-      "no-unused-vars": "error",
       // The rules below are listed in the order they appear on the eslint
       // rules page. All rules are listed to make it easier to keep in sync
       // as new ESLint rules are added.
@@ -236,7 +235,7 @@ export default [
           code: 120,
           tabWidth: 2,
           ignoreUrls: true,
-          ignorePattern: "goog\.(module|require)",
+          ignorePattern: "goog.(module|require)",
         },
       ],
       // 'max-lines': 'off',
@@ -272,7 +271,7 @@ export default [
       // 'no-whitespace-before-property': 'off',
       // 'nonblock-statement-body-position': 'off',
       // 'object-curly-newline': 'off',
-      "object-curly-spacing": "error",
+      // "object-curly-spacing": "error",
       // 'object-property-newline': 'off',
       "one-var": [
         "error",
@@ -287,8 +286,8 @@ export default [
       "operator-linebreak": ["error", "after"],
       "padded-blocks": ["error", "never"],
       // 'padding-line-between-statements': 'off',
-      "quote-props": ["error", "consistent"],
-      quotes: ["error", "single", { allowTemplateLiterals: true }],
+      "quote-props": [0, "off"],
+      quotes: ["error", "double", { allowTemplateLiterals: true }],
       semi: "error",
       "semi-spacing": "error",
       // 'semi-style': 'off',
