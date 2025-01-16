@@ -51,7 +51,7 @@ export const MATCHING_PROBLEM_TYPES = Object.freeze({
   MMS: new MatchingProblemType(
     5,
     "Multiple Sets",
-    //TODO: Replace with actual endpoints when implemented
+    // TODO: Replace with actual endpoints when implemented
     "/api/stable-matching-solver",
     "/api/matching-problem-result-insights",
   ),
