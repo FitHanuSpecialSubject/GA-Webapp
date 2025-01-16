@@ -143,7 +143,7 @@ export const loadProblemDataParallel = async (workbook, sheetNumber) => {
 
       let col;
       for (let k = 0; k < characteristicNum; k++) {
-        col = k + 4;
+        col = k + 5;
         r = getPropertyRequirement(sheet, currentRow + 1, col);
         w = getPropertyWeight(sheet, currentRow + 2, col);
         p = getPropertyValue(sheet, currentRow + 3, col);
@@ -197,7 +197,7 @@ export const loadProblemDataParallel = async (workbook, sheetNumber) => {
  * @returns {Object} -  Exclude Pairs
  */
 export const loadExcludePairs = async (workbook, sheetNumber) => {
-  const sheetName = workbook.worksheets[sheetNumber].name;
+  const sheetName = workbook.getWorksheet(sheetNumber).name;
   const result = {};
   if (sheetName !== "Exclude Pairs") return result;
   const sheet = workbook.getWorksheet(sheetName);

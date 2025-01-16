@@ -219,15 +219,14 @@ export default function InputPage() {
     const players = [];
     let errorMessage = null;
     try {
-      const sheetName = workbook.worksheets[sheetNumber].name;
-      const normalPlayerWorkSheet = workbook.getWorksheet(sheetName);
+      const normalPlayerWorkSheet = workbook.getWorksheet("Normal player");
       let currentPlayer = 0;
 
       // LOAD PLAYERS
       while (players.length < normalPlayerNum) {
         const playerNameCell = normalPlayerWorkSheet.getCell(`A${currentRow}`);
         const playerName = playerNameCell
-          ? playerNameCell.v
+          ? playerNameCell.value
           : `Player ${currentPlayer + 1}`; // because the player name is optional
         const strategyNumber = normalPlayerWorkSheet.getCell(
           `B${currentRow}`,
@@ -239,31 +238,31 @@ export default function InputPage() {
           throw new Error();
         }
         const payoffFunction = normalPlayerWorkSheet.getCell(`C${currentRow}`)
-          ? await normalPlayerWorkSheet.getCell(`C${currentRow}`).value
+          ? normalPlayerWorkSheet.getCell(`C${currentRow}`).value
           : null;
 
         const strategies = [];
 
         // LOAD STRATEGIES
-        for (let i = 1; i <= strategyNumber; i++) {
+        for (let i = 0; i < strategyNumber; i++) {
           // currentRow + i because the current row is the player name and the strategy number
           const strategyNameCell = normalPlayerWorkSheet.getCell(
-            `A${currentRow + i}`,
+            `A${currentRow + i + 1}`,
           );
 
           const strategyName = strategyNameCell
             ? strategyNameCell.value
-            : `Strategy ${i}`; // because the strategy name is optional
+            : `Strategy ${i + 1}`; // because the strategy name is optional
           const properties = [];
           // LOAD PROPERTIES
-          for (let j = 1; j <= normalPlayerPropsNum; j++) {
+          for (let j = 0; j < normalPlayerPropsNum; j++) {
             // c (0-based): j starts from 1 because the first column is the strategy name
             // r (0-based): currentRow + i - 1 because currentRow + i is the row of the startegy, and minus 1 because the row in this method is 0-based (remove this -1 if you want to see the error)
             const propertyCell = normalPlayerWorkSheet.getCell(
-              currentRow + i - 1,
-              j,
+              currentRow + i + 1,
+              j + 2,
             );
-            if (propertyCell) {
+            if (propertyCell.value) {
               properties.push(propertyCell.value);
             }
           }
@@ -316,12 +315,11 @@ export default function InputPage() {
       const sheetName = workbook.worksheets[sheetNumber].name;
       const conflictSetWorkSheet = workbook.getWorksheet(sheetName);
       const conflictSet = [];
-      let row = 0;
-      let col = 0;
+      let row = 1;
+      let col = 1;
       let currentCell = conflictSetWorkSheet.getCell(row, col);
-
       // loop until there is a cell contains data
-      while (currentCell) {
+      while (currentCell.value) {
         const string = currentCell.value;
         const conflict = string
           .replace(/[( )]/g, "")
