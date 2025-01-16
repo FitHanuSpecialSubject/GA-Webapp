@@ -1,11 +1,17 @@
 import pluginJs from "@eslint/js";
 import pluginReact from "eslint-plugin-react";
 import prettierPlugin from "eslint-plugin-prettier";
+import globals from "globals";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   {
     files: ["**/*.{js,mjs,cjs,jsx}"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
     plugins: {
       prettier: prettierPlugin,
     },
