@@ -4,6 +4,8 @@ import {
   STABLE_MATCHING_REQ_REGEX,
   REQUIREMENT_ROW_NAME,
 } from "../const/excel_const";
+import ExcelJS from "exceljs";
+import colCache from "exceljs/lib/utils/col-cache";
 
 /**
  * Tạo một sheet từ thông tin cấu hình máy tính.
