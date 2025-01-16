@@ -32,16 +32,17 @@ export const createSystemInfoSheet = (workbook, appData) => {
 
 /**
  * Tạo một sheet từ các thông số cấu hình.
+ * @param {ExcelJS.Workbook} workbook - Workbook cần thêm sheet.
  * @param {Object} appData - Dữ liệu ứng dụng chứa thông số cấu hình.
- * @returns {Object} - Sheet 2 chứa các thông số.
+ * @returns {void}
  */
-export const createParameterConfigSheet = (appData) => {
+export const createParameterConfigSheet = (workbook, appData) => {
   const numberOfCores =
     appData.result.params.distributedCoreParam === "all"
       ? "All available cores"
       : appData.result.params.distributedCoreParam + " cores";
-
-  return XLSX.utils.aoa_to_sheet([
+  const sheet = workbook.addWorksheet("Parameter Configurations");
+  sheet.addRows([
     ["Number of distributed cores", numberOfCores],
     ["Population size", appData.result.params.populationSizeParam],
     ["Number of crossover generation", appData.result.params.generationParam],
