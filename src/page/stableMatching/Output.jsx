@@ -304,12 +304,10 @@ export default function MatchingOutputPage() {
         isShow={isShowPopup}
         setIsShow={setIsShowPopup}
         title={"Get detailed insights"}
-        // message={`This process can take estimated ${data.estimatedWaitingTime || 1} minute(s) and you will be redirected to another page. Do you want to continue?`}
         message={`This process can take a while do you to continue?`}
         okCallback={handlePopupOk}
       />
 
-      {/* <Loading isLoading={isLoading} message={`Get more detailed insights. This can take estimated ${data.estimatedWaitingTime || 1} minute(s)...`} /> */}
       <Loading
         isLoading={isLoading}
         percentage={loadingPercentage}

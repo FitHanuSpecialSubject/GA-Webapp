@@ -219,7 +219,9 @@ export const loadExcludePairs = async (workbook, sheetNumber) => {
  * @deprecated
  * @param workbook
  * @param sheetNumber
- * @returns {Promise<{totalNumberOfIndividuals: *, characteristics: *[], setNum: *, fitnessFunction: *, problemName: *, individuals: *[], characteristicNum: *, setEvaluateFunction: *[]}>}
+ * @returns {Promise<{totalNumberOfIndividuals: *,
+ * characteristics: *[], setNum: *, fitnessFunction: *,
+ * problemName: *, individuals: *[], characteristicNum: *, setEvaluateFunction: *[]}>}
  */
 export const loadProblemDataOld = async (workbook, sheetNumber) => {
   const sheetName = workbook.SheetNames[sheetNumber];
@@ -300,6 +302,7 @@ export const loadProblemDataOld = async (workbook, sheetNumber) => {
           const argumentCell =
             sheet[XLSX.utils.encode_cell({ c: k + 4, r: currentRow + l })];
           if (argumentCell === undefined) {
+            // eslint-disable-next-line max-len
             errorMessage = `Error when loading Individual_${i + 1}, row = ${currentRow}, column = ${k + 1}. Characteristic_ of strategy are invalid`;
             throw new Error(errorMessage);
           }

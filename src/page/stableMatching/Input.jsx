@@ -1,3 +1,4 @@
+/* eslint max-len: 0 */
 import React, { useContext, useEffect, useState } from "react";
 import Input from "../../module/core/component/input";
 import ExcelImage from "../../module/core/asset/image/excel.png";
@@ -142,7 +143,7 @@ export default function InputPage() {
     const maxCharacteristics = 15; // Số lượng đặc điểm tối đa
     const maxTotalIndividuals = 100; // Số lượng cá nhân tối đa
 
-    const validFunctionPattern = /^[a-zA-Z0-9\s\+\-\*\/\^\(\)]+$/;
+    const validFunctionPattern = /^[a-zA-Z0-9s+\-*/^()]+$/;
     // check if the problem name is empty
     if (!problemName) {
       setProblemNameError("Problem name must not be empty");
@@ -439,7 +440,6 @@ export default function InputPage() {
         row.height = 45; // Set the desired height
       }
     });
-
     const colB = [
       "Tên problem được lấy từ dữ liệu người dùng nhập trên trang input",
       "Số lượng các set tham gia được lấy từ dữ liệu người dùng nhập trên trang input",
@@ -694,16 +694,12 @@ export default function InputPage() {
 
                 <ul>
                   <li>
-                    Set many: Capacity = 1
-                    <br />
-                    The number of individuals in the set {">"} the opponent's
-                    set
+                    {`Set many: Capacity = 1
+                      The number of individuals in the set {">"} the opponent's set`}
                   </li>
                   <li>
-                    Set one: Capacity {">"} 1
-                    <br />
-                    The number of individuals in the set {"<"} the opponent's
-                    set
+                    {`Set one: Capacity > 1
+                      The number of individuals in the set {"<"} the opponent's set`}
                   </li>
                 </ul>
 
@@ -711,11 +707,11 @@ export default function InputPage() {
                   Fill in the information in the blank box:
                   <ul>
                     <li>
-                      "Num individuals of Set_x" - the number of individuals of
-                      the corresponding set
+                      <b>Num individuals of Set_x</b>- the number of individuals
+                      of the corresponding set
                     </li>
                     <li>
-                      "Evaluate Function Set_x" - the evaluation function
+                      <b>Evaluate Function Set_x</b> - the evaluation function
                       corresponding to that set
                     </li>
                   </ul>
@@ -727,13 +723,13 @@ export default function InputPage() {
             <h5>Step 4: Enter the number of total individuals of both sets</h5>
             <h5>Step 5: Enter the fitness function which you initialize</h5>
             <h5>
-              Step 6: Click the button "Get Excel Templates" to receive the
+              Step 6: Click the button <b>Get Excel Templates</b> to receive the
               Excel file that contains all the information you entered above
             </h5>
             <h5>
               Step 7: Select or drag and drop the Excel file you just received
-              at the dotted line and the "Choose a file" button for the system
-              to process your problem
+              at the dotted line and the <b>Choose a file</b> button for the
+              system to process your problem
             </h5>
           </div>
         )}

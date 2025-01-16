@@ -170,8 +170,7 @@ export default function InputPage() {
         playerPayoffFunction,
         isMaximizing,
       };
-    } catch (error) {
-      console.error(error);
+    } catch (err_) {
       setIsLoading(false);
       displayPopup(
         "Something went wrong!",
@@ -234,7 +233,12 @@ export default function InputPage() {
         // console.log(`name address: A${currentRow}, name value: ${playerName} , strat number: B${currentRow}`);
 
         if (!strategyNumber || typeof strategyNumber !== "number") {
-          errorMessage = `Error when loading player#${currentPlayer + 1}, row = ${currentRow} . Number of strategies is invalid`;
+          errorMessage =
+            "Error when loading player#" +
+            (currentPlayer + 1) +
+            " row = " +
+            currentRow +
+            " . Number of strategies is invalid";
           throw new Error();
         }
         const payoffFunction = normalPlayerWorkSheet.getCell(`C${currentRow}`)
@@ -256,8 +260,8 @@ export default function InputPage() {
           const properties = [];
           // LOAD PROPERTIES
           for (let j = 0; j < normalPlayerPropsNum; j++) {
-            // c (0-based): j starts from 1 because the first column is the strategy name
-            // r (0-based): currentRow + i - 1 because currentRow + i is the row of the startegy, and minus 1 because the row in this method is 0-based (remove this -1 if you want to see the error)
+            // c (1-based)
+            // r (1-based)
             const propertyCell = normalPlayerWorkSheet.getCell(
               currentRow + i + 1,
               j + 2,
@@ -269,7 +273,12 @@ export default function InputPage() {
 
           // CHECK IF THE STRATEGY HAS PROPERTIES
           if (!properties.length) {
-            errorMessage = `Error when loading player#${currentPlayer + 1}, row = ${currentRow + i}. Properties of strategy are invalid`;
+            errorMessage =
+              "Error when loading player#" +
+              (currentPlayer + 1) +
+              " row = " +
+              (currentRow + i) +
+              ". Properties of strategy are invalid";
             throw new Error();
           }
 
@@ -286,7 +295,8 @@ export default function InputPage() {
         });
 
         if (!allStrategiesHaveSameNumOfProps) {
-          errorMessage = `Error when loading the player#${players.length + 1}. All strategies of a player must have the same number of properties!`;
+          errorMessage = `Error when loading the player#${players.length + 1}.
+          All strategies of a player must have the same number of properties!`;
           throw new Error();
         }
 
@@ -550,7 +560,8 @@ export default function InputPage() {
               error={normalPlayerNumError}
               handleOnChange={(e) => setNormalPlayerNum(e.target.value)}
               value={normalPlayerNum}
-              description="A positive number that reflects the number of players involved to ensure that the resulting Nash equilibrium is valid"
+              description="A positive number that reflects the number of players involved
+              to ensure that the resulting Nash equilibrium is valid"
               guideSectionIndex={4}
             />
             <Input
@@ -559,7 +570,8 @@ export default function InputPage() {
               error={normalPlayerPropsNumError}
               handleOnChange={(e) => setNormalPlayerPropsNum(e.target.value)}
               value={normalPlayerPropsNum}
-              description="A property is a characteristic or attribute that a player has that affects their actions or outcomes in the game"
+              description="A property is a characteristic or attribute that a player
+              has that affects their actions or outcomes in the game"
               guideSectionIndex={5}
             />
           </div>
@@ -571,7 +583,9 @@ export default function InputPage() {
               error={fitnessFunctionError}
               handleOnChange={(e) => setFitnessFunction(e.target.value)}
               value={fitnessFunction}
-              description="The fitness function is a mathematical function that represents the payoff that a player receives for a specific combination of strategies played by all the players in the game"
+              description="The fitness function is a mathematical function that
+                represents the payoff that a player receives for a specific
+                combination of strategies played by all the players in the game"
               guideSectionIndex={6}
             />
           </div>
@@ -583,7 +597,9 @@ export default function InputPage() {
               error={playerPayoffFunctionError}
               handleOnChange={(e) => setPlayerPayoffFunction(e.target.value)}
               value={playerPayoffFunction}
-              description="The player payoff function is a mathematical function that determines the outcome of the game by assigning a payoff value to each player based on the strategies chosen by all the players in the game"
+              description="The player payoff function is a mathematical function that determines
+              the outcome of the game by assigning a payoff value to each player based on the
+              strategies chosen by all the players in the game"
               guideSectionIndex={7}
             />
           </div>
