@@ -26,7 +26,7 @@ export default [
     // RULE COPIED FROM https://github.com/google/eslint-config-google/blob/main/index.js
     rules: {
       "prettier/prettier": ["error", { endOfLine: "auto" }],
-      "no-console": "off",
+      "no-console": "warn",
       // The rules below are listed in the order they appear on the eslint
       // rules page. All rules are listed to make it easier to keep in sync
       // as new ESLint rules are added.
@@ -36,7 +36,6 @@ export default [
       //   they don't override a base ruleset).
       // - Rules that are recommended but contradict the Google styleguide
       //   are explicitly set to the Google styleguide value.
-      "react/no-unescaped-entities": "off",
       // Possible Errors
       // http://eslint.org/docs/rules/#possible-errors
       // ---------------------------------------------
@@ -137,7 +136,7 @@ export default [
       // 'no-unused-labels': 'error', // eslint:recommended
       // 'no-useless-call': 'off',
       // 'no-useless-concat': 'off',
-      "no-useless-escape": "off",
+      "no-useless-escape": "error",
       // 'no-void': 'off',
       // 'no-warning-comments': 'off',
       "no-with": "error",
@@ -218,7 +217,7 @@ export default [
       "max-len": [
         "error",
         {
-          code: 300,
+          code: 120,
           tabWidth: 2,
           ignoreUrls: true,
           ignorePattern: "goog.(module|require)",
