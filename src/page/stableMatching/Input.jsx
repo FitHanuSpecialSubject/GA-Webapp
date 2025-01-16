@@ -70,6 +70,7 @@ export default function InputPage() {
   // Function to read data from the Excel file
   const readExcelFile = async (file) => {
     const reader = new FileReader();
+    setIsLoading(true);
     try {
       reader.readAsArrayBuffer(file);
       reader.onload = async () => {
