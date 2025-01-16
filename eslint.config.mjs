@@ -263,7 +263,7 @@ export default [
       ],
       // 'one-var-declaration-per-line': 'off',
       // 'operator-assignment': 'off',
-      "operator-linebreak": ["error", "before"],
+      "operator-linebreak": "off",
       "padded-blocks": ["error", "never"],
       // 'padding-line-between-statements': 'off',
       "quote-props": [0, "off"],
