@@ -15,8 +15,10 @@ import { Link } from "react-router-dom";
 import Loading from "../../module/core/component/Loading";
 import MaxMinCheckbox from "../../module/core/component/MaxMinCheckbox";
 import PopupContext from "../../module/core/context/PopupContext";
+import { validateExcelFile } from "../../utils/file_utils";
+import ExcelJS from "exceljs";
 export default function InputPage() {
-  //initialize form data
+  // initialize form data
   const [excelFile, setExcelFile] = useState(null);
 
   const [problemName, setProblemName] = useState("");
@@ -29,7 +31,6 @@ export default function InputPage() {
   const [isMaximizing, setIsMaximizing] = useState(false);
 
   const [problemNameError, setProblemNameError] = useState("");
-  const [specialPlayerExistsError, setSpecialPlayerExistsError] = useState("");
   const [specialPlayerPropsNumError, setSpecialPlayerPropsNumError] =
     useState("");
   const [normalPlayerNumError, setNormalPlayerNumError] = useState("");
@@ -46,34 +47,37 @@ export default function InputPage() {
   const { displayPopup } = useContext(PopupContext);
 
   const navigate = useNavigate();
-  //check if the uploaded file is an excel file
+  // check if the uploaded file is an excel file
   useEffect(() => {
     if (excelFile) {
-      const extension = excelFile.name.split(".").pop();
-
-      if (extension === "xlsx") {
-        setExcelFileError("");
-        const data = readExcelFile(excelFile);
-      } else {
-        displayPopup(
-          "Something went wrong!",
-          "The file was not an Excel file!",
-          true,
-        );
-        setExcelFileError("The file was not an Excel file!");
+      try {
+        if (validateExcelFile(excelFile)) {
+          readExcelFile(excelFile);
+        } else {
+          displayPopup(
+            "Something went wrong!",
+            "The file was not an Excel file!",
+            true,
+          );
+          setExcelFileError("The file was not an Excel file!");
+        }
+      } catch (error) {
+        console.error(error);
+        displayPopup("Error", error.message, true);
       }
     }
   }, [excelFile]);
 
-  //read file
+  // read file
   const readExcelFile = async (file) => {
     const reader = new FileReader();
     setIsLoading(true);
 
     try {
-      reader.onload = async (e) => {
-        const excelData = e.target.result;
-        const workbook = XLSX.read(excelData, { type: "binary" });
+      reader.readAsArrayBuffer(file);
+      reader.onload = async () => {
+        const data = reader.result;
+        const workbook = await new ExcelJS.Workbook().xlsx.load(data);
 
         const problemInfo = await loadProblemInfo(workbook, 0);
 
@@ -131,8 +135,8 @@ export default function InputPage() {
         setIsLoading(false);
         navigate("/input-processing");
       };
-      reader.readAsBinaryString(file);
     } catch (error) {
+      console.error(error);
       setIsLoading(false);
       displayPopup(
         "Something went wrong!",
@@ -188,7 +192,7 @@ export default function InputPage() {
 
       // LOAD PROPERTIES AND WEIGHTS
       for (let i = 1; i <= specialPlayerPropsNum; i++) {
-        //[`A${i + 1}`] and  [`B${i + 1}`] because the first row is the header
+        // [`A${i + 1}`] and  [`B${i + 1}`] because the first row is the header
         properties.push(await specialPlayerWorkSheet[`A${i + 1}`].v);
         weights.push(await specialPlayerWorkSheet[`B${i + 1}`].v);
       }
@@ -276,7 +280,7 @@ export default function InputPage() {
         }
 
         // CHECK IF ALL STRATEGIES HAVE THE SAME NUMBER OF PROPERTIES
-        let allStrategiesHaveSameNumOfProps = strategies.every((strategy) => {
+        const allStrategiesHaveSameNumOfProps = strategies.every((strategy) => {
           const firstStrategy = strategies[0];
           return (strategy.properties.length = firstStrategy.properties.length);
         });
@@ -348,6 +352,7 @@ export default function InputPage() {
 
       return conflictSet;
     } catch (error) {
+      console.error(error);
       setIsLoading(false);
       displayPopup(
         "Something went wrong!",
@@ -427,10 +432,10 @@ export default function InputPage() {
     return true;
   };
 
-  //tao file excel dua tren input
+  // tao file excel dua tren input
   const downloadExcel = () => {
     const workbook = XLSX.utils.book_new();
-    let payoffFunction = playerPayoffFunction;
+    const payoffFunction = playerPayoffFunction;
 
     // write problem information to sheet1
     const sheet1 = XLSX.utils.aoa_to_sheet([
@@ -617,7 +622,7 @@ export default function InputPage() {
           <Link
             to="/guide"
             className="guide-link"
-            onClick={(e) => setGuideSectionIndex(9)}
+            onClick={() => setGuideSectionIndex(9)}
           >
             {" "}
             Learn more on how to input to file Excel
