@@ -30,7 +30,7 @@ export default [
       //   they don't override a base ruleset).
       // - Rules that are recommended but contradict the Google styleguide
       //   are explicitly set to the Google styleguide value.
-
+      "react/no-unescaped-entities": "off",
       // Possible Errors
       // http://eslint.org/docs/rules/#possible-errors
       // ---------------------------------------------
@@ -131,7 +131,7 @@ export default [
       // 'no-unused-labels': 'error', // eslint:recommended
       // 'no-useless-call': 'off',
       // 'no-useless-concat': 'off',
-      // 'no-useless-escape': 'off',
+      "no-useless-escape": "off",
       // 'no-void': 'off',
       // 'no-warning-comments': 'off',
       "no-with": "error",
