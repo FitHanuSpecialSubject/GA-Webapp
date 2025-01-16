@@ -234,7 +234,7 @@ export const loadProblemDataOld = async (workbook, sheetNumber) => {
 
   let currentRow = 6 + Number(setNum);
   // let currentIndividual = 0;
-  let characteristics = [];
+  const characteristics = [];
   let errorMessage = "";
 
   // LOAD CHARACTERISTICS
@@ -254,7 +254,7 @@ export const loadProblemDataOld = async (workbook, sheetNumber) => {
 
   // LOAD SET
   const individuals = [];
-  let setEvaluateFunction = [];
+  const setEvaluateFunction = [];
   // const row = characteristicNum;
   // const col = 3;
   let individualNum = null;
@@ -267,7 +267,7 @@ export const loadProblemDataOld = async (workbook, sheetNumber) => {
   // Add evaluate function
   for (let j = 0; j < setNum; j++) {
     // let evaluateFunction = await sheet[`B${6 + j}`]['v'];
-    let evaluateFunction = getCellValueStr(sheet, `B${6 + j}`);
+    const evaluateFunction = getCellValueStr(sheet, `B${6 + j}`);
     setEvaluateFunction.push(evaluateFunction);
   }
 
@@ -293,7 +293,7 @@ export const loadProblemDataOld = async (workbook, sheetNumber) => {
       individualName = sheet[`A${currentRow + 1}`]?.v || "";
       capacity = sheet[`C${currentRow + 1}`]?.v || 0;
 
-      let argument = [];
+      const argument = [];
       for (let k = 0; k < characteristicNum; k++) {
         argument[k] = [];
         for (let l = 0; l < 3; l++) {
