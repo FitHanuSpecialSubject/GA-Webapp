@@ -26,7 +26,6 @@ export default function InputPage() {
   const [totalIndividualsNum, setTotalIndividualsNum] = useState(undefined);
   const [fitnessFunction, setFitnessFunction] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
   const [excelFileError, setExcelFileError] = useState("");
   const [problemNameError, setProblemNameError] = useState("");
   const [setNumError, setSetNumError] = useState("");
@@ -73,9 +72,10 @@ export default function InputPage() {
   const readExcelFile = async (file) => {
     const reader = new FileReader();
     try {
-      reader.onload = async (e) => {
-        const data = e.target.result;
-        const workbook = XLSX.read(data, { type: "binary" });
+      reader.readAsArrayBuffer(file);
+      reader.onload = async () => {
+        const data = reader.result;
+        const workbook = await new ExcelJS.Workbook().xlsx.load(data);
 
         let problemInfo;
         let excludePairs;
@@ -118,7 +118,6 @@ export default function InputPage() {
         });
         navigate("/matching-theory/input-processing");
       };
-      reader.readAsBinaryString(file);
     } catch (error) {
       console.error(error);
       setExcelFile(null);
