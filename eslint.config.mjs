@@ -201,27 +201,7 @@ export default [
       // 'id-blacklist': 'off',
       // 'id-length': 'off',
       // 'id-match': 'off',
-      indent: [
-        "error",
-        2,
-        {
-          CallExpression: {
-            arguments: 2,
-          },
-          FunctionDeclaration: {
-            body: 1,
-            parameters: 2,
-          },
-          FunctionExpression: {
-            body: 1,
-            parameters: 2,
-          },
-          MemberExpression: 2,
-          ObjectExpression: 1,
-          SwitchCase: 1,
-          ignoredNodes: ["ConditionalExpression"],
-        },
-      ],
+      indent: "off",
       // 'jsx-quotes': 'off',
       "key-spacing": "error",
       "keyword-spacing": "error",
