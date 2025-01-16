@@ -186,16 +186,16 @@ export default function InputPage() {
 
   const loadSpecialPlayer = async (workbook, sheetNumber) => {
     try {
-      const sheetName = await workbook.SheetNames[sheetNumber];
-      const specialPlayerWorkSheet = await workbook.Sheets[sheetName];
+      const sheetName = workbook.worksheets[sheetNumber].name;
+      const specialPlayerWorkSheet = workbook.getWorksheet(sheetName);
       const properties = [];
       const weights = [];
 
       // LOAD PROPERTIES AND WEIGHTS
       for (let i = 1; i <= specialPlayerPropsNum; i++) {
         // [`A${i + 1}`] and  [`B${i + 1}`] because the first row is the header
-        properties.push(await specialPlayerWorkSheet[`A${i + 1}`].v);
-        weights.push(await specialPlayerWorkSheet[`B${i + 1}`].v);
+        properties.push(specialPlayerWorkSheet.getCell(`A${i + 1}`).value);
+        weights.push(specialPlayerWorkSheet.getCell(`B${i + 1}`).value);
       }
       return {
         properties,
