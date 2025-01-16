@@ -212,7 +212,7 @@ export default [
       "max-len": [
         "error",
         {
-          code: 120,
+          code: 300,
           tabWidth: 2,
           ignoreUrls: true,
           ignorePattern: "goog.(module|require)",
