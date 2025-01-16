@@ -481,10 +481,10 @@ export const getPropertyWeight = (sheet, row, column) => {
 
 export const getPropertyRequirement = (sheet, row, column) => {
   validateAddress(row, column);
-  let fieldAddress = XLSX.utils.encode_cell({ c: column, r: row });
+  const fieldAddress = colCache.encode(row, column);
   try {
-    let value = sheet[fieldAddress].v;
-    if (!Number(value).isNaN) {
+    const { value } = sheet.getCell(fieldAddress);
+    if (!Number.isNaN(value)) {
       return value;
     } else if (typeof value === "string") {
       if (STABLE_MATCHING_REQ_REGEX.test(value)) {
