@@ -148,19 +148,20 @@ export default function InputPage() {
 
   const loadProblemInfo = async (workbook, sheetNumber) => {
     try {
-      const sheetName = await workbook.SheetNames[sheetNumber];
-      const problemInfoWorksheet = await workbook.Sheets[sheetName];
+      const sheetName = workbook.worksheets[sheetNumber].name;
+      const problemInfoWorksheet = workbook.getWorksheet(sheetName);
 
-      const problemName = await problemInfoWorksheet["B1"].v;
-      const specialPlayerExists = await problemInfoWorksheet["B2"].v;
-      const specialPlayerPropsNum = await problemInfoWorksheet["B3"].v;
-      const normalPlayerNum = await problemInfoWorksheet["B4"].v;
-      const normalPlayerPropsNum = await problemInfoWorksheet["B5"].v;
-      const fitnessFunction = await problemInfoWorksheet["B6"].v;
-      const playerPayoffFunction = await problemInfoWorksheet["B7"].v;
+      const problemName = problemInfoWorksheet.getCell("B1").value;
+      const specialPlayerExists = problemInfoWorksheet.getCell("B2").value;
+      const specialPlayerPropsNum = problemInfoWorksheet.getCell("B3").value;
+      const normalPlayerNum = problemInfoWorksheet.getCell("B4").value;
+      const normalPlayerPropsNum = problemInfoWorksheet.getCell("B5").value;
+      const fitnessFunction = problemInfoWorksheet.getCell("B6").value;
+      const playerPayoffFunction = problemInfoWorksheet.getCell("B7").value;
       const isMaximizing =
-        (await problemInfoWorksheet["B8"]?.v) &&
-        problemInfoWorksheet["B8"].v.toString().toLowerCase() == "true";
+        (await problemInfoWorksheet.getCell("B8")?.value) &&
+        problemInfoWorksheet.getCell("B8")?.value.toString().toLowerCase() ===
+          "true";
 
       return {
         problemName,
