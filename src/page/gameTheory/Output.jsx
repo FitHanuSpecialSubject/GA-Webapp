@@ -8,7 +8,6 @@ import DataContext from "../../module/core/context/DataContext";
 import { useNavigate } from "react-router-dom";
 import NothingToShow from "../../module/core/component/NothingToShow";
 import Loading from "../../module/core/component/Loading";
-import * as XLSX from "@e965/xlsx";
 import { saveAs } from "file-saver";
 import Popup from "../../module/core/component/Popup";
 import axios from "axios";
@@ -17,13 +16,12 @@ import PopupContext from "../../module/core/context/PopupContext";
 import {
   createSystemInfoSheet,
   createParameterConfigSheet,
-  loadProblemDataOld,
-  loadProblemDataParallel,
 } from "../../utils/excel_utils.js";
 
 import SockJS from "sockjs-client";
 import { v4 } from "uuid";
 import { over } from "stompjs";
+import ExcelJS from "exceljs";
 
 let stompClient = null;
 export default function OutputPage() {
@@ -48,9 +46,10 @@ export default function OutputPage() {
   }
 
   const handleExportToExcel = async () => {
-    const workbook = XLSX.utils.book_new();
+    const workbook = new ExcelJS.Workbook();
     // write result data to sheet 1
-    const sheet1 = XLSX.utils.aoa_to_sheet([
+    const sheet1 = workbook.addWorksheet("Optiomal solution");
+    sheet1.addRows([
       ["Fitness value", appData.result.data.fitnessValue],
       ["Used algorithm", appData.result.params.usedAlgorithm],
       ["Runtime (in seconds)", appData.result.data.runtime],
@@ -60,27 +59,17 @@ export default function OutputPage() {
     // append players data to sheet 1
     appData.result.data.players.forEach((player) => {
       const row = [player.playerName, player.strategyName, player.payoff];
-      XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
+      sheet1.addRow(row);
     });
 
     // write parameter configurations to sheet 2
-    const sheet2 = createParameterConfigSheet(appData);
-
+    createParameterConfigSheet(workbook, appData);
     // write computer specs to sheet 3
-    const sheet3 = createSystemInfoSheet(appData);
-
-    // append sheets to workbook
-    XLSX.utils.book_append_sheet(workbook, sheet1, "Optiomal solution");
-    XLSX.utils.book_append_sheet(workbook, sheet2, "Parameter Configurations");
-    XLSX.utils.book_append_sheet(workbook, sheet3, "Computer Specifications");
-
+    createSystemInfoSheet(workbook, appData);
     // write workbook to file
-    const wbout = await XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
+    const wbout = await workbook.xlsx.writeBuffer();
     const blob = new Blob([wbout], { type: "application/octet-stream" });
-    saveAs(blob, "result.xlsx");
+    saveAs(blob, appData.problem.name + "_Result.xlsx");
   };
 
   const handleGetMoreInsights = () => {
@@ -123,6 +112,7 @@ export default function OutputPage() {
       closeWebSocketConnection();
       navigate("/insights"); // navigate to insights page
     } catch (err) {
+      console.error(err);
       setIsLoading(false);
       displayPopup(
         "Something went wrong!",
@@ -133,7 +123,7 @@ export default function OutputPage() {
   };
 
   const connectWebSocket = async () => {
-    let Sock = new SockJS(
+    const Sock = new SockJS(
       `http://${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/ws`,
     );
     stompClient = over(Sock);
@@ -159,7 +149,7 @@ export default function OutputPage() {
   };
 
   const onPrivateMessage = (payload) => {
-    let payloadData = JSON.parse(payload.body);
+    const payloadData = JSON.parse(payload.body);
 
     // some return data are to show the progress, some are not
     // if the data is to show the progress, then it will have the estimated time and percentage
