@@ -1,11 +1,17 @@
 import pluginJs from "@eslint/js";
 import pluginReact from "eslint-plugin-react";
 import prettierPlugin from "eslint-plugin-prettier";
+import globals from "globals";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   {
     files: ["**/*.{js,mjs,cjs,jsx}"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
     plugins: {
       prettier: prettierPlugin,
     },
@@ -30,7 +36,6 @@ export default [
       //   they don't override a base ruleset).
       // - Rules that are recommended but contradict the Google styleguide
       //   are explicitly set to the Google styleguide value.
-
       // Possible Errors
       // http://eslint.org/docs/rules/#possible-errors
       // ---------------------------------------------
@@ -131,7 +136,7 @@ export default [
       // 'no-unused-labels': 'error', // eslint:recommended
       // 'no-useless-call': 'off',
       // 'no-useless-concat': 'off',
-      // 'no-useless-escape': 'off',
+      "no-useless-escape": "error",
       // 'no-void': 'off',
       // 'no-warning-comments': 'off',
       "no-with": "error",
@@ -157,10 +162,10 @@ export default [
       // 'no-restricted-globals': 'off',
       // 'no-shadow': 'off',
       // 'no-shadow-restricted-names': 'off',
-      // 'no-undef': 'error', // eslint:recommended
+      "no-undef": "warn", // eslint:recommended
       // 'no-undef-init': 'off',
       // 'no-undefined': 'off',
-      "no-unused-vars": ["error", { args: "none" }], // eslint:recommended
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }], // eslint:recommended
       // 'no-use-before-define': 'off',
 
       // Node.js and CommonJS
@@ -201,27 +206,7 @@ export default [
       // 'id-blacklist': 'off',
       // 'id-length': 'off',
       // 'id-match': 'off',
-      indent: [
-        "error",
-        2,
-        {
-          CallExpression: {
-            arguments: 2,
-          },
-          FunctionDeclaration: {
-            body: 1,
-            parameters: 2,
-          },
-          FunctionExpression: {
-            body: 1,
-            parameters: 2,
-          },
-          MemberExpression: 2,
-          ObjectExpression: 1,
-          SwitchCase: 1,
-          ignoredNodes: ["ConditionalExpression"],
-        },
-      ],
+      indent: "off",
       // 'jsx-quotes': 'off',
       "key-spacing": "error",
       "keyword-spacing": "error",
@@ -283,7 +268,7 @@ export default [
       ],
       // 'one-var-declaration-per-line': 'off',
       // 'operator-assignment': 'off',
-      "operator-linebreak": ["error", "after"],
+      "operator-linebreak": "off",
       "padded-blocks": ["error", "never"],
       // 'padding-line-between-statements': 'off',
       "quote-props": [0, "off"],
