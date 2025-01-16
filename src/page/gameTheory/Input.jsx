@@ -8,10 +8,8 @@ import { saveAs } from "file-saver";
 import * as XLSX from "@e965/xlsx";
 import { useContext } from "react";
 import DataContext from "../../module/core/context/DataContext";
-
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-
 import Loading from "../../module/core/component/Loading";
 import MaxMinCheckbox from "../../module/core/component/MaxMinCheckbox";
 import PopupContext from "../../module/core/context/PopupContext";
@@ -222,25 +220,27 @@ export default function InputPage() {
     const players = [];
     let errorMessage = null;
     try {
-      const sheetName = await workbook.SheetNames[sheetNumber];
-      const normalPlayerWorkSheet = await workbook.Sheets[sheetName];
+      const sheetName = workbook.worksheets[sheetNumber].name;
+      const normalPlayerWorkSheet = workbook.getWorksheet(sheetName);
       let currentPlayer = 0;
 
       // LOAD PLAYERS
       while (players.length < normalPlayerNum) {
-        const playerNameCell = normalPlayerWorkSheet[`A${currentRow}`];
+        const playerNameCell = normalPlayerWorkSheet.getCell(`A${currentRow}`);
         const playerName = playerNameCell
           ? playerNameCell.v
           : `Player ${currentPlayer + 1}`; // because the player name is optional
-        const strategyNumber = await normalPlayerWorkSheet[`B${currentRow}`].v;
+        const strategyNumber = normalPlayerWorkSheet.getCell(
+          `B${currentRow}`,
+        ).value;
         // console.log(`name address: A${currentRow}, name value: ${playerName} , strat number: B${currentRow}`);
 
         if (!strategyNumber || typeof strategyNumber !== "number") {
           errorMessage = `Error when loading player#${currentPlayer + 1}, row = ${currentRow} . Number of strategies is invalid`;
           throw new Error();
         }
-        const payoffFunction = (await normalPlayerWorkSheet[`C${currentRow}`])
-          ? await normalPlayerWorkSheet[`C${currentRow}`].v
+        const payoffFunction = normalPlayerWorkSheet.getCell(`C${currentRow}`)
+          ? await normalPlayerWorkSheet.getCell(`C${currentRow}`).value
           : null;
 
         const strategies = [];
@@ -248,23 +248,24 @@ export default function InputPage() {
         // LOAD STRATEGIES
         for (let i = 1; i <= strategyNumber; i++) {
           // currentRow + i because the current row is the player name and the strategy number
-          const strategyNameCell =
-            await normalPlayerWorkSheet[`A${currentRow + i}`];
+          const strategyNameCell = normalPlayerWorkSheet.getCell(
+            `A${currentRow + i}`,
+          );
 
           const strategyName = strategyNameCell
-            ? strategyNameCell.v
+            ? strategyNameCell.value
             : `Strategy ${i}`; // because the strategy name is optional
           const properties = [];
           // LOAD PROPERTIES
           for (let j = 1; j <= normalPlayerPropsNum; j++) {
             // c (0-based): j starts from 1 because the first column is the strategy name
             // r (0-based): currentRow + i - 1 because currentRow + i is the row of the startegy, and minus 1 because the row in this method is 0-based (remove this -1 if you want to see the error)
-            const propertyCell =
-              await normalPlayerWorkSheet[
-                XLSX.utils.encode_cell({ c: j, r: currentRow + i - 1 })
-              ];
+            const propertyCell = normalPlayerWorkSheet.getCell(
+              currentRow + i - 1,
+              j,
+            );
             if (propertyCell) {
-              properties.push(propertyCell.v);
+              properties.push(propertyCell.value);
             }
           }
 
@@ -287,7 +288,6 @@ export default function InputPage() {
         });
 
         if (!allStrategiesHaveSameNumOfProps) {
-          console.log("asdsad");
           errorMessage = `Error when loading the player#${players.length + 1}. All strategies of a player must have the same number of properties!`;
           throw new Error();
         }
@@ -314,17 +314,16 @@ export default function InputPage() {
 
   const loadConflictSet = async (workbook, sheetNumber) => {
     try {
-      const sheetName = workbook.SheetNames[sheetNumber];
-      const conflictSetWorkSheet = workbook.Sheets[sheetName];
+      const sheetName = workbook.worksheets[sheetNumber].name;
+      const conflictSetWorkSheet = workbook.getWorksheet(sheetName);
       const conflictSet = [];
       let row = 0;
       let col = 0;
-      let currentCell =
-        await conflictSetWorkSheet[XLSX.utils.encode_cell({ c: col, r: row })];
+      let currentCell = conflictSetWorkSheet.getCell(row, col);
 
       // loop until there is a cell contains data
       while (currentCell) {
-        const string = currentCell.v;
+        const string = currentCell.value;
         const conflict = string
           .replace(/[( )]/g, "")
           .split(",")
@@ -337,17 +336,13 @@ export default function InputPage() {
         });
 
         col++; // move to the right cell
-        currentCell =
-          await conflictSetWorkSheet[
-            XLSX.utils.encode_cell({ c: col, r: row })
-          ];
+        currentCell = conflictSetWorkSheet.getCell(row, col);
 
         // after moving to the right cell, if the cell is empty, move to the next row
         if (!currentCell) {
           row++;
           col = 0;
-          currentCell =
-            conflictSetWorkSheet[XLSX.utils.encode_cell({ c: col, r: row })];
+          currentCell = conflictSetWorkSheet.getCell(row, col);
         }
       }
 
@@ -427,19 +422,17 @@ export default function InputPage() {
     }
 
     // if there is no error, return true
-    if (error) {
-      return false;
-    }
-    return true;
+    return !error;
   };
 
   // tao file excel dua tren input
-  const downloadExcel = () => {
-    const workbook = XLSX.utils.book_new();
+  const downloadExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
     const payoffFunction = playerPayoffFunction;
 
     // write problem information to sheet1
-    const sheet1 = XLSX.utils.aoa_to_sheet([
+    const sheet1 = workbook.addWorksheet("Sheet 1");
+    sheet1.addRows([
       ["Problem name", problemName],
       ["Special Player exists (0 - No, 1 -Yes) ", specialPlayerExists ? 1 : 0],
       ["Number of properties of special player", Number(specialPlayerPropsNum)],
@@ -457,19 +450,17 @@ export default function InputPage() {
       isMaximizingRow = ["Is maximzing problem", "True"];
     }
     // add isMaximizingRow to the end of sheet1
-    XLSX.utils.sheet_add_aoa(sheet1, [isMaximizingRow], { origin: -1 });
+    sheet1.addRow(isMaximizingRow);
 
     // if user choose to add special player, add sheet2
     if (specialPlayerExists) {
-      const sheet2 = XLSX.utils.aoa_to_sheet([["Properties", "Weights"]]);
-      XLSX.utils.book_append_sheet(workbook, sheet2, "Special player");
+      const sheet2 = workbook.addWorksheet("Special player");
+      sheet2.addRow(["Properties", "Weights"]);
     }
 
     // Write the sheet3 with sample data
-    const sheet3 = XLSX.utils.aoa_to_sheet([
-      ["Player 1's Name", "2 (Number of strategies)"],
-    ]);
-    XLSX.utils.book_append_sheet(workbook, sheet3, "Normal player");
+    const sheet3 = workbook.addWorksheet("Normal player");
+    sheet3.addRow(["Player 1's Name", "2 (Number of strategies)"]);
 
     // add some  example data for sheet3 (base on the number of normal players user input)
     const row2 = ["Strategy 1's name"];
@@ -481,7 +472,7 @@ export default function InputPage() {
     }
 
     // add the row2 and row3 to the end of sheet3
-    XLSX.utils.sheet_add_aoa(sheet3, [row2, row3], { origin: -1 });
+    sheet3.addRows([row2, row3]);
     // if the number of normal players is greater than 1, add one more player sample data
     if (Number(normalPlayerNum)) {
       const row4 = ["Player 2's Name", "3 (Number of strategies)"];
@@ -496,17 +487,14 @@ export default function InputPage() {
         row7.push(`Property ${i + 1}`);
       }
       // add the row4, row5, row6, row7 to the end of sheet3
-      XLSX.utils.sheet_add_aoa(sheet3, [row4, row5, row6, row7], {
-        origin: -1,
-      });
+      sheet3.addRows([row4, row5, row6, row7]);
     }
 
     // Write the sheet4(blank sheet) for user to input conflict matrix
-    const sheet4 = XLSX.utils.aoa_to_sheet([]);
-    XLSX.utils.book_append_sheet(workbook, sheet4, "Conflict matrix");
+    workbook.addWorksheet("Conflict matrix");
 
-    const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([wbout], { type: "application/octet-stream" });
+    const wbout = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([wbout]);
     saveAs(blob, "input.xlsx");
   };
 
