@@ -160,7 +160,7 @@ export default [
       "no-undef": "warn", // eslint:recommended
       // 'no-undef-init': 'off',
       // 'no-undefined': 'off',
-      "no-unused-vars": ["error", { args: "none" }], // eslint:recommended
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }], // eslint:recommended
       // 'no-use-before-define': 'off',
 
       // Node.js and CommonJS
