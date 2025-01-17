@@ -1,3 +1,4 @@
+import React from "react";
 import InputPageMatchingTheory from "../page/stableMatching/Input";
 import { Route } from "react-router-dom";
 import InputProcessingPageMatchingTheory from "../page/stableMatching/Processing";
