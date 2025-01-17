@@ -1,3 +1,4 @@
+import React from "react";
 import Navbar from "../module/core/component/Navbar";
 import InputPage from "../page/gameTheory/Input";
 import "../module/core/css/index.scss";
@@ -26,12 +27,6 @@ function App() {
       setPopupError(error);
     }
   };
-  if (appData === null && guideSectionIndex === 0) {
-    console.log("Backend URL:");
-    console.log(
-      `${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}`,
-    );
-  }
   const StableMatchingRouter = stableMatchingRouter();
   const GameTheoryRouter = gameTheoryRouter();
   return (
