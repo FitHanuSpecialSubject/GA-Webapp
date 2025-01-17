@@ -14,6 +14,7 @@ import MaxMinCheckbox from "../../module/core/component/MaxMinCheckbox";
 import PopupContext from "../../module/core/context/PopupContext";
 import { validateExcelFile } from "../../utils/file_utils";
 import ExcelJS from "exceljs";
+import { loadSpecialPlayer } from "../../utils/excel_utils";
 export default function InputPage() {
   // initialize form data
   const [excelFile, setExcelFile] = useState(null);
@@ -87,7 +88,21 @@ export default function InputPage() {
         let conflictSet = null;
 
         if (problemInfo.specialPlayerExists) {
-          specialPlayers = await loadSpecialPlayer(workbook, 1); // sheet 1 is the special player sheet
+          try {
+            specialPlayers = await loadSpecialPlayer(
+              workbook,
+              1,
+              specialPlayerPropsNum,
+            ); // sheet 1 is the special player sheet
+          } catch (e) {
+            console.error(e);
+            setIsLoading(false);
+            displayPopup(
+              "Something went wrong!",
+              "Error when loading the Special Player sheet",
+              true,
+            );
+          }
           if (!specialPlayers) return; // stop processing in case of error
 
           players = await loadNormalPlayers(
@@ -176,34 +191,6 @@ export default function InputPage() {
       displayPopup(
         "Something went wrong!",
         "Error when loading the Problem Information sheet",
-        true,
-      );
-    }
-  };
-
-  const loadSpecialPlayer = async (workbook, sheetNumber) => {
-    try {
-      const sheetName = workbook.worksheets[sheetNumber].name;
-      const specialPlayerWorkSheet = workbook.getWorksheet(sheetName);
-      const properties = [];
-      const weights = [];
-
-      // LOAD PROPERTIES AND WEIGHTS
-      for (let i = 1; i <= specialPlayerPropsNum; i++) {
-        // [`A${i + 1}`] and  [`B${i + 1}`] because the first row is the header
-        properties.push(specialPlayerWorkSheet.getCell(`A${i + 1}`).value);
-        weights.push(specialPlayerWorkSheet.getCell(`B${i + 1}`).value);
-      }
-      return {
-        properties,
-        weights,
-      };
-    } catch (error) {
-      console.error(error);
-      setIsLoading(false);
-      displayPopup(
-        "Something went wrong!",
-        "Error when loading the Special Player sheet",
         true,
       );
     }

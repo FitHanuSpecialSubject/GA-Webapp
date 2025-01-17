@@ -194,6 +194,35 @@ export const loadProblemDataParallel = async (workbook, sheetNumber) => {
  * Tải dữ liệu Exclude Pairs từ workbook
  * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
  * @param {number} sheetNumber - Số thứ tự sheet cần đọc
+ * @param {number} specialPlayerPropsNum
+ * @returns {Object} -  Exclude Pairs
+ */
+export const loadSpecialPlayer = async (
+  workbook,
+  sheetNumber,
+  specialPlayerPropsNum,
+) => {
+  const sheetName = workbook.worksheets[sheetNumber].name;
+  const specialPlayerWorkSheet = workbook.getWorksheet(sheetName);
+  const properties = [];
+  const weights = [];
+
+  // LOAD PROPERTIES AND WEIGHTS
+  for (let i = 1; i <= specialPlayerPropsNum; i++) {
+    // [`A${i + 1}`] and  [`B${i + 1}`] because the first row is the header
+    properties.push(specialPlayerWorkSheet.getCell(`A${i + 1}`).value);
+    weights.push(specialPlayerWorkSheet.getCell(`B${i + 1}`).value);
+  }
+  return {
+    properties,
+    weights,
+  };
+};
+
+/**
+ * Tải dữ liệu Exclude Pairs từ workbook
+ * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
+ * @param {number} sheetNumber - Số thứ tự sheet cần đọc
  * @returns {Object} -  Exclude Pairs
  */
 export const loadExcludePairs = async (workbook, sheetNumber) => {
