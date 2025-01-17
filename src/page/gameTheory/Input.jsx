@@ -170,7 +170,8 @@ export default function InputPage() {
         playerPayoffFunction,
         isMaximizing,
       };
-    } catch (err_) {
+    } catch (e) {
+      console.error(e);
       setIsLoading(false);
       displayPopup(
         "Something went wrong!",
