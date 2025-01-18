@@ -1,4 +1,3 @@
-import process from "process";
 import { isStringNullOrEmpty } from "./string_utils";
 
 export function getBackendAddress() {
