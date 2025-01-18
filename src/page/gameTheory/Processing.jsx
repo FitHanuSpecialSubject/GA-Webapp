@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "../../module/gameTheory/css/processing.scss";
 import { useNavigate } from "react-router-dom";
 
-import { useContext, useState, useEffect } from "react";
 import Player from "../../module/gameTheory/component/Player";
 import axios from "axios";
 import DataContext from "../../module/core/context/DataContext";
@@ -24,9 +23,10 @@ export default function InputProcessingPage() {
   const { displayPopup } = useContext(PopupContext);
 
   useEffect(() => {
-    if (!appData || !appData.problem) return;
-    document.title = appData.problem.name;
-  });
+    if (appData?.problem) {
+      document.title = appData.problem.name;
+    }
+  }, [appData]);
   const handleChange = (event) => {
     setAlgorithm(event.target.value);
   };
@@ -73,7 +73,7 @@ export default function InputProcessingPage() {
       setIsLoading(false);
       navigate("/result");
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setIsLoading(false);
       displayPopup(
         "Running failed",

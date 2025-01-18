@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "../../module/stableMatching/css/processing.scss";
 import { useNavigate } from "react-router-dom";
-import { useContext, useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
 import DataContext from "../../module/core/context/DataContext";
 import NothingToShow from "../../module/core/component/NothingToShow";
