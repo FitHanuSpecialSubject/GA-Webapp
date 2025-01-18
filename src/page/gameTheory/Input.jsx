@@ -5,18 +5,18 @@ import SpecialPlayerInput from "../../module/gameTheory/component/specialPlayerI
 import Input from "../../module/core/component/input";
 import ExcelImage from "../../module/core/asset/image/excel.png";
 import { saveAs } from "file-saver";
-import * as XLSX from "@e965/xlsx";
 import { useContext } from "react";
 import DataContext from "../../module/core/context/DataContext";
-
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-
 import Loading from "../../module/core/component/Loading";
 import MaxMinCheckbox from "../../module/core/component/MaxMinCheckbox";
 import PopupContext from "../../module/core/context/PopupContext";
+import { validateExcelFile } from "../../utils/file_utils";
+import ExcelJS from "exceljs";
+import { loadSpecialPlayer } from "../../utils/excel_utils";
 export default function InputPage() {
-  //initialize form data
+  // initialize form data
   const [excelFile, setExcelFile] = useState(null);
 
   const [problemName, setProblemName] = useState("");
@@ -29,7 +29,6 @@ export default function InputPage() {
   const [isMaximizing, setIsMaximizing] = useState(false);
 
   const [problemNameError, setProblemNameError] = useState("");
-  const [specialPlayerExistsError, setSpecialPlayerExistsError] = useState("");
   const [specialPlayerPropsNumError, setSpecialPlayerPropsNumError] =
     useState("");
   const [normalPlayerNumError, setNormalPlayerNumError] = useState("");
@@ -46,34 +45,37 @@ export default function InputPage() {
   const { displayPopup } = useContext(PopupContext);
 
   const navigate = useNavigate();
-  //check if the uploaded file is an excel file
+  // check if the uploaded file is an excel file
   useEffect(() => {
     if (excelFile) {
-      const extension = excelFile.name.split(".").pop();
-
-      if (extension === "xlsx") {
-        setExcelFileError("");
-        const data = readExcelFile(excelFile);
-      } else {
-        displayPopup(
-          "Something went wrong!",
-          "The file was not an Excel file!",
-          true,
-        );
-        setExcelFileError("The file was not an Excel file!");
+      try {
+        if (validateExcelFile(excelFile)) {
+          readExcelFile(excelFile);
+        } else {
+          displayPopup(
+            "Something went wrong!",
+            "The file was not an Excel file!",
+            true,
+          );
+          setExcelFileError("The file was not an Excel file!");
+        }
+      } catch (error) {
+        console.error(error);
+        displayPopup("Error", error.message, true);
       }
     }
   }, [excelFile]);
 
-  //read file
+  // read file
   const readExcelFile = async (file) => {
     const reader = new FileReader();
     setIsLoading(true);
 
     try {
-      reader.onload = async (e) => {
-        const excelData = e.target.result;
-        const workbook = XLSX.read(excelData, { type: "binary" });
+      reader.readAsArrayBuffer(file);
+      reader.onload = async () => {
+        const data = reader.result;
+        const workbook = await new ExcelJS.Workbook().xlsx.load(data);
 
         const problemInfo = await loadProblemInfo(workbook, 0);
 
@@ -86,7 +88,21 @@ export default function InputPage() {
         let conflictSet = null;
 
         if (problemInfo.specialPlayerExists) {
-          specialPlayers = await loadSpecialPlayer(workbook, 1); // sheet 1 is the special player sheet
+          try {
+            specialPlayers = await loadSpecialPlayer(
+              workbook,
+              1,
+              specialPlayerPropsNum,
+            ); // sheet 1 is the special player sheet
+          } catch (e) {
+            console.error(e);
+            setIsLoading(false);
+            displayPopup(
+              "Something went wrong!",
+              "Error when loading the Special Player sheet",
+              true,
+            );
+          }
           if (!specialPlayers) return; // stop processing in case of error
 
           players = await loadNormalPlayers(
@@ -131,8 +147,8 @@ export default function InputPage() {
         setIsLoading(false);
         navigate("/input-processing");
       };
-      reader.readAsBinaryString(file);
     } catch (error) {
+      console.error(error);
       setIsLoading(false);
       displayPopup(
         "Something went wrong!",
@@ -144,19 +160,20 @@ export default function InputPage() {
 
   const loadProblemInfo = async (workbook, sheetNumber) => {
     try {
-      const sheetName = await workbook.SheetNames[sheetNumber];
-      const problemInfoWorksheet = await workbook.Sheets[sheetName];
+      const sheetName = workbook.worksheets[sheetNumber].name;
+      const problemInfoWorksheet = workbook.getWorksheet(sheetName);
 
-      const problemName = await problemInfoWorksheet["B1"].v;
-      const specialPlayerExists = await problemInfoWorksheet["B2"].v;
-      const specialPlayerPropsNum = await problemInfoWorksheet["B3"].v;
-      const normalPlayerNum = await problemInfoWorksheet["B4"].v;
-      const normalPlayerPropsNum = await problemInfoWorksheet["B5"].v;
-      const fitnessFunction = await problemInfoWorksheet["B6"].v;
-      const playerPayoffFunction = await problemInfoWorksheet["B7"].v;
+      const problemName = problemInfoWorksheet.getCell("B1").value;
+      const specialPlayerExists = problemInfoWorksheet.getCell("B2").value;
+      const specialPlayerPropsNum = problemInfoWorksheet.getCell("B3").value;
+      const normalPlayerNum = problemInfoWorksheet.getCell("B4").value;
+      const normalPlayerPropsNum = problemInfoWorksheet.getCell("B5").value;
+      const fitnessFunction = problemInfoWorksheet.getCell("B6").value;
+      const playerPayoffFunction = problemInfoWorksheet.getCell("B7").value;
       const isMaximizing =
-        (await problemInfoWorksheet["B8"]?.v) &&
-        problemInfoWorksheet["B8"].v.toString().toLowerCase() == "true";
+        (await problemInfoWorksheet.getCell("B8")?.value) &&
+        problemInfoWorksheet.getCell("B8")?.value.toString().toLowerCase() ===
+          "true";
 
       return {
         problemName,
@@ -168,40 +185,12 @@ export default function InputPage() {
         playerPayoffFunction,
         isMaximizing,
       };
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error(e);
       setIsLoading(false);
       displayPopup(
         "Something went wrong!",
         "Error when loading the Problem Information sheet",
-        true,
-      );
-    }
-  };
-
-  const loadSpecialPlayer = async (workbook, sheetNumber) => {
-    try {
-      const sheetName = await workbook.SheetNames[sheetNumber];
-      const specialPlayerWorkSheet = await workbook.Sheets[sheetName];
-      const properties = [];
-      const weights = [];
-
-      // LOAD PROPERTIES AND WEIGHTS
-      for (let i = 1; i <= specialPlayerPropsNum; i++) {
-        //[`A${i + 1}`] and  [`B${i + 1}`] because the first row is the header
-        properties.push(await specialPlayerWorkSheet[`A${i + 1}`].v);
-        weights.push(await specialPlayerWorkSheet[`B${i + 1}`].v);
-      }
-      return {
-        properties,
-        weights,
-      };
-    } catch (error) {
-      console.error(error);
-      setIsLoading(false);
-      displayPopup(
-        "Something went wrong!",
-        "Error when loading the Special Player sheet",
         true,
       );
     }
@@ -217,55 +206,67 @@ export default function InputPage() {
     const players = [];
     let errorMessage = null;
     try {
-      const sheetName = await workbook.SheetNames[sheetNumber];
-      const normalPlayerWorkSheet = await workbook.Sheets[sheetName];
+      const normalPlayerWorkSheet = workbook.getWorksheet("Normal player");
       let currentPlayer = 0;
 
       // LOAD PLAYERS
       while (players.length < normalPlayerNum) {
-        const playerNameCell = normalPlayerWorkSheet[`A${currentRow}`];
+        const playerNameCell = normalPlayerWorkSheet.getCell(`A${currentRow}`);
         const playerName = playerNameCell
-          ? playerNameCell.v
+          ? playerNameCell.value
           : `Player ${currentPlayer + 1}`; // because the player name is optional
-        const strategyNumber = await normalPlayerWorkSheet[`B${currentRow}`].v;
+        const strategyNumber = normalPlayerWorkSheet.getCell(
+          `B${currentRow}`,
+        ).value;
         // console.log(`name address: A${currentRow}, name value: ${playerName} , strat number: B${currentRow}`);
 
         if (!strategyNumber || typeof strategyNumber !== "number") {
-          errorMessage = `Error when loading player#${currentPlayer + 1}, row = ${currentRow} . Number of strategies is invalid`;
+          errorMessage =
+            "Error when loading player#" +
+            (currentPlayer + 1) +
+            " row = " +
+            currentRow +
+            " . Number of strategies is invalid";
           throw new Error();
         }
-        const payoffFunction = (await normalPlayerWorkSheet[`C${currentRow}`])
-          ? await normalPlayerWorkSheet[`C${currentRow}`].v
+        const payoffFunction = normalPlayerWorkSheet.getCell(`C${currentRow}`)
+          ? normalPlayerWorkSheet.getCell(`C${currentRow}`).value
           : null;
 
         const strategies = [];
 
         // LOAD STRATEGIES
-        for (let i = 1; i <= strategyNumber; i++) {
+        for (let i = 0; i < strategyNumber; i++) {
           // currentRow + i because the current row is the player name and the strategy number
-          const strategyNameCell =
-            await normalPlayerWorkSheet[`A${currentRow + i}`];
+          const strategyNameCell = normalPlayerWorkSheet.getCell(
+            `A${currentRow + i + 1}`,
+          );
 
           const strategyName = strategyNameCell
-            ? strategyNameCell.v
-            : `Strategy ${i}`; // because the strategy name is optional
+            ? strategyNameCell.value
+            : `Strategy ${i + 1}`; // because the strategy name is optional
           const properties = [];
           // LOAD PROPERTIES
-          for (let j = 1; j <= normalPlayerPropsNum; j++) {
-            // c (0-based): j starts from 1 because the first column is the strategy name
-            // r (0-based): currentRow + i - 1 because currentRow + i is the row of the startegy, and minus 1 because the row in this method is 0-based (remove this -1 if you want to see the error)
-            const propertyCell =
-              await normalPlayerWorkSheet[
-                XLSX.utils.encode_cell({ c: j, r: currentRow + i - 1 })
-              ];
-            if (propertyCell) {
-              properties.push(propertyCell.v);
+          for (let j = 0; j < normalPlayerPropsNum; j++) {
+            // c (1-based)
+            // r (1-based)
+            const propertyCell = normalPlayerWorkSheet.getCell(
+              currentRow + i + 1,
+              j + 2,
+            );
+            if (propertyCell.value) {
+              properties.push(propertyCell.value);
             }
           }
 
           // CHECK IF THE STRATEGY HAS PROPERTIES
           if (!properties.length) {
-            errorMessage = `Error when loading player#${currentPlayer + 1}, row = ${currentRow + i}. Properties of strategy are invalid`;
+            errorMessage =
+              "Error when loading player#" +
+              (currentPlayer + 1) +
+              " row = " +
+              (currentRow + i) +
+              ". Properties of strategy are invalid";
             throw new Error();
           }
 
@@ -276,14 +277,14 @@ export default function InputPage() {
         }
 
         // CHECK IF ALL STRATEGIES HAVE THE SAME NUMBER OF PROPERTIES
-        let allStrategiesHaveSameNumOfProps = strategies.every((strategy) => {
+        const allStrategiesHaveSameNumOfProps = strategies.every((strategy) => {
           const firstStrategy = strategies[0];
           return (strategy.properties.length = firstStrategy.properties.length);
         });
 
         if (!allStrategiesHaveSameNumOfProps) {
-          console.log("asdsad");
-          errorMessage = `Error when loading the player#${players.length + 1}. All strategies of a player must have the same number of properties!`;
+          errorMessage = `Error when loading the player#${players.length + 1}.
+          All strategies of a player must have the same number of properties!`;
           throw new Error();
         }
 
@@ -309,17 +310,15 @@ export default function InputPage() {
 
   const loadConflictSet = async (workbook, sheetNumber) => {
     try {
-      const sheetName = workbook.SheetNames[sheetNumber];
-      const conflictSetWorkSheet = workbook.Sheets[sheetName];
+      const sheetName = workbook.worksheets[sheetNumber].name;
+      const conflictSetWorkSheet = workbook.getWorksheet(sheetName);
       const conflictSet = [];
-      let row = 0;
-      let col = 0;
-      let currentCell =
-        await conflictSetWorkSheet[XLSX.utils.encode_cell({ c: col, r: row })];
-
+      let row = 1;
+      let col = 1;
+      let currentCell = conflictSetWorkSheet.getCell(row, col);
       // loop until there is a cell contains data
-      while (currentCell) {
-        const string = currentCell.v;
+      while (currentCell.value) {
+        const string = currentCell.value;
         const conflict = string
           .replace(/[( )]/g, "")
           .split(",")
@@ -332,22 +331,19 @@ export default function InputPage() {
         });
 
         col++; // move to the right cell
-        currentCell =
-          await conflictSetWorkSheet[
-            XLSX.utils.encode_cell({ c: col, r: row })
-          ];
+        currentCell = conflictSetWorkSheet.getCell(row, col);
 
         // after moving to the right cell, if the cell is empty, move to the next row
         if (!currentCell) {
           row++;
           col = 0;
-          currentCell =
-            conflictSetWorkSheet[XLSX.utils.encode_cell({ c: col, r: row })];
+          currentCell = conflictSetWorkSheet.getCell(row, col);
         }
       }
 
       return conflictSet;
     } catch (error) {
+      console.error(error);
       setIsLoading(false);
       displayPopup(
         "Something went wrong!",
@@ -421,19 +417,17 @@ export default function InputPage() {
     }
 
     // if there is no error, return true
-    if (error) {
-      return false;
-    }
-    return true;
+    return !error;
   };
 
-  //tao file excel dua tren input
-  const downloadExcel = () => {
-    const workbook = XLSX.utils.book_new();
-    let payoffFunction = playerPayoffFunction;
+  // tao file excel dua tren input
+  const downloadExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const payoffFunction = playerPayoffFunction;
 
     // write problem information to sheet1
-    const sheet1 = XLSX.utils.aoa_to_sheet([
+    const sheet1 = workbook.addWorksheet("Sheet 1");
+    sheet1.addRows([
       ["Problem name", problemName],
       ["Special Player exists (0 - No, 1 -Yes) ", specialPlayerExists ? 1 : 0],
       ["Number of properties of special player", Number(specialPlayerPropsNum)],
@@ -451,19 +445,17 @@ export default function InputPage() {
       isMaximizingRow = ["Is maximzing problem", "True"];
     }
     // add isMaximizingRow to the end of sheet1
-    XLSX.utils.sheet_add_aoa(sheet1, [isMaximizingRow], { origin: -1 });
+    sheet1.addRow(isMaximizingRow);
 
     // if user choose to add special player, add sheet2
     if (specialPlayerExists) {
-      const sheet2 = XLSX.utils.aoa_to_sheet([["Properties", "Weights"]]);
-      XLSX.utils.book_append_sheet(workbook, sheet2, "Special player");
+      const sheet2 = workbook.addWorksheet("Special player");
+      sheet2.addRow(["Properties", "Weights"]);
     }
 
     // Write the sheet3 with sample data
-    const sheet3 = XLSX.utils.aoa_to_sheet([
-      ["Player 1's Name", "2 (Number of strategies)"],
-    ]);
-    XLSX.utils.book_append_sheet(workbook, sheet3, "Normal player");
+    const sheet3 = workbook.addWorksheet("Normal player");
+    sheet3.addRow(["Player 1's Name", "2 (Number of strategies)"]);
 
     // add some  example data for sheet3 (base on the number of normal players user input)
     const row2 = ["Strategy 1's name"];
@@ -475,7 +467,7 @@ export default function InputPage() {
     }
 
     // add the row2 and row3 to the end of sheet3
-    XLSX.utils.sheet_add_aoa(sheet3, [row2, row3], { origin: -1 });
+    sheet3.addRows([row2, row3]);
     // if the number of normal players is greater than 1, add one more player sample data
     if (Number(normalPlayerNum)) {
       const row4 = ["Player 2's Name", "3 (Number of strategies)"];
@@ -490,17 +482,14 @@ export default function InputPage() {
         row7.push(`Property ${i + 1}`);
       }
       // add the row4, row5, row6, row7 to the end of sheet3
-      XLSX.utils.sheet_add_aoa(sheet3, [row4, row5, row6, row7], {
-        origin: -1,
-      });
+      sheet3.addRows([row4, row5, row6, row7]);
     }
 
     // Write the sheet4(blank sheet) for user to input conflict matrix
-    const sheet4 = XLSX.utils.aoa_to_sheet([]);
-    XLSX.utils.book_append_sheet(workbook, sheet4, "Conflict matrix");
+    workbook.addWorksheet("Conflict matrix");
 
-    const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([wbout], { type: "application/octet-stream" });
+    const wbout = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([wbout]);
     saveAs(blob, "input.xlsx");
   };
 
@@ -559,7 +548,8 @@ export default function InputPage() {
               error={normalPlayerNumError}
               handleOnChange={(e) => setNormalPlayerNum(e.target.value)}
               value={normalPlayerNum}
-              description="A positive number that reflects the number of players involved to ensure that the resulting Nash equilibrium is valid"
+              description="A positive number that reflects the number of players involved
+              to ensure that the resulting Nash equilibrium is valid"
               guideSectionIndex={4}
             />
             <Input
@@ -568,7 +558,8 @@ export default function InputPage() {
               error={normalPlayerPropsNumError}
               handleOnChange={(e) => setNormalPlayerPropsNum(e.target.value)}
               value={normalPlayerPropsNum}
-              description="A property is a characteristic or attribute that a player has that affects their actions or outcomes in the game"
+              description="A property is a characteristic or attribute that a player
+              has that affects their actions or outcomes in the game"
               guideSectionIndex={5}
             />
           </div>
@@ -580,7 +571,9 @@ export default function InputPage() {
               error={fitnessFunctionError}
               handleOnChange={(e) => setFitnessFunction(e.target.value)}
               value={fitnessFunction}
-              description="The fitness function is a mathematical function that represents the payoff that a player receives for a specific combination of strategies played by all the players in the game"
+              description="The fitness function is a mathematical function that
+                represents the payoff that a player receives for a specific
+                combination of strategies played by all the players in the game"
               guideSectionIndex={6}
             />
           </div>
@@ -592,7 +585,9 @@ export default function InputPage() {
               error={playerPayoffFunctionError}
               handleOnChange={(e) => setPlayerPayoffFunction(e.target.value)}
               value={playerPayoffFunction}
-              description="The player payoff function is a mathematical function that determines the outcome of the game by assigning a payoff value to each player based on the strategies chosen by all the players in the game"
+              description="The player payoff function is a mathematical function that determines
+              the outcome of the game by assigning a payoff value to each player based on the
+              strategies chosen by all the players in the game"
               guideSectionIndex={7}
             />
           </div>
@@ -617,7 +612,7 @@ export default function InputPage() {
           <Link
             to="/guide"
             className="guide-link"
-            onClick={(e) => setGuideSectionIndex(9)}
+            onClick={() => setGuideSectionIndex(9)}
           >
             {" "}
             Learn more on how to input to file Excel

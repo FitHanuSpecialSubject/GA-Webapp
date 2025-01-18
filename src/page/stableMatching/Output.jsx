@@ -10,7 +10,6 @@ import Popup from "../../module/core/component/Popup";
 import axios from "axios";
 import ParamSettingBox from "../../module/core/component/ParamSettingBox";
 import PopupContext from "../../module/core/context/PopupContext";
-import * as XLSX from "@e965/xlsx";
 import SockJS from "sockjs-client";
 import { v4 } from "uuid";
 import { over } from "stompjs";
@@ -21,9 +20,8 @@ import { getBackendAddress } from "../../utils/http_utils";
 import {
   createSystemInfoSheet,
   createParameterConfigSheet,
-  loadProblemDataOld,
-  loadProblemDataParallel,
 } from "../../utils/excel_utils.js";
+import ExcelJS from "exceljs";
 
 let stompClient = null;
 export default function MatchingOutputPage() {
@@ -32,7 +30,7 @@ export default function MatchingOutputPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isShowPopup, setIsShowPopup] = useState(false);
   const { displayPopup } = useContext(PopupContext);
-  const [sessionCode, setSessionCode] = useState(v4());
+  const [sessionCode] = useState(v4());
   const [loadingMessage, setLoadingMessage] = useState(
     "Processing to get problem insights, please wait...",
   );
@@ -44,18 +42,11 @@ export default function MatchingOutputPage() {
   const [maxTimeParam, setMaxTimeParam] = useState(5000);
   const [selectedSet, setSelectedSet] = useState("all");
   const problemType = appData.problemType;
-
-  const navigateToHome = () => {
-    setAppData(null);
-    navigate("/");
-  };
-
   if (appData == null) {
     return <NothingToShow />;
   }
   const matchesArray = appData.result.data.matches.matches;
   const leftOversArray = appData.result.data.matches.leftOvers;
-  const inputIndividuals = appData.problem.individuals;
   const problemData = appData.problem;
   // Handle filter change
   const handleSetFilterChange = (event) => {
@@ -63,13 +54,6 @@ export default function MatchingOutputPage() {
   };
 
   // Lọc dữ liệu theo giá trị selectedSet
-  const filteredMatches =
-    selectedSet === "all"
-      ? matchesArray
-      : matchesArray.filter((_, index) => {
-          const individual = inputIndividuals[index]; // Lấy cá nhân tại chỉ số index
-          return individual?.setType === Number(selectedSet) - 1; // So sánh với setType - 1
-        });
 
   const scroll = (pos) => {
     document.body.scrollTop = pos; // For Safari
@@ -77,9 +61,11 @@ export default function MatchingOutputPage() {
   };
 
   const handleExportToExcel = async () => {
-    const workbook = XLSX.utils.book_new();
+    const workbook = new ExcelJS.Workbook();
     // write result data to sheet 1
-    const sheet1 = XLSX.utils.aoa_to_sheet([
+    const sheet1 = workbook.addWorksheet("Optiomal solution");
+
+    sheet1.addRows([
       ["Fitness value", appData.result.data.fitnessValue],
       ["Used algorithm", appData.result.params.usedAlgorithm],
       ["Runtime (in seconds)", appData.result.data.runtime],
@@ -92,14 +78,12 @@ export default function MatchingOutputPage() {
     //   XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
     // });
     matchesArray.forEach((match, index) => {
-      let individualName = problemData.individualNames[index];
+      const individualName = problemData.individualNames[index];
 
       let individualMatches = "";
-      if (Object.values(match).length === 0) {
-        individualMatches = "There are no individual matches";
-      } else {
+      if (Object.values(match).length !== 0) {
         for (let i = 0; i < Object.values(match).length; i++) {
-          let name = problemData.individualNames[Object.values(match)[i]];
+          const name = problemData.individualNames[Object.values(match)[i]];
           if (i === Object.values(match).length - 1) {
             individualMatches += name;
           } else individualMatches += name + ", ";
@@ -109,28 +93,17 @@ export default function MatchingOutputPage() {
           individualMatches,
           appData.result.data.setSatisfactions[index].toFixed(3),
         ];
-        console.log(row);
-        XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
+        sheet1.addRow(row);
       }
     });
     // write parameter configurations to sheet 2
-    const sheet2 = createParameterConfigSheet(appData);
-
-    //TODO: tách thành một hàm riêng vào src/utils/excel_utils.js, sử dụng chung cho bên GT (nhớ test lại)
+    createParameterConfigSheet(workbook, appData);
     // write computer specs to sheet 3
-    const sheet3 = createSystemInfoSheet(appData);
-    // append sheets to workbook
-    XLSX.utils.book_append_sheet(workbook, sheet1, "Optiomal solution");
-    XLSX.utils.book_append_sheet(workbook, sheet2, "Parameter Configurations");
-    XLSX.utils.book_append_sheet(workbook, sheet3, "Computer Specifications");
-
+    createSystemInfoSheet(workbook, appData);
     // write workbook to file
-    const wbout = await XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
+    const wbout = await workbook.xlsx.writeBuffer();
     const blob = new Blob([wbout], { type: "application/octet-stream" });
-    saveAs(blob, "result.xlsx");
+    saveAs(blob, appData.problem.nameOfProblem + "_Result.xlsx");
   };
 
   const handleGetMoreInsights = () => {
@@ -161,9 +134,9 @@ export default function MatchingOutputPage() {
         maxTime: maxTimeParam,
       };
 
-      let problemType = appData.problemType;
-      let serviceEndpoint = problemType.insightEndpoint;
-      let endpoint = `${getBackendAddress()}${serviceEndpoint}/${sessionCode}`;
+      const problemType = appData.problemType;
+      const serviceEndpoint = problemType.insightEndpoint;
+      const endpoint = `${getBackendAddress()}${serviceEndpoint}/${sessionCode}`;
 
       setIsLoading(true);
       await connectWebSocket(); // connect to websocket to get the progress percentage
@@ -194,7 +167,7 @@ export default function MatchingOutputPage() {
   };
 
   const connectWebSocket = async () => {
-    let Sock = new SockJS(`${getBackendAddress()}/ws`);
+    const Sock = new SockJS(`${getBackendAddress()}/ws`);
     stompClient = over(Sock);
     await stompClient.connect({}, onConnected, onError);
   };
@@ -218,7 +191,7 @@ export default function MatchingOutputPage() {
   };
 
   const onPrivateMessage = (payload) => {
-    let payloadData = JSON.parse(payload.body);
+    const payloadData = JSON.parse(payload.body);
 
     // some return data are to show the progress, some are not
     // if the data is to show the progress, then it will have the estimated time and percentage
@@ -230,7 +203,7 @@ export default function MatchingOutputPage() {
     setLoadingMessage(payloadData.message);
   };
 
-  //Get data from sever
+  // Get data from sever
 
   console.log(appData.result.data);
   const fitnessValue = appData.result.data.fitnessValue.toFixed(3);
@@ -248,7 +221,7 @@ export default function MatchingOutputPage() {
   // Success couple
   matchesArray.forEach((match, index) => {
     // Lấy individualSet từ individualSetIndices (mặc định là 0 nếu không có)
-    let individualSet = appData.problem.individualSetIndices?.[index] ?? 0;
+    const individualSet = appData.problem.individualSetIndices?.[index] ?? 0;
 
     // Kiểm tra nếu set đã chọn không phải là "all" và không khớp với individualSet
     if (selectedSet !== "all" && individualSet !== Number(selectedSet) - 1) {
@@ -256,7 +229,7 @@ export default function MatchingOutputPage() {
     }
 
     // Lấy tên cá nhân
-    let individualName = problemData.individualNames?.[index] || "Unknown";
+    const individualName = problemData.individualNames?.[index] || "Unknown";
 
     let individualMatches = "";
 
@@ -266,7 +239,7 @@ export default function MatchingOutputPage() {
     } else {
       Object.values(match).forEach((matchIndex, i, arr) => {
         // Lấy tên cá nhân từ individualNames
-        let name = problemData.individualNames?.[matchIndex] || "Unknown";
+        const name = problemData.individualNames?.[matchIndex] || "Unknown";
         individualMatches += name + (i === arr.length - 1 ? "" : ", ");
       });
     }
@@ -288,7 +261,7 @@ export default function MatchingOutputPage() {
   });
 
   // LeftOves
-  let leftoverArray = [];
+  const leftoverArray = [];
   leftOversArray.forEach((individual, index) => {
     htmlLeftOvers.push(
       <tr className="table-danger" key={"L" + index}>
@@ -331,12 +304,10 @@ export default function MatchingOutputPage() {
         isShow={isShowPopup}
         setIsShow={setIsShowPopup}
         title={"Get detailed insights"}
-        // message={`This process can take estimated ${data.estimatedWaitingTime || 1} minute(s) and you will be redirected to another page. Do you want to continue?`}
         message={`This process can take a while do you to continue?`}
         okCallback={handlePopupOk}
       />
 
-      {/* <Loading isLoading={isLoading} message={`Get more detailed insights. This can take estimated ${data.estimatedWaitingTime || 1} minute(s)...`} /> */}
       <Loading
         isLoading={isLoading}
         percentage={loadingPercentage}

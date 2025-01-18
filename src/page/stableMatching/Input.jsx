@@ -1,8 +1,8 @@
+/* eslint max-len: 0 */
 import React, { useContext, useEffect, useState } from "react";
 import Input from "../../module/core/component/input";
 import ExcelImage from "../../module/core/asset/image/excel.png";
 import { saveAs } from "file-saver";
-import * as XLSX from "@e965/xlsx";
 import DataContext from "../../module/core/context/DataContext";
 import ExcelJS from "exceljs";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,9 +16,10 @@ import {
   loadProblemDataParallel,
   loadExcludePairs,
 } from "../../utils/excel_utils";
+import PropTypes from "prop-types";
 
 export default function InputPage() {
-  //initialize from data
+  // initialize from data
   const [excelFile, setExcelFile] = useState(null);
   const [problemName, setProblemName] = useState("");
   const [setNum, setSetNum] = useState(undefined);
@@ -26,15 +27,12 @@ export default function InputPage() {
   const [totalIndividualsNum, setTotalIndividualsNum] = useState(undefined);
   const [fitnessFunction, setFitnessFunction] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
   const [excelFileError, setExcelFileError] = useState("");
   const [problemNameError, setProblemNameError] = useState("");
   const [setNumError, setSetNumError] = useState("");
   const [characteristicsNumError, setCharacteristicsNumError] = useState("");
   const [totalIndividualsNumError, setTotalIndividualsNumError] = useState("");
   const [fitnessFunctionError, setFitnessFunctionError] = useState("");
-
-  const [setCharacteristics, setSetCharacteristics] = useState("");
   const { setAppData, setGuideSectionIndex } = useContext(DataContext);
   const { displayPopup } = useContext(PopupContext);
   const [colNums, setColNums] = useState(0);
@@ -74,10 +72,12 @@ export default function InputPage() {
   // Function to read data from the Excel file
   const readExcelFile = async (file) => {
     const reader = new FileReader();
+    setIsLoading(true);
     try {
-      reader.onload = async (e) => {
-        const data = e.target.result;
-        const workbook = XLSX.read(data, { type: "binary" });
+      reader.readAsArrayBuffer(file);
+      reader.onload = async () => {
+        const data = reader.result;
+        const workbook = await new ExcelJS.Workbook().xlsx.load(data);
 
         let problemInfo;
         let excludePairs;
@@ -90,7 +90,6 @@ export default function InputPage() {
             workbook,
             SMT.EXCLUDE_PAIRS_SHEET,
           );
-          console.log(problemInfo);
         } catch (error) {
           console.error(error);
           setExcelFile(null);
@@ -120,7 +119,6 @@ export default function InputPage() {
         });
         navigate("/matching-theory/input-processing");
       };
-      reader.readAsBinaryString(file);
     } catch (error) {
       console.error(error);
       setExcelFile(null);
@@ -145,7 +143,7 @@ export default function InputPage() {
     const maxCharacteristics = 15; // Số lượng đặc điểm tối đa
     const maxTotalIndividuals = 100; // Số lượng cá nhân tối đa
 
-    const validFunctionPattern = /^[a-zA-Z0-9\s\+\-\*\/\^\(\)]+$/;
+    const validFunctionPattern = /^[a-zA-Z0-9s+\-*/^()]+$/;
     // check if the problem name is empty
     if (!problemName) {
       setProblemNameError("Problem name must not be empty");
@@ -215,7 +213,7 @@ export default function InputPage() {
       setTotalIndividualsNumError("");
     }
 
-    //fitness
+    // fitness
     if (!fitnessFunction || !validFunctionPattern.test(fitnessFunction)) {
       setFitnessFunctionError("Function value contains an invalid character");
       error = true;
@@ -276,11 +274,11 @@ export default function InputPage() {
           const rowIndividual = [`Individual_${k + 1}`];
           if (setMany[i] === true) {
             rowIndividual.push(null);
-            //Change
+            // Change
             rowIndividual.push(1);
           } else {
             rowIndividual.push(null);
-            //Change
+            // Change
             rowIndividual.push("Fill capacity > 0");
           }
           rowIndividual.push(`Requirements`);
@@ -317,11 +315,11 @@ export default function InputPage() {
           const rowIndividual = [`Individual_${k + 1}`];
           if (setMany[i] === true) {
             rowIndividual.push(null);
-            //Change
+            // Change
             rowIndividual.push(1);
           } else {
             rowIndividual.push(null);
-            //Change
+            // Change
             rowIndividual.push("Fill capacity > 0");
           }
           rowIndividual.push(`Requirements`);
@@ -398,7 +396,7 @@ export default function InputPage() {
       cell.alignment = { vertical: "middle", horizontal: "center" };
     });
 
-    // Add values to the 3th to 13th row
+    // Add values to the 3rd to 13th row
 
     const colA = [
       "Problem name",
@@ -442,7 +440,6 @@ export default function InputPage() {
         row.height = 45; // Set the desired height
       }
     });
-
     const colB = [
       "Tên problem được lấy từ dữ liệu người dùng nhập trên trang input",
       "Số lượng các set tham gia được lấy từ dữ liệu người dùng nhập trên trang input",
@@ -566,13 +563,12 @@ export default function InputPage() {
     setExcelFile(event.target.files[0]);
   };
 
-  //Initialize table of individual per set
+  // Initialize table of individual per set
   const handleColumnsChange = (e) => {
     const value = e.target.value;
     setSetNum(value);
     setColNums(value);
     setSetIndividuals(Array.from({ length: value }, () => ""));
-    setSetCharacteristics(Array.from({ length: value }, () => ""));
     setSetEvaluateFunction(Array.from({ length: value }, () => ""));
     setSetMany(Array.from({ length: value }, () => ""));
   };
@@ -667,79 +663,8 @@ export default function InputPage() {
         <button className="show-guideline-btn" onClick={handleShowGuideline}>
           {showGuideline ? "Hide Guideline" : "Show Guideline"}
         </button>
-        {/*TODO: tách component cho phần này nhé, dài quá*/}
         {showGuidelineText && (
-          <div className="guideline-text">
-            <h5>Step 1: Enter the name of your problem (Text)</h5>
-            <h5>
-              Step 2: Enter the number of sets{" "}
-              <span
-                onClick={handleToggle}
-                className="toggle-icon"
-                style={{
-                  cursor: "pointer",
-                  color: isExpanded ? "gray" : "gray",
-                }}
-              >
-                {isExpanded ? "(▼)" : "(▶)"}
-              </span>
-            </h5>
-            {isExpanded && (
-              <div className="subsection" id="subsection">
-                <p>
-                  The system will display a corresponding table after you fill
-                  in the information in Step 2.
-                </p>
-
-                <p>
-                  Determine which set is one/many, then tick the blank box if
-                  that set is many. As instructed below:
-                </p>
-
-                <ul>
-                  <li>
-                    Set many: Capacity = 1
-                    <br />
-                    The number of individuals in the set {">"} the opponent's
-                    set
-                  </li>
-                  <li>
-                    Set one: Capacity {">"} 1
-                    <br />
-                    The number of individuals in the set {"<"} the opponent's
-                    set
-                  </li>
-                </ul>
-
-                <p>
-                  Fill in the information in the blank box:
-                  <ul>
-                    <li>
-                      "Num individuals of Set_x" - the number of individuals of
-                      the corresponding set
-                    </li>
-                    <li>
-                      "Evaluate Function Set_x" - the evaluation function
-                      corresponding to that set
-                    </li>
-                  </ul>
-                </p>
-              </div>
-            )}
-
-            <h5>Step 3: Enter the number of characteristics of both sets</h5>
-            <h5>Step 4: Enter the number of total individuals of both sets</h5>
-            <h5>Step 5: Enter the fitness function which you initialize</h5>
-            <h5>
-              Step 6: Click the button "Get Excel Templates" to receive the
-              Excel file that contains all the information you entered above
-            </h5>
-            <h5>
-              Step 7: Select or drag and drop the Excel file you just received
-              at the dotted line and the "Choose a file" button for the system
-              to process your problem
-            </h5>
-          </div>
+          <GuidelineText isExpanded={isExpanded} handleToggle={handleToggle} />
         )}
 
         <Loading isLoading={isLoading} />
@@ -821,7 +746,7 @@ export default function InputPage() {
           <Link
             to="/guide"
             className="guide-link"
-            onClick={(e) => setGuideSectionIndex(9)}
+            onClick={() => setGuideSectionIndex(9)}
           >
             {" "}
             Learn more on how to input to file Excel
@@ -847,3 +772,79 @@ export default function InputPage() {
     </>
   );
 }
+
+function GuidelineText({ handleToggle, isExpanded }) {
+  return (
+    <div className="guideline-text">
+      <h5>Step 1: Enter the name of your problem (Text)</h5>
+      <h5>
+        Step 2: Enter the number of sets{" "}
+        <span
+          onClick={handleToggle}
+          className="toggle-icon"
+          style={{
+            cursor: "pointer",
+            color: "gray",
+          }}
+        >
+          {isExpanded ? "(▼)" : "(▶)"}
+        </span>
+      </h5>
+      {isExpanded && (
+        <div className="subsection" id="subsection">
+          <p>
+            The system will display a corresponding table after you fill in the
+            information in Step 2.
+          </p>
+
+          <p>
+            Determine which set is one/many, then tick the blank box if that set
+            is many. As instructed below:
+          </p>
+
+          <ul>
+            <li>
+              {`Set many: Capacity = 1
+                      The number of individuals in the set {">"} the opponent's set`}
+            </li>
+            <li>
+              {`Set one: Capacity > 1
+                      The number of individuals in the set {"<"} the opponent's set`}
+            </li>
+          </ul>
+
+          <p>
+            Fill in the information in the blank box:
+            <ul>
+              <li>
+                <b>Num individuals of Set_x</b>- the number of individuals of
+                the corresponding set
+              </li>
+              <li>
+                <b>Evaluate Function Set_x</b> - the evaluation function
+                corresponding to that set
+              </li>
+            </ul>
+          </p>
+        </div>
+      )}
+
+      <h5>Step 3: Enter the number of characteristics of both sets</h5>
+      <h5>Step 4: Enter the number of total individuals of both sets</h5>
+      <h5>Step 5: Enter the fitness function which you initialize</h5>
+      <h5>
+        Step 6: Click the button <b>Get Excel Templates</b> to receive the Excel
+        file that contains all the information you entered above
+      </h5>
+      <h5>
+        Step 7: Select or drag and drop the Excel file you just received at the
+        dotted line and the <b>Choose a file</b> button for the system to
+        process your problem
+      </h5>
+    </div>
+  );
+}
+GuidelineText.propTypes = {
+  handleToggle: PropTypes.func.isRequired,
+  isExpanded: PropTypes.bool.isRequired,
+};

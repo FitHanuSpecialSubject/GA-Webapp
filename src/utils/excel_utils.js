@@ -4,17 +4,19 @@ import {
   STABLE_MATCHING_REQ_REGEX,
   REQUIREMENT_ROW_NAME,
 } from "../const/excel_const";
+import ExcelJS from "exceljs";
+import colCache from "exceljs/lib/utils/col-cache";
 
 /**
  * Tạo một sheet từ thông tin cấu hình máy tính.
+ * @param {ExcelJS.Workbook} workbook - Workbook cần thêm sheet.
  * @param {Object} appData - Dữ liệu ứng dụng chứa thông tin cấu hình.
- * @returns {Object} - Sheet được tạo.
+ * @returns {void}
  */
-export const createSystemInfoSheet = (appData) => {
-  // Kiểm tra nếu appData hoặc computerSpecs không tồn tại
+export const createSystemInfoSheet = (workbook, appData) => {
   const computerSpecs = appData?.result?.data?.computerSpecs || {};
-
-  return XLSX.utils.aoa_to_sheet([
+  const sheet = workbook.addWorksheet("Computer Specifications");
+  sheet.addRows([
     ["Operating System Family", computerSpecs.osFamily || "unknown"],
     [
       "Operating System Manufacturer",
@@ -30,16 +32,17 @@ export const createSystemInfoSheet = (appData) => {
 
 /**
  * Tạo một sheet từ các thông số cấu hình.
+ * @param {ExcelJS.Workbook} workbook - Workbook cần thêm sheet.
  * @param {Object} appData - Dữ liệu ứng dụng chứa thông số cấu hình.
- * @returns {Object} - Sheet 2 chứa các thông số.
+ * @returns {void}
  */
-export const createParameterConfigSheet = (appData) => {
+export const createParameterConfigSheet = (workbook, appData) => {
   const numberOfCores =
     appData.result.params.distributedCoreParam === "all"
       ? "All available cores"
       : appData.result.params.distributedCoreParam + " cores";
-
-  return XLSX.utils.aoa_to_sheet([
+  const sheet = workbook.addWorksheet("Parameter Configurations");
+  sheet.addRows([
     ["Number of distributed cores", numberOfCores],
     ["Population size", appData.result.params.populationSizeParam],
     ["Number of crossover generation", appData.result.params.generationParam],
@@ -52,167 +55,190 @@ export const createParameterConfigSheet = (appData) => {
 
 /**
  * Tải dữ liệu bài toán song song từ workbook
- * @param {Object} workbook - Workbook Excel chứa dữ liệu bài toán
+ * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
  * @param {number} sheetNumber - Số thứ tự sheet cần đọc
  * @returns {Object} - Dữ liệu bài toán
  */
 export const loadProblemDataParallel = async (workbook, sheetNumber) => {
-  try {
-    const sheetName = workbook.SheetNames[sheetNumber];
-    const sheet = workbook.Sheets[sheetName];
-    const problemName = getCellValueStr(sheet, "B1");
-    const setNum = getCellValueNum(sheet, "B2");
-    const totalNumberOfIndividuals = getCellValueNum(sheet, "B3");
-    const characteristicNum = getCellValueNum(sheet, "B4");
-    const fitnessFunction = getCellValueStr(sheet, "B5");
+  const sheetName = workbook.worksheets[sheetNumber].name;
+  const sheet = workbook.getWorksheet(sheetName);
+  const problemName = getCellValueStr(sheet, "B1");
+  const setNum = getCellValueNum(sheet, "B2");
+  const totalNumberOfIndividuals = getCellValueNum(sheet, "B3");
+  const characteristicNum = getCellValueNum(sheet, "B4");
+  const fitnessFunction = getCellValueStr(sheet, "B5");
 
-    let currentRow = 6 + setNum;
-    let characteristics = [];
+  let currentRow = 6 + setNum;
+  const characteristics = [];
 
-    let currentColumnIndex = XLSX.utils.decode_col(
-      MATCHING.CHARACTERISTIC_START_COL,
-    );
+  const currentColumnIndex = colCache.decode(
+    MATCHING.CHARACTERISTIC_START_COL,
+  ).col;
 
-    // Đọc các đặc tính từ bảng
-    for (let i = currentColumnIndex; ; i++) {
-      const cellAddress = XLSX.utils.encode_cell({ c: i, r: currentRow - 1 });
-      const cell = sheet[cellAddress];
-      // Break if cell is empty or undefined
-      if (!cell || !cell.v) {
-        break;
-      }
-      characteristics.push(cell.v);
+  // Đọc các đặc tính từ bảng
+  for (let i = currentColumnIndex; ; i++) {
+    const cell = sheet.getCell(colCache.encode(currentRow, i));
+    // Break if cell is empty or undefined
+    if (!cell || !cell.value) {
+      break;
     }
-
-    // Đọc các bộ dữ liệu (sets)
-    const individuals = [];
-    let setEvaluateFunction = [];
-    let individualSetIndices = [];
-    let individualNames = [];
-    let individualProperties = [];
-    let individualRequirements = [];
-    let individualWeights = [];
-    let individualCapacities = [];
-
-    let setNames = [];
-    let setTypes = [];
-    let individualNum = null;
-    let setType = null;
-    let setName = null;
-
-    // Load evaluate functions for each set
-    for (let j = 0; j < setNum; j++) {
-      const evaluateFunction = getCellValueStr(sheet, `B${6 + j}`);
-      setEvaluateFunction.push(evaluateFunction);
-    }
-
-    for (let g = 0; g < setNum; g++) {
-      setName = sheet[`A${currentRow}`]?.v || "";
-      setType = sheet[`B${currentRow}`]?.v || "";
-      setNames.push(setName);
-      setTypes.push(setType);
-
-      individualNum = sheet[`D${currentRow}`]?.v || 0;
-
-      for (let i = 0; i < individualNum; i++) {
-        let name = sheet[`A${currentRow + 1}`]?.v;
-        if (
-          Object.is(name, undefined) ||
-          Object.is(name, null) ||
-          Object.is(name, "")
-        ) {
-          name = `no_name_${i + 1}`;
-        }
-
-        // Validate data in good shape
-        let requirementLabel = getCellValueStr(sheet, `D${currentRow + 1}`);
-        if (requirementLabel !== REQUIREMENT_ROW_NAME) {
-          throw new Error(`Error when loading indiviudal ${name},
-            row = ${currentRow}.
-            Expected label at D${currentRow} to be ${REQUIREMENT_ROW_NAME}`);
-        }
-
-        const properties = [];
-        const requirements = [];
-        const weights = [];
-
-        let r;
-        let p;
-        let w;
-
-        let col;
-        for (let k = 0; k < characteristicNum; k++) {
-          col = k + 4;
-          r = getPropertyRequirement(sheet, currentRow, col);
-          w = getPropertyWeight(sheet, currentRow + 1, col);
-          p = getPropertyValue(sheet, currentRow + 2, col);
-          requirements.push(r);
-          weights.push(w);
-          properties.push(p);
-        }
-
-        individualNames.push(name);
-        individualSetIndices.push(g);
-        individualProperties.push(properties);
-        individualRequirements.push(requirements);
-        individualWeights.push(weights);
-
-        // Load capacity
-        const capacityValue = await sheet[`C${currentRow + 1}`]?.v;
-        if (capacityValue !== undefined && capacityValue !== null) {
-          individualCapacities.push(capacityValue);
-        }
-
-        currentRow += 3;
-      }
-
-      currentRow += 1;
-    }
-
-    return {
-      problemName,
-      characteristicNum,
-      setNum,
-      setNames,
-      setTypes,
-      totalNumberOfIndividuals,
-      individualNames,
-      characteristics,
-      individualSetIndices,
-      individualCapacities,
-      individualRequirements,
-      individualProperties,
-      individualWeights,
-      individuals,
-      fitnessFunction,
-      setEvaluateFunction,
-    };
-  } catch (error) {
-    throw error;
+    characteristics.push(cell.value);
   }
+
+  // Đọc các bộ dữ liệu (sets)
+  const individuals = [];
+  const setEvaluateFunction = [];
+  const individualSetIndices = [];
+  const individualNames = [];
+  const individualProperties = [];
+  const individualRequirements = [];
+  const individualWeights = [];
+  const individualCapacities = [];
+
+  const setNames = [];
+  const setTypes = [];
+  let individualNum = null;
+  let setType = null;
+  let setName = null;
+
+  // Load evaluate functions for each set
+  for (let j = 0; j < setNum; j++) {
+    const evaluateFunction = getCellValueStr(sheet, `B${6 + j}`);
+    setEvaluateFunction.push(evaluateFunction);
+  }
+
+  for (let g = 0; g < setNum; g++) {
+    setName = sheet.getCell(`A${currentRow}`)?.value || "";
+    setType = sheet.getCell(`B${currentRow}`)?.value || "";
+    setNames.push(setName);
+    setTypes.push(setType);
+
+    individualNum = sheet.getCell(`D${currentRow}`)?.value || 0;
+
+    for (let i = 0; i < individualNum; i++) {
+      let name = sheet.getCell(`A${currentRow + 1}`)?.value;
+      if (
+        Object.is(name, undefined) ||
+        Object.is(name, null) ||
+        Object.is(name, "")
+      ) {
+        name = `no_name_${i + 1}`;
+      }
+
+      // Validate data in good shape
+      const requirementLabel = getCellValueStr(sheet, `D${currentRow + 1}`);
+      if (requirementLabel !== REQUIREMENT_ROW_NAME) {
+        throw new Error(`Error when loading indiviudal ${name},
+          row = ${currentRow}.
+          Expected label at D${currentRow} to be ${REQUIREMENT_ROW_NAME}`);
+      }
+
+      const properties = [];
+      const requirements = [];
+      const weights = [];
+
+      let r;
+      let p;
+      let w;
+
+      let col;
+      for (let k = 0; k < characteristicNum; k++) {
+        col = k + 5;
+        r = getPropertyRequirement(sheet, currentRow + 1, col);
+        w = getPropertyWeight(sheet, currentRow + 2, col);
+        p = getPropertyValue(sheet, currentRow + 3, col);
+        requirements.push(r);
+        weights.push(w);
+        properties.push(p);
+      }
+
+      individualNames.push(name);
+      individualSetIndices.push(g);
+      individualProperties.push(properties);
+      individualRequirements.push(requirements);
+      individualWeights.push(weights);
+
+      // Load capacity
+      const capacityValue = sheet.getCell(`C${currentRow + 1}`)?.value;
+      if (capacityValue !== undefined && capacityValue !== null) {
+        individualCapacities.push(capacityValue);
+      }
+
+      currentRow += 3;
+    }
+
+    currentRow += 1;
+  }
+
+  return {
+    problemName,
+    characteristicNum,
+    setNum,
+    setNames,
+    setTypes,
+    totalNumberOfIndividuals,
+    individualNames,
+    characteristics,
+    individualSetIndices,
+    individualCapacities,
+    individualRequirements,
+    individualProperties,
+    individualWeights,
+    individuals,
+    fitnessFunction,
+    setEvaluateFunction,
+  };
 };
 
 /**
  * Tải dữ liệu Exclude Pairs từ workbook
- * @param {Object} workbook - Workbook Excel chứa dữ liệu bài toán
+ * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
+ * @param {number} sheetNumber - Số thứ tự sheet cần đọc
+ * @param {number} specialPlayerPropsNum
+ * @returns {Object} -  Exclude Pairs
+ */
+export const loadSpecialPlayer = async (
+  workbook,
+  sheetNumber,
+  specialPlayerPropsNum,
+) => {
+  const sheetName = workbook.worksheets[sheetNumber].name;
+  const specialPlayerWorkSheet = workbook.getWorksheet(sheetName);
+  const properties = [];
+  const weights = [];
+
+  // LOAD PROPERTIES AND WEIGHTS
+  for (let i = 1; i <= specialPlayerPropsNum; i++) {
+    // [`A${i + 1}`] and  [`B${i + 1}`] because the first row is the header
+    properties.push(specialPlayerWorkSheet.getCell(`A${i + 1}`).value);
+    weights.push(specialPlayerWorkSheet.getCell(`B${i + 1}`).value);
+  }
+  return {
+    properties,
+    weights,
+  };
+};
+
+/**
+ * Tải dữ liệu Exclude Pairs từ workbook
+ * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
  * @param {number} sheetNumber - Số thứ tự sheet cần đọc
  * @returns {Object} -  Exclude Pairs
  */
 export const loadExcludePairs = async (workbook, sheetNumber) => {
-  const sheetName = workbook.SheetNames[sheetNumber];
+  const sheetName = workbook.getWorksheet(sheetNumber).name;
   const result = {};
   if (sheetName !== "Exclude Pairs") return result;
-  const sheet = workbook.Sheets[sheetName];
+  const sheet = workbook.getWorksheet(sheetName);
   let index = 2;
   while (
     getCellValueStr(sheet, "A" + index) !== "" &&
     getCellValueStr(sheet, "B" + index) !== ""
   ) {
     const individual = getCellValueNum(sheet, "A" + index);
-    const excludedFrom = getCellValueStr(sheet, "B" + index)
+    result[individual] = getCellValueStr(sheet, "B" + index)
       .split(",")
       .map((e) => parseInt(e));
-    result[individual] = excludedFrom;
     index++;
   }
   return result;
@@ -222,7 +248,9 @@ export const loadExcludePairs = async (workbook, sheetNumber) => {
  * @deprecated
  * @param workbook
  * @param sheetNumber
- * @returns {Promise<{totalNumberOfIndividuals: *, characteristics: *[], setNum: *, fitnessFunction: *, problemName: *, individuals: *[], characteristicNum: *, setEvaluateFunction: *[]}>}
+ * @returns {Promise<{totalNumberOfIndividuals: *,
+ * characteristics: *[], setNum: *, fitnessFunction: *,
+ * problemName: *, individuals: *[], characteristicNum: *, setEvaluateFunction: *[]}>}
  */
 export const loadProblemDataOld = async (workbook, sheetNumber) => {
   const sheetName = workbook.SheetNames[sheetNumber];
@@ -237,7 +265,7 @@ export const loadProblemDataOld = async (workbook, sheetNumber) => {
 
   let currentRow = 6 + Number(setNum);
   // let currentIndividual = 0;
-  let characteristics = [];
+  const characteristics = [];
   let errorMessage = "";
 
   // LOAD CHARACTERISTICS
@@ -257,7 +285,7 @@ export const loadProblemDataOld = async (workbook, sheetNumber) => {
 
   // LOAD SET
   const individuals = [];
-  let setEvaluateFunction = [];
+  const setEvaluateFunction = [];
   // const row = characteristicNum;
   // const col = 3;
   let individualNum = null;
@@ -270,7 +298,7 @@ export const loadProblemDataOld = async (workbook, sheetNumber) => {
   // Add evaluate function
   for (let j = 0; j < setNum; j++) {
     // let evaluateFunction = await sheet[`B${6 + j}`]['v'];
-    let evaluateFunction = getCellValueStr(sheet, `B${6 + j}`);
+    const evaluateFunction = getCellValueStr(sheet, `B${6 + j}`);
     setEvaluateFunction.push(evaluateFunction);
   }
 
@@ -296,13 +324,14 @@ export const loadProblemDataOld = async (workbook, sheetNumber) => {
       individualName = sheet[`A${currentRow + 1}`]?.v || "";
       capacity = sheet[`C${currentRow + 1}`]?.v || 0;
 
-      let argument = [];
+      const argument = [];
       for (let k = 0; k < characteristicNum; k++) {
         argument[k] = [];
         for (let l = 0; l < 3; l++) {
           const argumentCell =
             sheet[XLSX.utils.encode_cell({ c: k + 4, r: currentRow + l })];
           if (argumentCell === undefined) {
+            // eslint-disable-next-line max-len
             errorMessage = `Error when loading Individual_${i + 1}, row = ${currentRow}, column = ${k + 1}. Characteristic_ of strategy are invalid`;
             throw new Error(errorMessage);
           }
@@ -348,27 +377,28 @@ export async function exportInsights(
   computerSpecs,
   params,
 ) {
-  const workbook = XLSX.utils.book_new();
+  const workbook = new ExcelJS.Workbook();
 
   const algorithms = Object.keys(fitnessValues);
 
-  const sheet1 = XLSX.utils.aoa_to_sheet([["Iteration", ...algorithms]]);
+  const sheet1 = workbook.addWorksheet("Sheet 1");
+  sheet1.addRow(["Iteration", ...algorithms]);
 
   const totalRun = fitnessValues[algorithms[0]].length;
   for (let i = 0; i < totalRun; i++) {
     const values = Object.values(fitnessValues).map((values) => values[i]);
     const row = [i + 1, ...values];
-
-    XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
+    sheet1.addRow(row);
   }
 
   // write runtime values to the second sheet
-  const sheet2 = XLSX.utils.aoa_to_sheet([["Iteration", ...algorithms]]);
+  const sheet2 = workbook.addWorksheet("Sheet 2");
+  sheet2.addRow(["Iteration", ...algorithms]);
   for (let i = 0; i < totalRun; i++) {
     const values = Object.values(runtimes).map((value) => value[i]);
     const row = [i + 1, ...values];
 
-    XLSX.utils.sheet_add_aoa(sheet2, [row], { origin: -1 });
+    sheet2.addRow(row);
   }
 
   // write parameter configurations to the third sheet
@@ -376,7 +406,8 @@ export async function exportInsights(
     params.distributedCoreParam === "all"
       ? "All available cores"
       : params.distributedCoreParam + " cores";
-  const sheet3 = XLSX.utils.aoa_to_sheet([
+  const sheet3 = workbook.addWorksheet("Sheet 3");
+  sheet3.addRows([
     ["Number of distributed cores", numberOfCores],
     ["Population size", params.populationSizeParam],
     ["Number of crossover generation", params.generationParam],
@@ -384,7 +415,8 @@ export async function exportInsights(
   ]);
 
   // write computer specifications to the fourth sheet
-  const sheet4 = XLSX.utils.aoa_to_sheet([
+  const sheet4 = workbook.addWorksheet("Sheet 4");
+  sheet4.addRows([
     ["Operating System Family", computerSpecs?.osFamily || "unknown"],
     [
       "Operating System Manufacturer",
@@ -397,27 +429,20 @@ export async function exportInsights(
     ["Total Memory", computerSpecs?.totalMemory || "unknown"],
   ]);
 
-  // add sheets to the workbook
-  XLSX.utils.book_append_sheet(workbook, sheet1, "Fitness Values");
-  XLSX.utils.book_append_sheet(workbook, sheet2, "Runtimes");
-  XLSX.utils.book_append_sheet(workbook, sheet3, "Parameter Configurations");
-  XLSX.utils.book_append_sheet(workbook, sheet4, "Computer Specifications");
-
   // save the workbook
-  const wbout = await XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const wbout = await workbook.xlsx.writeBuffer();
   return new Blob([wbout], { type: "application/octet-stream" });
 }
 
 /**
- * get cell value as String
- *
- * @param sheet
- * @param address
- * @returns {string} empty String if error
+ * Get cell value as String
+ * @param {ExcelJS.Worksheet} sheet
+ * @param {string} address
+ * @returns {string} - Empty String if error
  */
 const getCellValueStr = (sheet, address) => {
   try {
-    return sheet[address]?.v?.toString() || "";
+    return sheet.getCell(address)?.value?.toString() || "";
   } catch (error) {
     console.error(
       "Error parsing string cell value, address: " +
@@ -430,28 +455,27 @@ const getCellValueStr = (sheet, address) => {
 };
 
 /**
- * get cell value as Number
- *
- * @param sheet
- * @param address
- * @returns
+ * Get cell value as Number
+ * @param {ExcelJS.Worksheet} sheet
+ * @param {string} address
+ * @returns {number}
  *
  * @throws error if error
  */
 export const getCellValueNum = (sheet, address) => {
-  let val = Number(sheet[address]?.v);
+  const val = Number(sheet.getCell(address)?.value);
   if (Number.isNaN(val)) {
-    throw TypeError("Invalid number format, cell address: " + address);
+    throw new TypeError("Invalid number format, cell address: " + address);
   }
   return val;
 };
 
 export const getPropertyValue = (sheet, row, column) => {
   validateAddress(row, column);
-  let fieldAddress = XLSX.utils.encode_cell({ c: column, r: row });
+  const fieldAddress = colCache.encode(row, column);
   try {
-    let value = Number(sheet[fieldAddress].v);
-    if (value.isNaN) {
+    const value = Number(sheet.getCell(fieldAddress).value);
+    if (Number.isNaN(value)) {
       throw new TypeError(`Invalid type for property value: ${value},
         field address: ${fieldAddress},
         expected type: number`);
@@ -466,10 +490,10 @@ export const getPropertyValue = (sheet, row, column) => {
 
 export const getPropertyWeight = (sheet, row, column) => {
   validateAddress(row, column);
-  let fieldAddress = XLSX.utils.encode_cell({ c: column, r: row });
+  const fieldAddress = colCache.encode(row, column);
   try {
-    let value = Number(sheet[fieldAddress].v);
-    if (!value.isNaN) {
+    const value = Number(sheet.getCell(fieldAddress).value);
+    if (!Number.isNaN(value)) {
       if (value < 0 || value > 10) {
         throw new RangeError(`Invalid value for property Weight: ${value},
           field address: ${fieldAddress},
@@ -489,10 +513,10 @@ export const getPropertyWeight = (sheet, row, column) => {
 
 export const getPropertyRequirement = (sheet, row, column) => {
   validateAddress(row, column);
-  let fieldAddress = XLSX.utils.encode_cell({ c: column, r: row });
+  const fieldAddress = colCache.encode(row, column);
   try {
-    let value = sheet[fieldAddress].v;
-    if (!Number(value).isNaN) {
+    const { value } = sheet.getCell(fieldAddress);
+    if (!Number.isNaN(value)) {
       return value;
     } else if (typeof value === "string") {
       if (STABLE_MATCHING_REQ_REGEX.test(value)) {

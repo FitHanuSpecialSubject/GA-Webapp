@@ -26,7 +26,7 @@ export default [
     // RULE COPIED FROM https://github.com/google/eslint-config-google/blob/main/index.js
     rules: {
       "prettier/prettier": ["error", { endOfLine: "auto" }],
-      "no-console": "warn",
+      "no-console": ["warn", { allow: ["error"] }],
       // The rules below are listed in the order they appear on the eslint
       // rules page. All rules are listed to make it easier to keep in sync
       // as new ESLint rules are added.
@@ -165,7 +165,14 @@ export default [
       "no-undef": "warn", // eslint:recommended
       // 'no-undef-init': 'off',
       // 'no-undefined': 'off',
-      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }], // eslint:recommended
+      "no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ], // eslint:recommended
       // 'no-use-before-define': 'off',
 
       // Node.js and CommonJS
