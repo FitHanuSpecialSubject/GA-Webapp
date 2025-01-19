@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "../../module/stableMatching/css/processing.scss";
 import { useNavigate } from "react-router-dom";
-import { useContext, useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
 import DataContext from "../../module/core/context/DataContext";
 import NothingToShow from "../../module/core/component/NothingToShow";
@@ -35,6 +34,10 @@ export default function InputProcessingPage() {
   const [body, setBody] = useState(null);
 
   useEffect(() => {
+    setBody("New value");
+  }, []);
+
+  useEffect(() => {
     if (appData && appData.problem) {
       document.title = "Special Subject Solver";
     }
@@ -46,7 +49,7 @@ export default function InputProcessingPage() {
 
   // Hàm thay đổi problemType
   const handleChangeProblemType = (event) => {
-    let ordinal = Number(event.target.value);
+    const ordinal = Number(event.target.value);
     for (const key in SMT.PROBLEM_TYPES) {
       if (SMT.PROBLEM_TYPES[key].ordinal === ordinal) {
         setProblemTypeOrdinal(ordinal);
@@ -60,7 +63,7 @@ export default function InputProcessingPage() {
         return;
       }
     }
-    //setProblemType(SMT.PROBLEM_TYPES.OTO);
+    // setProblemType(SMT.PROBLEM_TYPES.OTO);
   };
 
   // navigate to home page if there is no problem data
@@ -117,8 +120,8 @@ export default function InputProcessingPage() {
         maxTime: maxTimeParam,
       };
 
-      let serviceEndpoint = problemType.endpoint;
-      let endpoint = `${getBackendAddress()}${serviceEndpoint}`;
+      const serviceEndpoint = problemType.endpoint;
+      const endpoint = `${getBackendAddress()}${serviceEndpoint}`;
       console.log(endpoint);
 
       setIsLoading(true);
@@ -152,7 +155,7 @@ export default function InputProcessingPage() {
       navigate("/matching-theory/result");
     } catch (err) {
       console.error(err);
-      //Handle Errors
+      // Handle Errors
       if (err instanceof AxiosError) {
         let title;
         let message;
@@ -188,7 +191,7 @@ export default function InputProcessingPage() {
     }
   };
 
-  //Add demo individuals for displaying
+  // Add demo individuals for displaying
   const demoIndividuals = [];
   const defaultDisNum = SMT.DEFAULT_SAMPLE_DISPLAY_NUM;
   const numDemo =
@@ -251,7 +254,7 @@ export default function InputProcessingPage() {
       <div className="algo-chooser">
         <p className="algorithm-text bold">Choose an algorithm: </p>
 
-        {/*drop down chọn thuật toán*/}
+        {/* drop down chọn thuật toán*/}
         <select
           name="algorithm"
           value={algorithm}
@@ -313,7 +316,7 @@ export default function InputProcessingPage() {
               <td>
                 <strong>Attributes</strong>
               </td>
-              {/*<td>{appData.problem.characteristics.join(', ')}</td>*/}
+              {/* <td>{appData.problem.characteristics.join(', ')}</td>*/}
               <td>
                 <ol>
                   {appData.problem.characteristics.map((elm, idx) => (
