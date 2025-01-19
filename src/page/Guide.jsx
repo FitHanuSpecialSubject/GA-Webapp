@@ -279,8 +279,8 @@ export default function GuidePage() {
             they are trying to solve using the MOEA framework. The name should
             be concise and meaningful, reflecting the nature of the game being
             analyzed. For example, if the game is about two competing companies
-            deciding whether to enter a new market, the name could be "Market
-            Entry Game." Providing a name for the problem helps keep track of
+            deciding whether to enter a new market, the name could be `Market
+            Entry Game`. Providing a name for the problem helps keep track of
             different games that are being analyzed and facilitates sharing and
             collaboration.
           </p>
@@ -292,7 +292,7 @@ export default function GuidePage() {
         >
           <h1>Special Player exists.</h1>
           <p>
-            The checkbox in the UI labeled "Special Player" is an option for
+            The checkbox in the UI labeled `Special Player` is an option for
             users to indicate whether or not the game being analyzed involves a
             player with unique characteristics or advantages not present in the
             other players. If this option is selected, the user will be prompted
@@ -317,8 +317,8 @@ export default function GuidePage() {
             Stackelberg competition model. In this model, one firm acts as a
             leader and sets their output quantity first, and the other firms act
             as followers and choose their output quantities after observing the
-            leader's choice. The leader has a unique advantage in this scenario,
-            as they can anticipate the followers' responses and make decisions
+            leader`s choice. The leader has a unique advantage in this scenario,
+            as they can anticipate the followers` responses and make decisions
             accordingly.
           </p>
           <p>
@@ -360,7 +360,7 @@ export default function GuidePage() {
           <p>
             In the context of Nash equilibrium and MOEA framework, the number of
             properties possessed by a special player is used to define the
-            game's parameters and constraints. By inputting this value, the user
+            game`s parameters and constraints. By inputting this value, the user
             provides crucial information that allows the algorithm to search for
             Nash equilibria more effectively.
           </p>
@@ -368,9 +368,9 @@ export default function GuidePage() {
             For example, consider a game where there is a special player who has
             three properties, and four normal players who each have two
             properties. The algorithm will use this information to generate a
-            set of strategies and payoffs that satisfy the game's constraints
+            set of strategies and payoffs that satisfy the game`s constraints
             and find the Nash equilibrium. Without this input, the algorithm
-            would not be able to consider the special player's properties, and
+            would not be able to consider the special player`s properties, and
             the Nash equilibrium may not be accurate or feasible.
           </p>
         </section>
@@ -392,8 +392,8 @@ export default function GuidePage() {
           <p>
             The input field for the number of normal players should be a numeric
             field that only accepts positive integers. The field should have a
-            clear label indicating what it is asking for, such as "Number of
-            normal players." It is also important to provide some context or
+            clear label indicating what it is asking for, such as `Number of
+            normal players`. It is also important to provide some context or
             guidance for the user on how to determine the appropriate number to
             input. This could be done through the use of placeholder text, a
             tooltip, or a brief description of the game scenario in the
@@ -426,13 +426,13 @@ export default function GuidePage() {
             The next input is the number of properties each normal player
             possesses. A property in game theory refers to any characteristic or
             attribute that a player has, which affects their decisions and
-            outcomes in the game. For example, in a game of chess, a player's
+            outcomes in the game. For example, in a game of chess, a player`s
             properties may include the location of their pieces, the number of
             pieces they have, and their overall strategy.{" "}
           </p>
           <p>
-            It's important to note that all normal players should have the same
-            number of properties, as it simplifies the calculation of the game's
+            It`s important to note that all normal players should have the same
+            number of properties, as it simplifies the calculation of the game`s
             Nash equilibria. If the number of properties differs between
             players, it can complicate the game and make it more difficult to
             find a Nash equilibrium.{" "}
@@ -453,14 +453,14 @@ export default function GuidePage() {
           <h1>Fitness function.</h1>
           <p>
             The fitness function is a crucial component of any game theory
-            problem, as it determines the success of a player's strategy in a
+            problem, as it determines the success of a player`s strategy in a
             given game. In simple terms, the fitness function represents the
             payoff that a player receives for a specific combination of
             strategies played by all the players in the game.
           </p>
           <p>
             The fitness function is a mathematical function that evaluates how
-            well a player's strategy performs in the game. It is used to
+            well a player`s strategy performs in the game. It is used to
             determine the relative fitness or success of a strategy in relation
             to other strategies used by other players in the game. The fitness
             function is defined based on the payoff matrix of the game, which
@@ -496,7 +496,7 @@ export default function GuidePage() {
             a form of a string expression that can be parsed by the app.{" "}
           </p>
           <p>
-            Note: It's important to note that the string expression must be
+            Note: It`s important to note that the string expression must be
             correctly formatted with respect to order of operations,
             parentheses, and other mathematical conventions. Any mistakes in
             formatting could lead to incorrect results when the app processes
@@ -524,7 +524,7 @@ export default function GuidePage() {
             It is important to note that the payoff function should satisfy the
             rationality assumption of the players. That is, each player will
             choose the strategy that maximizes their expected payoff given the
-            other player's strategy. This is the basis for finding the Nash
+            other player`s strategy. This is the basis for finding the Nash
             equilibrium of the game.
           </p>
           <p>
@@ -541,7 +541,7 @@ export default function GuidePage() {
             function should be input such that it takes into account the two
             properties of each normal player. This ensures that the payoff
             function accurately reflects the game being played and provides an
-            appropriate measure of the players' success.
+            appropriate measure of the players` success.
           </p>
           <p>
             In the context of game theory, a payoff function is a mathematical
@@ -607,7 +607,7 @@ export default function GuidePage() {
             <ol>
               <li>
                 Fill out the necessary information about the problem in the
-                "Problem Information" sheet, including the problem name, whether
+                `Problem Information` sheet, including the problem name, whether
                 a special player exists, the number of properties of the special
                 player, the number of normal players, the number of properties
                 of each normal player, the fitness function, and the player
@@ -615,16 +615,16 @@ export default function GuidePage() {
               </li>
               <li>
                 If a special player exists, fill out the data of the properties
-                and weights of the special player in the "Special Player" sheet.
+                and weights of the special player in the `Special Player` sheet.
               </li>
               <li>
                 Fill out all the necessary data about normal players, including
                 name, number of strategies, and property data of each strategy,
-                in the "Normal Players" sheet.
+                in the `Normal Players` sheet.
               </li>
               <li>
-                If necessary, conflict set of strategies to the sheet "Conflict
-                Set".
+                If necessary, conflict set of strategies to the sheet `Conflict
+                Set`.
               </li>
               <li>Save the Excel file.</li>
             </ol>
@@ -928,15 +928,15 @@ export default function GuidePage() {
               </p>
               <ul>
                 <li>
-                  "Num individuals of Set_x": Enter the number of individuals in
+                  `Num individuals of Set_x`: Enter the number of individuals in
                   the corresponding set (Set_1, Set_2, etc.).
                 </li>
                 <li>
-                  "Evaluate Function Set_x": Enter the evaluation function
+                  `Evaluate Function Set_x`: Enter the evaluation function
                   corresponding to each set.
                 </li>
                 <li>
-                  "Tick if Set_2 is Many":
+                  `Tick if Set_2 is Many`:
                   <p>
                     <strong>Input Cell:</strong> If Set_2 contains many
                     individuals (for example, more than 5 or 10), check this
@@ -985,7 +985,7 @@ export default function GuidePage() {
           <h1>About backend</h1>
           <h2>Logic</h2>
           <p>
-            After receiving your problem's data, the backend server will create
+            After receiving your problem`s data, the backend server will create
             the following MOEA problem. We implement an advanced Gale-Shapley to
             find the result for your problem.{" "}
             <span className={"fst-italic fw-bold"}>
@@ -1001,9 +1001,9 @@ export default function GuidePage() {
           </p>
           <p>
             Afterward, the backend server returns the best solution to your
-            problem with pairs. If you're looking for more information, such as
-            algorithms' efficiency on solving your problem, you should click
-            "Get detailed insights" button.
+            problem with pairs. If you`re looking for more information, such as
+            algorithms` efficiency on solving your problem, you should click
+            `Get detailed insights` button.
           </p>
           <h2>Endpoints</h2>
           <p>
@@ -1011,7 +1011,7 @@ export default function GuidePage() {
             <a rel="noreferrer" href="http://localhost:8080" target="_blank">
               this
             </a>{" "}
-            on browser in order to check backend's status.
+            on browser in order to check backend`s status.
           </p>
           <div className="card border-0">
             <div

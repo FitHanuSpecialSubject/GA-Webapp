@@ -24,6 +24,7 @@
     "react-router-dom": "^6.9.0",
     "react-scripts": "^5.0.1",
     "sass": "^1.60.0",
+    "save": "^2.9.0",
     "server": "^1.0.39",
     "sockjs-client": "^1.5.2",
     "stompjs": "^2.3.3",
