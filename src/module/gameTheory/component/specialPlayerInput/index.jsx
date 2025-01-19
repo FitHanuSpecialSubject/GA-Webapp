@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import "./style.scss";
 import Input from "../../../core/component/input";
 import { useState, useEffect } from "react";
@@ -15,9 +16,15 @@ export default function SpecialPlayerInput({
   const handleHidingAnimationEnd = (e) => {
     if (style === "hiding") {
       e.target.classList.add("hidden");
-    } else {
-      e.target.classList.remove("hidden");
     }
+  };
+
+  SpecialPlayerInput.propTypes = {
+    specialPlayerExists: PropTypes.bool.isRequired,
+    setSpecialPlayerExists: PropTypes.func.isRequired,
+    specialPlayerPropsNum: PropTypes.number.isRequired,
+    setSpecialPlayerPropsNum: PropTypes.func.isRequired,
+    error: PropTypes.string,
   };
 
   useEffect(() => {

@@ -1,3 +1,6 @@
+import React from "react";
+import PropTypes from "prop-types";
+
 export default function InsightsTable({ fitnessValues }) {
   const algorithms = Object.keys(fitnessValues);
   const headers = algorithms.map((name) => <th key={name}>{name}</th>);
@@ -6,7 +9,7 @@ export default function InsightsTable({ fitnessValues }) {
       <tr key={index}>
         <td className="first-col">{index + 1}</td>
         {algorithms.map((name) => (
-          <td>{fitnessValues[name][index]}</td>
+          <td key={name}>{fitnessValues[name][index]}</td>
         ))}
       </tr>
     );
@@ -23,3 +26,7 @@ export default function InsightsTable({ fitnessValues }) {
     </table>
   );
 }
+
+InsightsTable.propTypes = {
+  fitnessValues: PropTypes.object.isRequired,
+};

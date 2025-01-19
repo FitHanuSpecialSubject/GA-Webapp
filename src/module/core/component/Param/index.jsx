@@ -1,15 +1,10 @@
 import React from "react";
+import PropTypes from "prop-types";
 import "./style.scss";
 import InputHint from "../InputHint";
-import { useState, useContext } from "react";
+import { useState } from "react";
 
-export default function ({
-  inputText,
-  paramVal,
-  setParamVal,
-  hintTitle,
-  hintContent,
-}) {
+function Param({ inputText, paramVal, setParamVal, hintTitle, hintContent }) {
   // const playerHolder = error ? message: message
   const [showHint, setShowHint] = useState(false);
 
@@ -47,3 +42,16 @@ export default function ({
     </div>
   );
 }
+
+Param.propTypes = {
+  inputText: PropTypes.string.isRequired,
+  paramVal: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  setParamVal: PropTypes.func.isRequired,
+  hintTitle: PropTypes.string.isRequired,
+  hintContent: PropTypes.string.isRequired,
+};
+
+Param.displayName = "Param";
+
+export default Param;

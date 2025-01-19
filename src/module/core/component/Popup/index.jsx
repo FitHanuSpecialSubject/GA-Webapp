@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import "./style.scss";
 import ErrorImage from "../../asset/image/error.png";
 export default function Popup({
@@ -18,7 +19,20 @@ export default function Popup({
       okCallback();
     }
   };
+  if (okCallback) {
+    okCallback();
+  }
+
   if (!isShow) return null;
+
+  Popup.propTypes = {
+    title: PropTypes.string.isRequired,
+    isShow: PropTypes.bool.isRequired,
+    setIsShow: PropTypes.func.isRequired,
+    message: PropTypes.string.isRequired,
+    okCallback: PropTypes.func,
+    error: PropTypes.bool,
+  };
   return (
     <div className="popup">
       <div className="background" onClick={handleCancelClick}></div>
@@ -38,10 +52,10 @@ export default function Popup({
           <p>{message}</p>
         </div>
         <div className="btn-container">
-          <p class="ok-btn" onClick={handleOK}>
+          <p className="ok-btn" onClick={handleOK}>
             Ok
           </p>
-          <p class="cancel-btn" onClick={handleCancelClick}>
+          <p className="cancel-btn" onClick={handleCancelClick}>
             Cancel
           </p>
         </div>

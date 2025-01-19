@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import "./style.scss";
 
 export default function PlayerResult({ index, player }) {
@@ -11,3 +12,12 @@ export default function PlayerResult({ index, player }) {
     </div>
   );
 }
+
+PlayerResult.propTypes = {
+  index: PropTypes.number.isRequired,
+  player: PropTypes.shape({
+    playerName: PropTypes.string.isRequired,
+    strategyName: PropTypes.string.isRequired,
+    payoff: PropTypes.number.isRequired,
+  }).isRequired,
+};

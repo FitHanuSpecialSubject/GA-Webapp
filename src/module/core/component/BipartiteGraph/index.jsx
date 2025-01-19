@@ -1,4 +1,5 @@
-import { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
+import PropTypes from "prop-types";
 import * as d3 from "d3";
 import useSize from "../../context/WindowResize";
 
@@ -11,9 +12,9 @@ export default function BipartiteGraph({ appData }) {
 
     // Extract nodes from inputIndividual
     const svg = d3.select(svgRef.current);
-    let width = +svg.attr("width");
-    let startX = width / 3;
-    let startY = 50;
+    const width = +svg.attr("width");
+    const startX = width / 3;
+    const startY = 50;
     let y1 = startY;
     let y2 = startY;
 
@@ -36,8 +37,28 @@ export default function BipartiteGraph({ appData }) {
           x: width - startX,
           y: y2,
         });
-        y2 += 70;
-      }
+        }
+      });
+  
+      BipartiteGraph.propTypes = {
+        appData: PropTypes.shape({
+          result: PropTypes.shape({
+            data: PropTypes.shape({
+              matches: PropTypes.shape({
+                matches: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+              }).isRequired,
+            }).isRequired,
+          }).isRequired,
+          problem: PropTypes.shape({
+            individuals: PropTypes.arrayOf(
+              PropTypes.shape({
+                setType: PropTypes.number.isRequired,
+                individualName: PropTypes.string.isRequired,
+              })
+            ).isRequired,
+          }).isRequired,
+        }).isRequired,
+      };
     });
 
     // Extract links from matchesArray
@@ -60,7 +81,7 @@ export default function BipartiteGraph({ appData }) {
     const valLink = links.filter((link) => link.target === -1);
 
     const node2 = [];
-    nodes.forEach((node, index) => {
+    nodes.forEach((node) => {
       console.log(node.id);
       for (let i = 0; i < valLink.length; i++) {
         if (valLink[i].source === node.id) {
@@ -91,7 +112,6 @@ export default function BipartiteGraph({ appData }) {
       .attr("x2", (d) => nodes.find((node) => node.id === d.target).x)
       .attr("y2", (d) => nodes.find((node) => node.id === d.target).y);
 
-    //Match nodes
     const node = svg
       .selectAll(".node")
       .data(nodes)
@@ -116,7 +136,7 @@ export default function BipartiteGraph({ appData }) {
       .attr("x", (d) => d.x - 23)
       .attr("y", (d) => d.y - 30)
       .text((d) => d.name);
-  }, [appData]); // Include appData in the dependency array
+  }, [appData]);; 
 
   const windowSize = useSize();
   return (

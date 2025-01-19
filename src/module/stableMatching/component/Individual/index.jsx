@@ -1,6 +1,7 @@
 import React from "react";
 import "../../asset/css/styleIndividual.scss";
 import { useState } from "react";
+import PropTypes from "prop-types";
 export default function Individual({
   index,
   allPropertyNames,
@@ -36,7 +37,7 @@ export default function Individual({
         <div className="menubar">
           <ul>
             {Properties.map((Property, index) => (
-              <li className="Property-name">
+              <li key={index} className="Property-name">
                 {" "}
                 <span className="bold">
                   {Object.values(allPropertyNames)[index]}:
@@ -51,3 +52,10 @@ export default function Individual({
     </div>
   );
 }
+
+Individual.propTypes = {
+  index: PropTypes.number.isRequired,
+  allPropertyNames: PropTypes.object.isRequired,
+  IndividualName: PropTypes.string.isRequired,
+  Properties: PropTypes.arrayOf(PropTypes.array).isRequired,
+};
