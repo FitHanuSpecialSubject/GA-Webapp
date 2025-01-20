@@ -34,7 +34,7 @@ export default function InputProcessingPage() {
   const [body, setBody] = useState(null);
 
   useEffect(() => {
-    setBody("New value");
+    setBody(appData.problem);
   }, []);
 
   useEffect(() => {
@@ -122,13 +122,9 @@ export default function InputProcessingPage() {
 
       const serviceEndpoint = problemType.endpoint;
       const endpoint = `${getBackendAddress()}${serviceEndpoint}`;
-      console.log(endpoint);
 
       setIsLoading(true);
-      console.log(requestBody);
       const res = await axios.post(endpoint, requestBody);
-
-      console.log(res.data.data);
       const runtime = res.data.data.runtime;
       const usedAlgorithm = res.data.data.algorithm;
 
@@ -151,7 +147,6 @@ export default function InputProcessingPage() {
       });
 
       setIsLoading(false);
-      console.log(result);
       navigate("/matching-theory/result");
     } catch (err) {
       console.error(err);
@@ -205,9 +200,11 @@ export default function InputProcessingPage() {
       name: problem.individualNames[i],
       set: problem.individualSetIndices[i],
       capacity: problem.individualCapacities[i],
-      property: `P: ${problem.individualProperties[i].join(" | ")} <br/>
-                       W: ${problem.individualWeights[i].join(" | ")} <br/>
-                       R: ${problem.individualRequirements[i].join(" | ")}`,
+      property: {
+        P: problem.individualProperties[i].join(" | "),
+        W: problem.individualWeights[i].join(" | "),
+        R: problem.individualRequirements[i].join(" | "),
+      },
     });
   }
 
@@ -274,7 +271,7 @@ export default function InputProcessingPage() {
           Solve now
         </p>
         {body && (
-          <div>
+          <div className={"info-display"}>
             <h3>JSON Data to backend:</h3>
             <pre
               style={{
@@ -283,7 +280,13 @@ export default function InputProcessingPage() {
                 overflowX: "auto",
               }}
             >
-              {JSON.stringify(body, null, 2)}
+              <button
+                className="btn btn-danger"
+                /* eslint-disable-next-line no-console */
+                onClick={() => console.info(body)}
+              >
+                Log to console
+              </button>
             </pre>
           </div>
         )}
@@ -348,7 +351,13 @@ export default function InputProcessingPage() {
                   <td>{elm.name}</td>
                   <td>{elm.set}</td>
                   <td>{elm.capacity}</td>
-                  <td>{elm.property}</td>
+                  <td>
+                    <ul>
+                      <li>P: {elm.property.P}</li>
+                      <li>W: {elm.property.W}</li>
+                      <li>R: {elm.property.R}</li>
+                    </ul>
+                  </td>
                 </tr>
               ))}
           </tbody>

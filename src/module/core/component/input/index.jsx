@@ -43,7 +43,7 @@ export default function Input({
           type={inputType}
           placeholder={message}
           onChange={internalOnchangeEvent}
-          value={value}
+          value={value == null ? undefined : value}
         />
         <i
           className="info fa-solid fa-info"
@@ -63,10 +63,10 @@ export default function Input({
 }
 
 Input.propTypes = {
-  type: PropTypes.string.isRequired,
+  type: PropTypes.string,
   message: PropTypes.string,
-  error: PropTypes.bool,
-  handleOnChange: PropTypes.func.isRequired,
+  error: PropTypes.string,
+  handleOnChange: PropTypes.func,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   description: PropTypes.string,
   guideSectionIndex: PropTypes.number,

@@ -36,7 +36,7 @@ export default function SpecialPlayerInput({
           placeholder="You problem name"
           id="special-player-checkbox"
           onChange={(e) => setSpecialPlayerExists(e.target.checked)}
-          value={specialPlayerExists}
+          value={specialPlayerExists == null ? undefined : specialPlayerExists}
         />
         <p id="text">Special player exists</p>
       </label>
@@ -49,7 +49,9 @@ export default function SpecialPlayerInput({
           handleOnChange={(e) => {
             setSpecialPlayerPropsNum(e.target.value);
           }}
-          value={specialPlayerPropsNum}
+          value={
+            specialPlayerPropsNum == null ? undefined : specialPlayerPropsNum
+          }
           description="Positive integer value that corresponds to the number of properties that the special player has."
           guideSectionIndex={3}
         />
@@ -58,9 +60,9 @@ export default function SpecialPlayerInput({
   );
 }
 SpecialPlayerInput.propTypes = {
-  specialPlayerExists: PropTypes.bool.isRequired,
-  setSpecialPlayerExists: PropTypes.func.isRequired,
-  specialPlayerPropsNum: PropTypes.number.isRequired,
-  setSpecialPlayerPropsNum: PropTypes.func.isRequired,
+  specialPlayerExists: PropTypes.string,
+  setSpecialPlayerExists: PropTypes.func,
+  specialPlayerPropsNum: PropTypes.number,
+  setSpecialPlayerPropsNum: PropTypes.func,
   error: PropTypes.string,
 };
