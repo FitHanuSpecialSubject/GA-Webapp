@@ -14,7 +14,7 @@ export default function SpecialPlayerInput({
   const [style, setStyle] = useState("hidden");
 
   const handleHiddenAnimationEnd = (e) => {
-    if (style === "hiding") {
+    if (style === "hidden") {
       e.target.classList.add("hidden");
     } else {
       e.target.classList.remove("hidden");
