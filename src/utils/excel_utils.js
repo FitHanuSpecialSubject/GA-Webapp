@@ -449,6 +449,42 @@ export const loadSpecialPlayer = async (workbook, specialPlayerPropsNum) => {
   };
 };
 
+export const loadConflictSet = async (workbook) => {
+  const conflictSetWorkSheet = workbook.getWorksheet(
+    GAME_THEORY_WORKBOOK.CONFLICT_MATRIX_SHEET_NAME,
+  );
+  const conflictSet = [];
+  let row = 1;
+  let col = 1;
+  let currentCell = conflictSetWorkSheet.getCell(row, col);
+  // loop until there is a cell contains data
+  while (currentCell.value) {
+    const string = currentCell.value;
+    const conflict = string
+      .replace(/[( )]/g, "")
+      .split(",")
+      .map((item) => parseInt(item));
+    conflictSet.push({
+      leftPlayer: conflict[0],
+      leftPlayerStrategy: conflict[1],
+      rightPlayer: conflict[2],
+      rightPlayerStrategy: conflict[3],
+    });
+
+    col++; // move to the right cell
+    currentCell = conflictSetWorkSheet.getCell(row, col);
+
+    // after moving to the right cell, if the cell is empty, move to the next row
+    if (!currentCell) {
+      row++;
+      col = 0;
+      currentCell = conflictSetWorkSheet.getCell(row, col);
+    }
+  }
+
+  return conflictSet;
+};
+
 /**
  * Tải dữ liệu Exclude Pairs từ workbook
  * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán

@@ -15,6 +15,7 @@ import PopupContext from "../../module/core/context/PopupContext";
 import { validateExcelFile } from "../../utils/file_utils";
 import ExcelJS from "exceljs";
 import {
+  loadConflictSet,
   loadNormalPlayers,
   loadProblemInfoGT,
   loadSpecialPlayer,
@@ -132,8 +133,17 @@ export default function InputPage() {
             displayPopup("Something went wrong!", errorMessage, true);
           }
           if (!players) return; // stop processing in case of error
-
-          conflictSet = await loadConflictSet(workbook, 3); // sheet 3 is the conflict set sheet
+          try {
+            conflictSet = await loadConflictSet(workbook); // sheet 3 is the conflict set sheet
+          } catch (error) {
+            console.error(error);
+            setIsLoading(false);
+            displayPopup(
+              "Something went wrong!",
+              "Error when loading the Conflict Matrix sheet",
+              true,
+            );
+          }
           if (!conflictSet) return; // stop processing in case of error
         } else {
           players = await loadNormalPlayers(
@@ -144,8 +154,17 @@ export default function InputPage() {
             displayPopup,
           ); // sheet 1 is the normal player sheet because there is no special player sheet
           if (!players) return; // stop processing in case of error
-
-          conflictSet = await loadConflictSet(workbook, 2); // sheet 2 is the conflict set sheet
+          try {
+            conflictSet = await loadConflictSet(workbook); // sheet 3 is the conflict set sheet
+          } catch (error) {
+            console.error(error);
+            setIsLoading(false);
+            displayPopup(
+              "Something went wrong!",
+              "Error when loading the Conflict Matrix sheet",
+              true,
+            );
+          } // sheet 2 is the conflict set sheet
           if (!conflictSet) return; // stop processing in case of error
         }
 
@@ -178,51 +197,6 @@ export default function InputPage() {
       );
     }
   };
-  const loadConflictSet = async (workbook, sheetNumber) => {
-    try {
-      const sheetName = workbook.worksheets[sheetNumber].name;
-      const conflictSetWorkSheet = workbook.getWorksheet(sheetName);
-      const conflictSet = [];
-      let row = 1;
-      let col = 1;
-      let currentCell = conflictSetWorkSheet.getCell(row, col);
-      // loop until there is a cell contains data
-      while (currentCell.value) {
-        const string = currentCell.value;
-        const conflict = string
-          .replace(/[( )]/g, "")
-          .split(",")
-          .map((item) => parseInt(item));
-        conflictSet.push({
-          leftPlayer: conflict[0],
-          leftPlayerStrategy: conflict[1],
-          rightPlayer: conflict[2],
-          rightPlayerStrategy: conflict[3],
-        });
-
-        col++; // move to the right cell
-        currentCell = conflictSetWorkSheet.getCell(row, col);
-
-        // after moving to the right cell, if the cell is empty, move to the next row
-        if (!currentCell) {
-          row++;
-          col = 0;
-          currentCell = conflictSetWorkSheet.getCell(row, col);
-        }
-      }
-
-      return conflictSet;
-    } catch (error) {
-      console.error(error);
-      setIsLoading(false);
-      displayPopup(
-        "Something went wrong!",
-        "Error when loading the Conflict Matrix sheet",
-        true,
-      );
-    }
-  };
-
   const handleGetExcelTemplate = () => {
     if (validateForm()) {
       downloadExcel().then();
