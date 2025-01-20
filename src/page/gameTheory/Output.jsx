@@ -22,6 +22,7 @@ import SockJS from "sockjs-client";
 import { v4 } from "uuid";
 import { over } from "stompjs";
 import ExcelJS from "exceljs";
+import { RESULT_WORKBOOK } from "../../const/excel_const";
 
 let stompClient = null;
 export default function OutputPage() {
@@ -48,7 +49,7 @@ export default function OutputPage() {
   const handleExportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
     // write result data to sheet 1
-    const sheet1 = workbook.addWorksheet("Optiomal solution");
+    const sheet1 = workbook.addWorksheet(RESULT_WORKBOOK.SOLUTION_SHEET_NAME);
     sheet1.addRows([
       ["Fitness value", appData.result.data.fitnessValue],
       ["Used algorithm", appData.result.params.usedAlgorithm],

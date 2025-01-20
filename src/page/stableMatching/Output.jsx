@@ -22,6 +22,7 @@ import {
   createParameterConfigSheet,
 } from "../../utils/excel_utils.js";
 import ExcelJS from "exceljs";
+import { RESULT_WORKBOOK } from "../../const/excel_const";
 
 let stompClient = null;
 export default function MatchingOutputPage() {
@@ -63,7 +64,7 @@ export default function MatchingOutputPage() {
   const handleExportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
     // write result data to sheet 1
-    const sheet1 = workbook.addWorksheet("Optiomal solution");
+    const sheet1 = workbook.addWorksheet(RESULT_WORKBOOK.SOLUTION_SHEET_NAME);
 
     sheet1.addRows([
       ["Fitness value", appData.result.data.fitnessValue],

@@ -19,6 +19,7 @@ import {
   loadProblemInfoGT,
   loadSpecialPlayer,
 } from "../../utils/excel_utils";
+import { GAME_THEORY_WORKBOOK } from "../../const/excel_const";
 export default function InputPage() {
   // initialize form data
   const [excelFile, setExcelFile] = useState(null);
@@ -324,12 +325,16 @@ export default function InputPage() {
 
     // if user choose to add special player, add sheet2
     if (specialPlayerExists) {
-      const sheet2 = workbook.addWorksheet("Special player");
+      const sheet2 = workbook.addWorksheet(
+        GAME_THEORY_WORKBOOK.SPECIAL_PLAYER_SHEET_NAME,
+      );
       sheet2.addRow(["Properties", "Weights"]);
     }
 
     // Write the sheet3 with sample data
-    const sheet3 = workbook.addWorksheet("Normal player");
+    const sheet3 = workbook.addWorksheet(
+      GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME,
+    );
     sheet3.addRow(["Player 1's Name", "2 (Number of strategies)"]);
 
     // add some  example data for sheet3 (base on the number of normal players user input)
@@ -361,7 +366,7 @@ export default function InputPage() {
     }
 
     // Write the sheet4(blank sheet) for user to input conflict matrix
-    workbook.addWorksheet("Conflict matrix");
+    workbook.addWorksheet(GAME_THEORY_WORKBOOK.CONFLICT_MATRIX_SHEET_NAME);
 
     const wbout = await workbook.xlsx.writeBuffer();
     const blob = new Blob([wbout]);
