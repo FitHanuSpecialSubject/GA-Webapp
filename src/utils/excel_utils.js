@@ -3,6 +3,7 @@ import {
   STABLE_MATCHING_REQ_REGEX,
   REQUIREMENT_ROW_NAME,
   STABLE_MATCHING_WORKBOOK,
+  GAME_THEORY_WORKBOOK,
 } from "../const/excel_const";
 import ExcelJS from "exceljs";
 import colCache from "exceljs/lib/utils/col-cache";
@@ -63,7 +64,7 @@ export const createParameterConfigSheet = (workbook, appData) => {
  * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa thông tin bài toán
  * @returns {Object} - Thông tin bài toán
  */
-export const loadProblemInfo = async (workbook) => {
+export const loadProblemInfoSMT = async (workbook) => {
   const problemSheet = workbook.getWorksheet(
     STABLE_MATCHING_WORKBOOK.PROBLEM_INFO_SHEET_NAME,
   );
@@ -290,20 +291,149 @@ export const loadProblemDataParallel = async (workbook, sheetNumber) => {
   };
 };
 
+export const loadProblemInfoGT = async (workbook) => {
+  const problemInfoWorksheet = workbook.getWorksheet(
+    GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME,
+  );
+
+  const problemName = problemInfoWorksheet.getCell("B1").value;
+  const specialPlayerExists = problemInfoWorksheet.getCell("B2").value;
+  const specialPlayerPropsNum = problemInfoWorksheet.getCell("B3").value;
+  const normalPlayerNum = problemInfoWorksheet.getCell("B4").value;
+  const normalPlayerPropsNum = problemInfoWorksheet.getCell("B5").value;
+  const fitnessFunction = problemInfoWorksheet.getCell("B6").value;
+  const playerPayoffFunction = problemInfoWorksheet.getCell("B7").value;
+  const isMaximizing =
+    (await problemInfoWorksheet.getCell("B8")?.value) &&
+    problemInfoWorksheet.getCell("B8")?.value.toString().toLowerCase() ===
+      "true";
+
+  return {
+    problemName,
+    specialPlayerExists,
+    specialPlayerPropsNum,
+    normalPlayerNum,
+    normalPlayerPropsNum,
+    fitnessFunction,
+    playerPayoffFunction,
+    isMaximizing,
+  };
+};
+
+export const loadNormalPlayers = async (
+  workbook,
+  normalPlayerNum,
+  normalPlayerPropsNum,
+) => {
+  let currentRow = 1;
+  const players = [];
+  let errorMessage = null;
+  const normalPlayerWorkSheet = workbook.getWorksheet(
+    GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME,
+  );
+  let currentPlayer = 0;
+
+  // LOAD PLAYERS
+  while (players.length < normalPlayerNum) {
+    const playerNameCell = normalPlayerWorkSheet.getCell(`A${currentRow}`);
+    const playerName = playerNameCell
+      ? playerNameCell.value
+      : `Player ${currentPlayer + 1}`; // because the player name is optional
+    const strategyNumber = normalPlayerWorkSheet.getCell(
+      `B${currentRow}`,
+    ).value;
+    // console.log(`name address: A${currentRow}, name value: ${playerName} , strat number: B${currentRow}`);
+
+    if (!strategyNumber || typeof strategyNumber !== "number") {
+      errorMessage =
+        "Error when loading player#" +
+        (currentPlayer + 1) +
+        " row = " +
+        currentRow +
+        " . Number of strategies is invalid";
+      throw new Error(errorMessage);
+    }
+    const payoffFunction = normalPlayerWorkSheet.getCell(`C${currentRow}`)
+      ? normalPlayerWorkSheet.getCell(`C${currentRow}`).value
+      : null;
+
+    const strategies = [];
+
+    // LOAD STRATEGIES
+    for (let i = 0; i < strategyNumber; i++) {
+      // currentRow + i because the current row is the player name and the strategy number
+      const strategyNameCell = normalPlayerWorkSheet.getCell(
+        `A${currentRow + i + 1}`,
+      );
+
+      const strategyName = strategyNameCell
+        ? strategyNameCell.value
+        : `Strategy ${i + 1}`; // because the strategy name is optional
+      const properties = [];
+      // LOAD PROPERTIES
+      for (let j = 0; j < normalPlayerPropsNum; j++) {
+        // c (1-based)
+        // r (1-based)
+        const propertyCell = normalPlayerWorkSheet.getCell(
+          currentRow + i + 1,
+          j + 2,
+        );
+        if (propertyCell.value) {
+          properties.push(propertyCell.value);
+        }
+      }
+
+      // CHECK IF THE STRATEGY HAS PROPERTIES
+      if (!properties.length) {
+        errorMessage =
+          "Error when loading player#" +
+          (currentPlayer + 1) +
+          " row = " +
+          (currentRow + i) +
+          ". Properties of strategy are invalid";
+        throw new Error(errorMessage);
+      }
+
+      strategies.push({
+        name: strategyName,
+        properties: properties,
+      });
+    }
+
+    // CHECK IF ALL STRATEGIES HAVE THE SAME NUMBER OF PROPERTIES
+    const allStrategiesHaveSameNumOfProps = strategies.every((strategy) => {
+      const firstStrategy = strategies[0];
+      return (strategy.properties.length = firstStrategy.properties.length);
+    });
+
+    if (!allStrategiesHaveSameNumOfProps) {
+      errorMessage = `Error when loading the player#${players.length + 1}.
+        All strategies of a player must have the same number of properties!`;
+      throw new Error(errorMessage);
+    }
+
+    players.push({
+      name: playerName,
+      strategies: strategies,
+      payoffFunction: payoffFunction,
+    });
+    currentRow += strategyNumber + 1;
+    currentPlayer++;
+  }
+
+  return players;
+};
+
 /**
  * Tải dữ liệu Exclude Pairs từ workbook
  * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
- * @param {number} sheetNumber - Số thứ tự sheet cần đọc
  * @param {number} specialPlayerPropsNum
  * @returns {Object} -  Exclude Pairs
  */
-export const loadSpecialPlayer = async (
-  workbook,
-  sheetNumber,
-  specialPlayerPropsNum,
-) => {
-  const sheetName = workbook.worksheets[sheetNumber].name;
-  const specialPlayerWorkSheet = workbook.getWorksheet(sheetName);
+export const loadSpecialPlayer = async (workbook, specialPlayerPropsNum) => {
+  const specialPlayerWorkSheet = workbook.getWorksheet(
+    GAME_THEORY_WORKBOOK.SPECIAL_PLAYER_SHEET_NAME,
+  );
   const properties = [];
   const weights = [];
 

@@ -14,8 +14,8 @@ import { SMT } from "../../consts";
 import { validateExcelFile } from "../../utils/file_utils";
 import {
   loadExcludePairs,
-  loadProblemInfo,
   loadDataset,
+  loadProblemInfoSMT,
 } from "../../utils/excel_utils";
 import PropTypes from "prop-types";
 import { STABLE_MATCHING_WORKBOOK } from "../../const/excel_const";
@@ -85,7 +85,7 @@ export default function InputPage() {
         let excludePairs;
         let dataset;
         try {
-          problemInfo = await loadProblemInfo(workbook);
+          problemInfo = await loadProblemInfoSMT(workbook);
           dataset = await loadDataset(
             workbook,
             problemInfo.characteristicNum,

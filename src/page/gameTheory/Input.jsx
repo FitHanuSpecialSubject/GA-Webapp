@@ -14,7 +14,11 @@ import MaxMinCheckbox from "../../module/core/component/MaxMinCheckbox";
 import PopupContext from "../../module/core/context/PopupContext";
 import { validateExcelFile } from "../../utils/file_utils";
 import ExcelJS from "exceljs";
-import { loadSpecialPlayer } from "../../utils/excel_utils";
+import {
+  loadNormalPlayers,
+  loadProblemInfoGT,
+  loadSpecialPlayer,
+} from "../../utils/excel_utils";
 export default function InputPage() {
   // initialize form data
   const [excelFile, setExcelFile] = useState(null);
@@ -76,11 +80,19 @@ export default function InputPage() {
       reader.onload = async () => {
         const data = reader.result;
         const workbook = await new ExcelJS.Workbook().xlsx.load(data);
+        let problemInfo;
+        try {
+          problemInfo = await loadProblemInfoGT(workbook);
+        } catch (e) {
+          console.error(e);
+          setIsLoading(false);
+          displayPopup(
+            "Something went wrong!",
+            "Error when loading the Problem Information sheet",
+            true,
+          );
+        }
 
-        const problemInfo = await loadProblemInfo(workbook, 0);
-
-        console.log("Problem Info: ");
-        console.log(problemInfo);
         if (!problemInfo) return; // stop processing in case of error
 
         let specialPlayers = null;
@@ -91,7 +103,6 @@ export default function InputPage() {
           try {
             specialPlayers = await loadSpecialPlayer(
               workbook,
-              1,
               specialPlayerPropsNum,
             ); // sheet 1 is the special player sheet
           } catch (e) {
@@ -104,13 +115,21 @@ export default function InputPage() {
             );
           }
           if (!specialPlayers) return; // stop processing in case of error
-
-          players = await loadNormalPlayers(
-            workbook,
-            2,
-            problemInfo.normalPlayerNum,
-            problemInfo.normalPlayerPropsNum,
-          ); // sheet 2 is the normal player sheet
+          try {
+            players = await loadNormalPlayers(
+              workbook,
+              problemInfo.normalPlayerNum,
+              problemInfo.normalPlayerPropsNum,
+            );
+          } catch (error) {
+            let errorMessage = error;
+            console.error(error);
+            if (!errorMessage) {
+              errorMessage = `Error when loading Normal Player sheet.`;
+            }
+            setIsLoading(false);
+            displayPopup("Something went wrong!", errorMessage, true);
+          }
           if (!players) return; // stop processing in case of error
 
           conflictSet = await loadConflictSet(workbook, 3); // sheet 3 is the conflict set sheet
@@ -118,9 +137,10 @@ export default function InputPage() {
         } else {
           players = await loadNormalPlayers(
             workbook,
-            1,
             problemInfo.normalPlayerNum,
             problemInfo.normalPlayerPropsNum,
+            setIsLoading,
+            displayPopup,
           ); // sheet 1 is the normal player sheet because there is no special player sheet
           if (!players) return; // stop processing in case of error
 
@@ -157,157 +177,6 @@ export default function InputPage() {
       );
     }
   };
-
-  const loadProblemInfo = async (workbook, sheetNumber) => {
-    try {
-      const sheetName = workbook.worksheets[sheetNumber].name;
-      const problemInfoWorksheet = workbook.getWorksheet(sheetName);
-
-      const problemName = problemInfoWorksheet.getCell("B1").value;
-      const specialPlayerExists = problemInfoWorksheet.getCell("B2").value;
-      const specialPlayerPropsNum = problemInfoWorksheet.getCell("B3").value;
-      const normalPlayerNum = problemInfoWorksheet.getCell("B4").value;
-      const normalPlayerPropsNum = problemInfoWorksheet.getCell("B5").value;
-      const fitnessFunction = problemInfoWorksheet.getCell("B6").value;
-      const playerPayoffFunction = problemInfoWorksheet.getCell("B7").value;
-      const isMaximizing =
-        (await problemInfoWorksheet.getCell("B8")?.value) &&
-        problemInfoWorksheet.getCell("B8")?.value.toString().toLowerCase() ===
-          "true";
-
-      return {
-        problemName,
-        specialPlayerExists,
-        specialPlayerPropsNum,
-        normalPlayerNum,
-        normalPlayerPropsNum,
-        fitnessFunction,
-        playerPayoffFunction,
-        isMaximizing,
-      };
-    } catch (e) {
-      console.error(e);
-      setIsLoading(false);
-      displayPopup(
-        "Something went wrong!",
-        "Error when loading the Problem Information sheet",
-        true,
-      );
-    }
-  };
-
-  const loadNormalPlayers = async (
-    workbook,
-    sheetNumber,
-    normalPlayerNum,
-    normalPlayerPropsNum,
-  ) => {
-    let currentRow = 1;
-    const players = [];
-    let errorMessage = null;
-    try {
-      const normalPlayerWorkSheet = workbook.getWorksheet("Normal player");
-      let currentPlayer = 0;
-
-      // LOAD PLAYERS
-      while (players.length < normalPlayerNum) {
-        const playerNameCell = normalPlayerWorkSheet.getCell(`A${currentRow}`);
-        const playerName = playerNameCell
-          ? playerNameCell.value
-          : `Player ${currentPlayer + 1}`; // because the player name is optional
-        const strategyNumber = normalPlayerWorkSheet.getCell(
-          `B${currentRow}`,
-        ).value;
-        // console.log(`name address: A${currentRow}, name value: ${playerName} , strat number: B${currentRow}`);
-
-        if (!strategyNumber || typeof strategyNumber !== "number") {
-          errorMessage =
-            "Error when loading player#" +
-            (currentPlayer + 1) +
-            " row = " +
-            currentRow +
-            " . Number of strategies is invalid";
-          throw new Error();
-        }
-        const payoffFunction = normalPlayerWorkSheet.getCell(`C${currentRow}`)
-          ? normalPlayerWorkSheet.getCell(`C${currentRow}`).value
-          : null;
-
-        const strategies = [];
-
-        // LOAD STRATEGIES
-        for (let i = 0; i < strategyNumber; i++) {
-          // currentRow + i because the current row is the player name and the strategy number
-          const strategyNameCell = normalPlayerWorkSheet.getCell(
-            `A${currentRow + i + 1}`,
-          );
-
-          const strategyName = strategyNameCell
-            ? strategyNameCell.value
-            : `Strategy ${i + 1}`; // because the strategy name is optional
-          const properties = [];
-          // LOAD PROPERTIES
-          for (let j = 0; j < normalPlayerPropsNum; j++) {
-            // c (1-based)
-            // r (1-based)
-            const propertyCell = normalPlayerWorkSheet.getCell(
-              currentRow + i + 1,
-              j + 2,
-            );
-            if (propertyCell.value) {
-              properties.push(propertyCell.value);
-            }
-          }
-
-          // CHECK IF THE STRATEGY HAS PROPERTIES
-          if (!properties.length) {
-            errorMessage =
-              "Error when loading player#" +
-              (currentPlayer + 1) +
-              " row = " +
-              (currentRow + i) +
-              ". Properties of strategy are invalid";
-            throw new Error();
-          }
-
-          strategies.push({
-            name: strategyName,
-            properties: properties,
-          });
-        }
-
-        // CHECK IF ALL STRATEGIES HAVE THE SAME NUMBER OF PROPERTIES
-        const allStrategiesHaveSameNumOfProps = strategies.every((strategy) => {
-          const firstStrategy = strategies[0];
-          return (strategy.properties.length = firstStrategy.properties.length);
-        });
-
-        if (!allStrategiesHaveSameNumOfProps) {
-          errorMessage = `Error when loading the player#${players.length + 1}.
-          All strategies of a player must have the same number of properties!`;
-          throw new Error();
-        }
-
-        players.push({
-          name: playerName,
-          strategies: strategies,
-          payoffFunction: payoffFunction,
-        });
-        currentRow += strategyNumber + 1;
-        currentPlayer++;
-      }
-
-      return players;
-    } catch (error) {
-      console.error(error);
-      if (!errorMessage) {
-        errorMessage = `Error when loading Normal Player sheet, row = ${currentRow}.`;
-      }
-      setIsLoading(false);
-      displayPopup("Something went wrong!", errorMessage, true);
-    }
-  };
-
   const loadConflictSet = async (workbook, sheetNumber) => {
     try {
       const sheetName = workbook.worksheets[sheetNumber].name;
@@ -355,7 +224,13 @@ export default function InputPage() {
 
   const handleGetExcelTemplate = () => {
     if (validateForm()) {
-      downloadExcel();
+      downloadExcel().then();
+    } else {
+      displayPopup(
+        "Invalid Form!",
+        "Make sure you have filled all the required fields.",
+        true,
+      );
     }
   };
 
