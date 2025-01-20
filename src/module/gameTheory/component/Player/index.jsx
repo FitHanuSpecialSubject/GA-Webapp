@@ -1,6 +1,7 @@
 import React from "react";
 import "./style.scss";
 import { useState } from "react";
+import PropTypes from "prop-types";
 export default function Player({ index, name, strategies }) {
   const [showMore, setShowMore] = useState(false);
 
@@ -31,7 +32,7 @@ export default function Player({ index, name, strategies }) {
         <div className="menubar">
           <ul>
             {strategies.map((strategy, index) => (
-              <li className="strategy-name">
+              <li key={index} className="strategy-name">
                 {" "}
                 <span className="bold">Strategy #{index + 1}:</span>{" "}
                 {strategy.name} ({strategy.properties.length}{" "}
@@ -44,3 +45,14 @@ export default function Player({ index, name, strategies }) {
     </div>
   );
 }
+
+Player.propTypes = {
+  index: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired,
+  strategies: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      properties: PropTypes.array.isRequired,
+    }),
+  ).isRequired,
+};

@@ -1,3 +1,5 @@
+import React from "react";
+import PropTypes from "prop-types";
 import { Line } from "react-chartjs-2";
 
 const colors = [
@@ -36,6 +38,9 @@ export default function InsightsGraph({ runtimes }) {
     width: 600,
     height: 600,
   };
-
   return <Line class="graph" data={graphData} option={graphOptions} />;
 }
+
+InsightsGraph.propTypes = {
+  runtimes: PropTypes.object.isRequired,
+};

@@ -1,5 +1,6 @@
 import React from "react";
 import "./style.scss";
+import PropTypes from "prop-types";
 export default function Loading({
   isLoading,
   message,
@@ -10,7 +11,7 @@ export default function Loading({
   return (
     <div className="loading">
       <div className="background"></div>
-      <div class="lds-grid">
+      <div className="lds-grid">
         <div></div>
         <div></div>
         <div></div>
@@ -21,7 +22,7 @@ export default function Loading({
         <div></div>
         <div></div>
       </div>
-      <div class="loading-content">
+      <div className="loading-content">
         {estimatedTime && (
           <p className="estimated-time">
             Total estimated {estimatedTime} minute(s) left
@@ -33,3 +34,10 @@ export default function Loading({
     </div>
   );
 }
+
+Loading.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  message: PropTypes.string,
+  estimatedTime: PropTypes.number,
+  percentage: PropTypes.number,
+};

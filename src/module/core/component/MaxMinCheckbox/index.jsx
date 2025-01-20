@@ -1,9 +1,10 @@
 import React from "react";
+import PropTypes from "prop-types";
 import "./style.scss";
 import InputHint from "../InputHint";
-import { useState, useContext } from "react";
+import { useState } from "react";
 
-export default function ({ isMaximizing, setIsMaximizing }) {
+function MaxMinCheckbox({ isMaximizing, setIsMaximizing }) {
   const [showHint, setShowHint] = useState(false);
   const handleMouseOver = () => {
     setShowHint(true);
@@ -34,9 +35,19 @@ export default function ({ isMaximizing, setIsMaximizing }) {
         showHint={showHint}
         setShowHint={setShowHint}
         heading="Maximizing - Minimizing Problem"
+        // eslint-disable-next-line max-len
         description="Maximizing means trying to achieve the best outcome, while minimizing means trying to avoid the worst outcome"
         guideSectionIndex={8}
       />
     </div>
   );
 }
+
+MaxMinCheckbox.propTypes = {
+  isMaximizing: PropTypes.bool.isRequired,
+  setIsMaximizing: PropTypes.func.isRequired,
+};
+
+MaxMinCheckbox.displayName = "MaxMinCheckbox";
+
+export default MaxMinCheckbox;

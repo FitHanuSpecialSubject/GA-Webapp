@@ -1,7 +1,8 @@
 import React from "react";
+import PropTypes from "prop-types";
 import "./style.scss";
 import { Link } from "react-router-dom";
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import DataContext from "../../context/DataContext";
 
 export default function InputHint({
@@ -29,7 +30,7 @@ export default function InputHint({
         <Link
           to="/guide"
           className="btn"
-          onClick={(e) => setGuideSectionIndex(guideSectionIndex)}
+          onClick={(_) => setGuideSectionIndex(guideSectionIndex)}
         >
           {" "}
           Learn more
@@ -38,3 +39,11 @@ export default function InputHint({
     )
   );
 }
+
+InputHint.propTypes = {
+  showHint: PropTypes.bool.isRequired,
+  setShowHint: PropTypes.func.isRequired,
+  heading: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  guideSectionIndex: PropTypes.number.isRequired,
+};

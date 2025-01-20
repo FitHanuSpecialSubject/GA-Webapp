@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./style.scss";
 
+// eslint-disable-next-line react/prop-types
 export default function Checkbox({ initialChecked, onChange }) {
   const [isChecked, setIsChecked] = useState(() => {
     return initialChecked && typeof initialChecked === "boolean"
@@ -14,7 +15,7 @@ export default function Checkbox({ initialChecked, onChange }) {
   };
 
   const suppressWarning = () => {
-    //suppress development warning
+    // suppress development warning
   };
 
   return (

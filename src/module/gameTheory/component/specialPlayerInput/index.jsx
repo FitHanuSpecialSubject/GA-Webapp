@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import "./style.scss";
 import Input from "../../../core/component/input";
 import { useState, useEffect } from "react";
@@ -12,14 +13,13 @@ export default function SpecialPlayerInput({
 }) {
   const [style, setStyle] = useState("hidden");
 
-  const handleHidingAnimationEnd = (e) => {
-    if (style === "hiding") {
+  const handleHiddenAnimationEnd = (e) => {
+    if (style === "hidden") {
       e.target.classList.add("hidden");
     } else {
       e.target.classList.remove("hidden");
     }
   };
-
   useEffect(() => {
     if (specialPlayerExists) {
       setStyle("showing");
@@ -41,7 +41,7 @@ export default function SpecialPlayerInput({
         <p id="text">Special player exists</p>
       </label>
 
-      <div className={`${style}`} onAnimationEnd={handleHidingAnimationEnd}>
+      <div className={`${style}`} onAnimationEnd={handleHiddenAnimationEnd}>
         <Input
           message="Number of properties of special player"
           type="number"
@@ -57,3 +57,10 @@ export default function SpecialPlayerInput({
     </div>
   );
 }
+SpecialPlayerInput.propTypes = {
+  specialPlayerExists: PropTypes.bool.isRequired,
+  setSpecialPlayerExists: PropTypes.func.isRequired,
+  specialPlayerPropsNum: PropTypes.number.isRequired,
+  setSpecialPlayerPropsNum: PropTypes.func.isRequired,
+  error: PropTypes.string,
+};

@@ -2,6 +2,7 @@ import React from "react";
 import InputHint from "../InputHint";
 import "./style.scss";
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 export default function Input({
   type,
@@ -60,3 +61,15 @@ export default function Input({
     </>
   );
 }
+
+Input.propTypes = {
+  type: PropTypes.string.isRequired,
+  message: PropTypes.string,
+  error: PropTypes.bool,
+  handleOnChange: PropTypes.func.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  description: PropTypes.string,
+  guideSectionIndex: PropTypes.number,
+  min: PropTypes.number,
+  max: PropTypes.number,
+};
