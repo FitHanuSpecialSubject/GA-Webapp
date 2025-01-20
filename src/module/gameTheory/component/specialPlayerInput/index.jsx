@@ -16,17 +16,10 @@ export default function SpecialPlayerInput({
   const handleHidingAnimationEnd = (e) => {
     if (style === "hiding") {
       e.target.classList.add("hidden");
+    } else {
+      e.target.classList.remove("hidden");
     }
   };
-
-  SpecialPlayerInput.propTypes = {
-    specialPlayerExists: PropTypes.bool.isRequired,
-    setSpecialPlayerExists: PropTypes.func.isRequired,
-    specialPlayerPropsNum: PropTypes.number.isRequired,
-    setSpecialPlayerPropsNum: PropTypes.func.isRequired,
-    error: PropTypes.string,
-  };
-
   useEffect(() => {
     if (specialPlayerExists) {
       setStyle("showing");
@@ -64,3 +57,10 @@ export default function SpecialPlayerInput({
     </div>
   );
 }
+SpecialPlayerInput.propTypes = {
+  specialPlayerExists: PropTypes.bool.isRequired,
+  setSpecialPlayerExists: PropTypes.func.isRequired,
+  specialPlayerPropsNum: PropTypes.number.isRequired,
+  setSpecialPlayerPropsNum: PropTypes.func.isRequired,
+  error: PropTypes.string,
+};

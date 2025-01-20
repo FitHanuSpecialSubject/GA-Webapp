@@ -39,27 +39,8 @@ export default function BipartiteGraph({ appData }) {
         });
         }
       });
-  
-      BipartiteGraph.propTypes = {
-        appData: PropTypes.shape({
-          result: PropTypes.shape({
-            data: PropTypes.shape({
-              matches: PropTypes.shape({
-                matches: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
-              }).isRequired,
-            }).isRequired,
-          }).isRequired,
-          problem: PropTypes.shape({
-            individuals: PropTypes.arrayOf(
-              PropTypes.shape({
-                setType: PropTypes.number.isRequired,
-                individualName: PropTypes.string.isRequired,
-              })
-            ).isRequired,
-          }).isRequired,
-        }).isRequired,
-      };
-    });
+      });
+    };
 
     // Extract links from matchesArray
     const links = [];
@@ -136,10 +117,26 @@ export default function BipartiteGraph({ appData }) {
       .attr("x", (d) => d.x - 23)
       .attr("y", (d) => d.y - 30)
       .text((d) => d.name);
-  }, [appData]);; 
-
-  const windowSize = useSize();
-  return (
-    <svg ref={svgRef} width={windowSize[0] / 1.5} height={windowSize[1]}></svg>
-  );
-}
+  }, [appData]);
+      return (
+        <svg ref={svgRef} width={windowSize[0] / 1.5} height={windowSize[1]}></svg>
+      );
+    BipartiteGraph.propTypes = {
+      appData: PropTypes.shape({
+        result: PropTypes.shape({
+          data: PropTypes.shape({
+            matches: PropTypes.shape({
+              matches: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+            }).isRequired,
+          }).isRequired,
+        }).isRequired,
+        problem: PropTypes.shape({
+          individuals: PropTypes.arrayOf(
+            PropTypes.shape({
+              setType: PropTypes.number.isRequired,
+              individualName: PropTypes.string.isRequired,
+            })
+          ).isRequired,
+        }).isRequired,
+      }).isRequired,
+    };

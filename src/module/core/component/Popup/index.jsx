@@ -24,15 +24,6 @@ export default function Popup({
   }
 
   if (!isShow) return null;
-
-  Popup.propTypes = {
-    title: PropTypes.string.isRequired,
-    isShow: PropTypes.bool.isRequired,
-    setIsShow: PropTypes.func.isRequired,
-    message: PropTypes.string.isRequired,
-    okCallback: PropTypes.func,
-    error: PropTypes.bool,
-  };
   return (
     <div className="popup">
       <div className="background" onClick={handleCancelClick}></div>
@@ -63,3 +54,12 @@ export default function Popup({
     </div>
   );
 }
+
+Popup.propTypes = {
+  title: PropTypes.string.isRequired,
+  isShow: PropTypes.bool.isRequired,
+  setIsShow: PropTypes.func.isRequired,
+  message: PropTypes.string.isRequired,
+  okCallback: PropTypes.func,
+  error: PropTypes.bool,
+};
