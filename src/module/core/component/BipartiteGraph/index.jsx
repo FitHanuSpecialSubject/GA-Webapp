@@ -16,7 +16,7 @@ export default function BipartiteGraph({ appData }) {
     const startX = width / 3;
     const startY = 50;
     let y1 = startY;
-    let y2 = startY;
+    const y2 = startY;
 
     const nodes = [];
     inputIndividuals.forEach((individual, index) => {
@@ -37,10 +37,8 @@ export default function BipartiteGraph({ appData }) {
           x: width - startX,
           y: y2,
         });
-        }
-      });
-      });
-    };
+      }
+    });
 
     // Extract links from matchesArray
     const links = [];
@@ -63,17 +61,12 @@ export default function BipartiteGraph({ appData }) {
 
     const node2 = [];
     nodes.forEach((node) => {
-      console.log(node.id);
       for (let i = 0; i < valLink.length; i++) {
         if (valLink[i].source === node.id) {
-          console.log(node);
           node2.push(node);
         }
       }
     });
-
-    console.log(node2);
-    console.log(valLink);
 
     svg.selectAll("circle").remove();
     svg.selectAll("line").remove();
@@ -101,7 +94,7 @@ export default function BipartiteGraph({ appData }) {
       .attr("class", "node")
       .attr("r", 20)
       .attr("fill", (d) =>
-        node2.some((nod) => nod.id == d.id)
+        node2.some((nod) => nod.id === d.id)
           ? "red"
           : (d = d.group === 0 ? "blue" : "green"),
       );
@@ -120,25 +113,26 @@ export default function BipartiteGraph({ appData }) {
   }, [appData]);
 
   const windowSize = useSize();
-      return (
-        <svg ref={svgRef} width={windowSize[0] / 1.5} height={windowSize[1]}></svg>
-      );
-    BipartiteGraph.propTypes = {
-      appData: PropTypes.shape({
-        result: PropTypes.shape({
-          data: PropTypes.shape({
-            matches: PropTypes.shape({
-              matches: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
-            }).isRequired,
-          }).isRequired,
-        }).isRequired,
-        problem: PropTypes.shape({
-          individuals: PropTypes.arrayOf(
-            PropTypes.shape({
-              setType: PropTypes.number.isRequired,
-              individualName: PropTypes.string.isRequired,
-            })
-          ).isRequired,
-        }).isRequired,
-      }).isRequired,
-    };
+  return (
+    <svg ref={svgRef} width={windowSize[0] / 1.5} height={windowSize[1]}></svg>
+  );
+}
+BipartiteGraph.propTypes = {
+  appData: PropTypes.shape({
+    result: PropTypes.shape({
+      data: PropTypes.shape({
+        matches: PropTypes.shape({
+          matches: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+        }),
+      }),
+    }),
+    problem: PropTypes.shape({
+      individuals: PropTypes.arrayOf(
+        PropTypes.shape({
+          setType: PropTypes.number,
+          individualName: PropTypes.string,
+        }),
+      ),
+    }),
+  }),
+};
