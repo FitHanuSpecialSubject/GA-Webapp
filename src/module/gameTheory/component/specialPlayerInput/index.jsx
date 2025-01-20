@@ -13,7 +13,7 @@ export default function SpecialPlayerInput({
 }) {
   const [style, setStyle] = useState("hidden");
 
-  const handleHidingAnimationEnd = (e) => {
+  const handleHiddenAnimationEnd = (e) => {
     if (style === "hiding") {
       e.target.classList.add("hidden");
     } else {
@@ -41,7 +41,7 @@ export default function SpecialPlayerInput({
         <p id="text">Special player exists</p>
       </label>
 
-      <div className={`${style}`} onAnimationEnd={handleHidingAnimationEnd}>
+      <div className={`${style}`} onAnimationEnd={handleHiddenAnimationEnd}>
         <Input
           message="Number of properties of special player"
           type="number"

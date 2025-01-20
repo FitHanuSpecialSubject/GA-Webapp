@@ -118,6 +118,8 @@ export default function BipartiteGraph({ appData }) {
       .attr("y", (d) => d.y - 30)
       .text((d) => d.name);
   }, [appData]);
+
+  const windowSize = useSize();
       return (
         <svg ref={svgRef} width={windowSize[0] / 1.5} height={windowSize[1]}></svg>
       );
