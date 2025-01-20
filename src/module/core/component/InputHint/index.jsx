@@ -43,7 +43,7 @@ export default function InputHint({
 InputHint.propTypes = {
   showHint: PropTypes.bool.isRequired,
   setShowHint: PropTypes.func.isRequired,
-  heading: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  guideSectionIndex: PropTypes.number.isRequired,
+  heading: PropTypes.string,
+  description: PropTypes.string,
+  guideSectionIndex: PropTypes.number,
 };

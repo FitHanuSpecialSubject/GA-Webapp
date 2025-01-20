@@ -100,12 +100,12 @@ export default function Input({
 }
 
 Input.propTypes = {
-  distributedCoreParam: PropTypes.string.isRequired,
-  setDistributedCoreParam: PropTypes.func.isRequired,
-  populationSizeParam: PropTypes.string.isRequired,
-  setPopulationSizeParam: PropTypes.func.isRequired,
-  generationParam: PropTypes.string.isRequired,
-  setGenerationParam: PropTypes.func.isRequired,
-  maxTimeParam: PropTypes.string.isRequired,
-  setMaxTimeParam: PropTypes.func.isRequired,
+  distributedCoreParam: PropTypes.string,
+  setDistributedCoreParam: PropTypes.func,
+  populationSizeParam: PropTypes.number,
+  setPopulationSizeParam: PropTypes.func,
+  generationParam: PropTypes.number,
+  setGenerationParam: PropTypes.func,
+  maxTimeParam: PropTypes.number,
+  setMaxTimeParam: PropTypes.func,
 };
