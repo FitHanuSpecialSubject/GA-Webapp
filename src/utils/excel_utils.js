@@ -2,9 +2,11 @@ import {
   MATCHING,
   STABLE_MATCHING_REQ_REGEX,
   REQUIREMENT_ROW_NAME,
+  STABLE_MATCHING_WORKBOOK,
 } from "../const/excel_const";
 import ExcelJS from "exceljs";
 import colCache from "exceljs/lib/utils/col-cache";
+import { RESULT_WORKBOOK } from "../const/excel_const";
 
 /**
  * Tạo một sheet từ thông tin cấu hình máy tính.
@@ -14,7 +16,9 @@ import colCache from "exceljs/lib/utils/col-cache";
  */
 export const createSystemInfoSheet = (workbook, appData) => {
   const computerSpecs = appData?.result?.data?.computerSpecs || {};
-  const sheet = workbook.addWorksheet("Computer Specifications");
+  const sheet = workbook.addWorksheet(
+    RESULT_WORKBOOK.COMPUTER_SPECS_SHEET_NAME,
+  );
   sheet.addRows([
     ["Operating System Family", computerSpecs.osFamily || "unknown"],
     [
@@ -40,7 +44,9 @@ export const createParameterConfigSheet = (workbook, appData) => {
     appData.result.params.distributedCoreParam === "all"
       ? "All available cores"
       : appData.result.params.distributedCoreParam + " cores";
-  const sheet = workbook.addWorksheet("Parameter Configurations");
+  const sheet = workbook.addWorksheet(
+    RESULT_WORKBOOK.PARAMETER_CONFIG_SHEET_NAME,
+  );
   sheet.addRows([
     ["Number of distributed cores", numberOfCores],
     ["Population size", appData.result.params.populationSizeParam],
@@ -53,7 +59,99 @@ export const createParameterConfigSheet = (workbook, appData) => {
 };
 
 /**
+ * Tải thông tin bài toán từ Workbook
+ * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa thông tin bài toán
+ * @returns {Object} - Thông tin bài toán
+ */
+export const loadProblemInfo = async (workbook) => {
+  const problemSheet = workbook.getWorksheet(
+    STABLE_MATCHING_WORKBOOK.PROBLEM_INFO_SHEET_NAME,
+  );
+  const problemName = getCellValueStr(problemSheet, "B1");
+  const setNum = getCellValueNum(problemSheet, "B2");
+  const totalNumberOfIndividuals = getCellValueNum(problemSheet, "B3");
+  const characteristicNum = getCellValueNum(problemSheet, "B4");
+  const fitnessFunction = getCellValueStr(problemSheet, "B5");
+  const setEvaluateFunction = [];
+  for (let i = 0; i < setNum; i++) {
+    setEvaluateFunction.push(problemSheet.getCell(`B${i + 5}`).value);
+  }
+  return {
+    problemName,
+    setNum,
+    totalNumberOfIndividuals,
+    characteristicNum,
+    fitnessFunction,
+    setEvaluateFunction,
+  };
+};
+
+/**
+ * Tải dữ liệu bài toán từ Workbook
+ * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
+ * @param {number} charNum - Số lượng characteristics
+ * @param {number} setNum - Số lượng set
+ * @returns {Object} - Dữ liệu bài toán
+ */
+export const loadDataset = async (workbook, charNum, setNum) => {
+  const dataSheet = workbook.getWorksheet(
+    STABLE_MATCHING_WORKBOOK.DATASET_SHEET_NAME,
+  );
+  const characteristics = [];
+  const setNames = [];
+  const setTypes = [];
+  const individualNames = [];
+  const individualSetIndices = [];
+  const individualCapacities = [];
+  const individualProperties = [];
+  const individualRequirements = [];
+  const individualWeights = [];
+  for (let i = 0; i < charNum; i++) {
+    const cellValue = dataSheet.getCell(1, i + 5).value;
+    characteristics.push(
+      cellValue == null ? `Characteristic ${i + 1}` : cellValue,
+    );
+  }
+  let rowPointer = 1;
+  for (let set = 0; set < setNum; set++) {
+    setNames.push(dataSheet.getCell(`A${rowPointer}`).value);
+    setTypes.push(dataSheet.getCell(`B${rowPointer}`).value);
+    const individualNum = Number(dataSheet.getCell(`D${rowPointer}`));
+    rowPointer++;
+    for (let i = 0; i < individualNum; i++) {
+      individualNames.push(dataSheet.getCell(`A${rowPointer}`).value);
+      individualCapacities.push(dataSheet.getCell(`C${rowPointer}`).value);
+      individualSetIndices.push(set);
+      const r = [];
+      const w = [];
+      const p = [];
+      for (let c = 0; c < charNum; c++) {
+        r.push(getPropertyRequirement(dataSheet, rowPointer, c + 5));
+        w.push(getPropertyWeight(dataSheet, rowPointer + 1, c + 5));
+        p.push(getPropertyValue(dataSheet, rowPointer + 2, c + 5));
+      }
+      individualRequirements.push(r);
+      individualWeights.push(w);
+      individualProperties.push(p);
+      rowPointer += 3;
+    }
+  }
+  return {
+    characteristics,
+    setNames,
+    setTypes,
+    individualNames,
+    individualCapacities,
+    individualSetIndices,
+    individualProperties,
+    individualRequirements,
+    individualWeights,
+  };
+};
+
+/**
  * Tải dữ liệu bài toán song song từ workbook
+ * @deprecated
  * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
  * @param {number} sheetNumber - Số thứ tự sheet cần đọc
  * @returns {Object} - Dữ liệu bài toán
@@ -224,14 +322,13 @@ export const loadSpecialPlayer = async (
 /**
  * Tải dữ liệu Exclude Pairs từ workbook
  * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
- * @param {number} sheetNumber - Số thứ tự sheet cần đọc
  * @returns {Object} -  Exclude Pairs
  */
-export const loadExcludePairs = async (workbook, sheetNumber) => {
-  const sheetName = workbook.getWorksheet(sheetNumber).name;
+export const loadExcludePairs = async (workbook) => {
+  const sheet = workbook.getWorksheet(
+    STABLE_MATCHING_WORKBOOK.EXCLUDE_PAIRS_SHEET_NAME,
+  );
   const result = {};
-  if (sheetName !== "Exclude Pairs") return result;
-  const sheet = workbook.getWorksheet(sheetName);
   let index = 2;
   while (
     getCellValueStr(sheet, "A" + index) !== "" &&
@@ -340,65 +437,66 @@ const getCellValueStr = (sheet, address) => {
 /**
  * Get cell value as Number
  * @param {ExcelJS.Worksheet} sheet
- * @param {string} address
+ * @param {number} row
+ * @param {number} col
  * @returns {number}
  *
  * @throws error if error
  */
-export const getCellValueNum = (sheet, address) => {
-  const val = Number(sheet.getCell(address)?.value);
+export const getCellValueNum = (sheet, row, col) => {
+  validateAddress(row, col);
+  const val = Number(sheet.getCell(row, col)?.value);
   if (Number.isNaN(val)) {
-    throw new TypeError("Invalid number format, cell address: " + address);
+    throw new TypeError(
+      `Invalid number format, cell address: R=${row} C=${col}`,
+    );
   }
   return val;
 };
 
-export const getPropertyValue = (sheet, row, column) => {
-  validateAddress(row, column);
-  const fieldAddress = colCache.encode(row, column);
+export const getPropertyValue = (sheet, row, col) => {
+  validateAddress(row, col);
+  const value = Number(sheet.getCell(row, col).value);
   try {
-    const value = Number(sheet.getCell(fieldAddress).value);
     if (Number.isNaN(value)) {
       throw new TypeError(`Invalid type for property value: ${value},
-        field address: ${fieldAddress},
+        field address: R=${row} C=${col},
         expected type: number`);
     } else {
       return value;
     }
   } catch (e) {
     console.error(e);
-    throw new Error(`Error when reading Property Value at: ${fieldAddress}`);
+    throw new Error(`Error when reading Property Value at: R=${row} C=${col}`);
   }
 };
 
-export const getPropertyWeight = (sheet, row, column) => {
-  validateAddress(row, column);
-  const fieldAddress = colCache.encode(row, column);
+export const getPropertyWeight = (sheet, row, col) => {
+  validateAddress(row, col);
   try {
-    const value = Number(sheet.getCell(fieldAddress).value);
+    const value = Number(sheet.getCell(row, col).value);
     if (!Number.isNaN(value)) {
       if (value < 0 || value > 10) {
         throw new RangeError(`Invalid value for property Weight: ${value},
-          field address: ${fieldAddress},
+          field address: R=${row} C=${col},
           expected value in range [0, 10] for Weight`);
       }
       return value;
     } else {
       throw new TypeError(`Invalid type for property Weight: ${value},
-        field address: ${fieldAddress},
+        field address: R=${row} C=${col},
         expected type: number`);
     }
   } catch (e) {
     console.error(e);
-    throw new Error(`Error when reading Property Weight at: ${fieldAddress}`);
+    throw new Error(`Error when reading Property Weight at: R=${row} C=${col}`);
   }
 };
 
-export const getPropertyRequirement = (sheet, row, column) => {
-  validateAddress(row, column);
-  const fieldAddress = colCache.encode(row, column);
+export const getPropertyRequirement = (sheet, row, col) => {
+  validateAddress(row, col);
   try {
-    const { value } = sheet.getCell(fieldAddress);
+    const { value } = sheet.getCell(row, col);
     if (!Number.isNaN(value)) {
       return value;
     } else if (typeof value === "string") {
@@ -406,17 +504,17 @@ export const getPropertyRequirement = (sheet, row, column) => {
         return value;
       } else {
         throw new TypeError(`Invalid string format for property Requirement: ${value},
-          field address: ${fieldAddress},
+          field address: R=${row} C=${col},
           expected value in format: "number:number" or "number++" or "number--"`);
       }
     } else {
       throw new TypeError(`Invalid type for property Requirement: ${value},
-        field address: ${fieldAddress},
+        field address: R=${row} C=${col},
         expected type: string, number`);
     }
   } catch (e) {
     console.error(e);
-    throw new Error(`Error when reading Property Value at: ${fieldAddress}`);
+    throw new Error(`Error when reading Property Value at: R=${row} C=${col}`);
   }
 };
 

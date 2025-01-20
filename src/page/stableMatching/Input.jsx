@@ -13,10 +13,12 @@ import PopupContext from "../../module/core/context/PopupContext";
 import { SMT } from "../../consts";
 import { validateExcelFile } from "../../utils/file_utils";
 import {
-  loadProblemDataParallel,
   loadExcludePairs,
+  loadProblemInfo,
+  loadDataset,
 } from "../../utils/excel_utils";
 import PropTypes from "prop-types";
+import { STABLE_MATCHING_WORKBOOK } from "../../const/excel_const";
 
 export default function InputPage() {
   // initialize from data
@@ -81,15 +83,15 @@ export default function InputPage() {
 
         let problemInfo;
         let excludePairs;
+        let dataset;
         try {
-          problemInfo = await loadProblemDataParallel(
+          problemInfo = await loadProblemInfo(workbook);
+          dataset = await loadDataset(
             workbook,
-            SMT.INDIVIDUAL_SHEET,
+            problemInfo.characteristicNum,
+            problemInfo.setNum,
           );
-          excludePairs = await loadExcludePairs(
-            workbook,
-            SMT.EXCLUDE_PAIRS_SHEET,
-          );
+          excludePairs = await loadExcludePairs(workbook);
         } catch (error) {
           console.error(error);
           setExcelFile(null);
@@ -101,19 +103,19 @@ export default function InputPage() {
           problem: {
             nameOfProblem: problemInfo.problemName,
             numberOfSets: problemInfo.setNum,
-            setNames: problemInfo.setNames,
-            setTypes: problemInfo.setTypes,
             numberOfIndividuals: problemInfo.totalNumberOfIndividuals,
-            individualNames: problemInfo.individualNames,
-            characteristics: problemInfo.characteristics,
-            individualSetIndices: problemInfo.individualSetIndices,
-            individualCapacities: problemInfo.individualCapacities,
-            individualProperties: problemInfo.individualProperties,
-            individualRequirements: problemInfo.individualRequirements,
-            individualWeights: problemInfo.individualWeights,
-            individuals: problemInfo.individuals,
             fitnessFunction: problemInfo.fitnessFunction,
             evaluateFunctions: problemInfo.setEvaluateFunction,
+            setNames: dataset.setNames,
+            setTypes: dataset.setTypes,
+            individualNames: dataset.individualNames,
+            characteristics: dataset.characteristics,
+            individualSetIndices: dataset.individualSetIndices,
+            individualCapacities: dataset.individualCapacities,
+            individualProperties: dataset.individualProperties,
+            individualRequirements: dataset.individualRequirements,
+            individualWeights: dataset.individualWeights,
+            // individuals: problemInfo.individuals,
             excludePairs,
           },
         });
@@ -133,7 +135,13 @@ export default function InputPage() {
 
   const handleGetExcelTemplate = () => {
     if (validateForm()) {
-      downloadExcel();
+      downloadExcel().then();
+    } else {
+      displayPopup(
+        "Invalid Form!",
+        "Make sure you have filled all the required fields.",
+        true,
+      );
     }
   };
 
@@ -222,7 +230,7 @@ export default function InputPage() {
     }
     setEvaluateFunction.forEach((evaluateFunction, index) => {
       if (!evaluateFunction || !validFunctionPattern.test(evaluateFunction)) {
-        setEvaluateFunction((prevState) => {
+        setSetEvaluateFunction((prevState) => {
           const newState = [...prevState];
           newState[index] = "Function value contains an invalid character";
           return newState;
@@ -236,20 +244,28 @@ export default function InputPage() {
 
   const downloadExcel = async () => {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Problem Information");
-    const excludePairsWorksheet = workbook.addWorksheet("Exclude Pairs");
-    const guidelinesWorksheet = workbook.addWorksheet("Guidelines");
+    const problemWorksheet = workbook.addWorksheet(
+      STABLE_MATCHING_WORKBOOK.PROBLEM_INFO_SHEET_NAME,
+    );
+    const datasetWorksheet = workbook.addWorksheet(
+      STABLE_MATCHING_WORKBOOK.DATASET_SHEET_NAME,
+    );
+    const excludePairsWorksheet = workbook.addWorksheet(
+      STABLE_MATCHING_WORKBOOK.EXCLUDE_PAIRS_SHEET_NAME,
+    );
+    const guidelinesWorksheet = workbook.addWorksheet(
+      STABLE_MATCHING_WORKBOOK.GUIDELINE_SHEET_NAME,
+    );
 
     // Add "Problem Information" worksheet
-    worksheet.addRow(["Problem name", problemName]);
-    worksheet.addRow(["Number of set", setNum]);
-    worksheet.addRow(["Number of individuals", totalIndividualsNum]);
-    worksheet.addRow(["Number of characteristics", characteristicsNum]);
-    worksheet.addRow(["Fitness function", fitnessFunction]);
-
+    problemWorksheet.addRow(["Problem name", problemName]);
+    problemWorksheet.addRow(["Number of set", setNum]);
+    problemWorksheet.addRow(["Number of individuals", totalIndividualsNum]);
+    problemWorksheet.addRow(["Number of characteristics", characteristicsNum]);
+    problemWorksheet.addRow(["Fitness function", fitnessFunction]);
     // Add evaluate function sets
     setEvaluateFunction.forEach((evaluateFunction, index) => {
-      worksheet.addRow([
+      problemWorksheet.addRow([
         `Evaluate Function Set_${index + 1}`,
         evaluateFunction,
       ]);
@@ -269,7 +285,7 @@ export default function InputPage() {
           row8.push(`Characteristic_${j + 1}`);
         }
 
-        worksheet.addRow(row8);
+        datasetWorksheet.addRow(row8);
         for (let k = 0; k < numberSetIndividuals; k++) {
           const rowIndividual = [`Individual_${k + 1}`];
           if (setMany[i] === true) {
@@ -297,9 +313,9 @@ export default function InputPage() {
             rowProperties.push(String(`p_${h + 1}`));
           }
 
-          worksheet.addRow(rowIndividual);
-          worksheet.addRow(rowWeights);
-          worksheet.addRow(rowProperties);
+          datasetWorksheet.addRow(rowIndividual);
+          datasetWorksheet.addRow(rowWeights);
+          datasetWorksheet.addRow(rowProperties);
         }
       } else {
         const rowSet = [`Set_${i + 1}`];
@@ -310,7 +326,7 @@ export default function InputPage() {
         }
         rowSet.push(null);
         rowSet.push(numberSetIndividuals);
-        worksheet.addRow(rowSet);
+        datasetWorksheet.addRow(rowSet);
         for (let k = 0; k < numberSetIndividuals; k++) {
           const rowIndividual = [`Individual_${k + 1}`];
           if (setMany[i] === true) {
@@ -338,13 +354,12 @@ export default function InputPage() {
             rowProperties.push(String(`p_${h + 1}`));
           }
 
-          worksheet.addRow(rowIndividual);
-          worksheet.addRow(rowWeights);
-          worksheet.addRow(rowProperties);
+          datasetWorksheet.addRow(rowIndividual);
+          datasetWorksheet.addRow(rowWeights);
+          datasetWorksheet.addRow(rowProperties);
         }
       }
     }
-
     // Add header to Exclude Pairs
     excludePairsWorksheet.getCell("A1").value = "Individual";
     excludePairsWorksheet.getCell("B1").value = "Excluded from";
