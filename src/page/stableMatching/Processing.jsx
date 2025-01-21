@@ -31,11 +31,6 @@ export default function InputProcessingPage() {
   );
   const [maxTimeParam, setMaxTimeParam] = useState(SMT.DEFAULT_MAXTIME);
   const { displayPopup } = useContext(PopupContext);
-  const [body, setBody] = useState(null);
-
-  useEffect(() => {
-    setBody(appData.problem);
-  }, []);
 
   useEffect(() => {
     if (appData && appData.problem) {
@@ -270,26 +265,6 @@ export default function InputProcessingPage() {
         <p className="solve-now-btn" onClick={handleSolveNow}>
           Solve now
         </p>
-        {body && (
-          <div className={"info-display"}>
-            <h3>JSON Data to backend:</h3>
-            <pre
-              style={{
-                whiteSpace: "pre-wrap",
-                maxWidth: "800px",
-                overflowX: "auto",
-              }}
-            >
-              <button
-                className="btn btn-danger"
-                /* eslint-disable-next-line no-console */
-                onClick={() => console.info(body)}
-              >
-                Log to console
-              </button>
-            </pre>
-          </div>
-        )}
       </div>
 
       {/* Hiển thị thông tin */}

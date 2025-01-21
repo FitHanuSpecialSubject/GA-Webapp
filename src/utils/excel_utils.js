@@ -2,9 +2,12 @@ import {
   MATCHING,
   STABLE_MATCHING_REQ_REGEX,
   REQUIREMENT_ROW_NAME,
+  STABLE_MATCHING_WORKBOOK,
+  GAME_THEORY_WORKBOOK,
 } from "../const/excel_const";
 import ExcelJS from "exceljs";
 import colCache from "exceljs/lib/utils/col-cache";
+import { RESULT_WORKBOOK } from "../const/excel_const";
 
 /**
  * Tạo một sheet từ thông tin cấu hình máy tính.
@@ -14,7 +17,9 @@ import colCache from "exceljs/lib/utils/col-cache";
  */
 export const createSystemInfoSheet = (workbook, appData) => {
   const computerSpecs = appData?.result?.data?.computerSpecs || {};
-  const sheet = workbook.addWorksheet("Computer Specifications");
+  const sheet = workbook.addWorksheet(
+    RESULT_WORKBOOK.COMPUTER_SPECS_SHEET_NAME,
+  );
   sheet.addRows([
     ["Operating System Family", computerSpecs.osFamily || "unknown"],
     [
@@ -40,7 +45,9 @@ export const createParameterConfigSheet = (workbook, appData) => {
     appData.result.params.distributedCoreParam === "all"
       ? "All available cores"
       : appData.result.params.distributedCoreParam + " cores";
-  const sheet = workbook.addWorksheet("Parameter Configurations");
+  const sheet = workbook.addWorksheet(
+    RESULT_WORKBOOK.PARAMETER_CONFIG_SHEET_NAME,
+  );
   sheet.addRows([
     ["Number of distributed cores", numberOfCores],
     ["Population size", appData.result.params.populationSizeParam],
@@ -53,7 +60,99 @@ export const createParameterConfigSheet = (workbook, appData) => {
 };
 
 /**
+ * Tải thông tin bài toán từ Workbook
+ * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa thông tin bài toán
+ * @returns {Object} - Thông tin bài toán
+ */
+export const loadProblemInfoSMT = async (workbook) => {
+  const problemSheet = workbook.getWorksheet(
+    STABLE_MATCHING_WORKBOOK.PROBLEM_INFO_SHEET_NAME,
+  );
+  const problemName = getCellValueStr(problemSheet, "B1");
+  const setNum = getCellValueNum(problemSheet, "B2");
+  const totalNumberOfIndividuals = getCellValueNum(problemSheet, "B3");
+  const characteristicNum = getCellValueNum(problemSheet, "B4");
+  const fitnessFunction = getCellValueStr(problemSheet, "B5");
+  const setEvaluateFunction = [];
+  for (let i = 0; i < setNum; i++) {
+    setEvaluateFunction.push(problemSheet.getCell(`B${i + 5}`).value);
+  }
+  return {
+    problemName,
+    setNum,
+    totalNumberOfIndividuals,
+    characteristicNum,
+    fitnessFunction,
+    setEvaluateFunction,
+  };
+};
+
+/**
+ * Tải dữ liệu bài toán từ Workbook
+ * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
+ * @param {number} charNum - Số lượng characteristics
+ * @param {number} setNum - Số lượng set
+ * @returns {Object} - Dữ liệu bài toán
+ */
+export const loadDataset = async (workbook, charNum, setNum) => {
+  const dataSheet = workbook.getWorksheet(
+    STABLE_MATCHING_WORKBOOK.DATASET_SHEET_NAME,
+  );
+  const characteristics = [];
+  const setNames = [];
+  const setTypes = [];
+  const individualNames = [];
+  const individualSetIndices = [];
+  const individualCapacities = [];
+  const individualProperties = [];
+  const individualRequirements = [];
+  const individualWeights = [];
+  for (let i = 0; i < charNum; i++) {
+    const cellValue = dataSheet.getCell(1, i + 5).value;
+    characteristics.push(
+      cellValue == null ? `Characteristic ${i + 1}` : cellValue,
+    );
+  }
+  let rowPointer = 1;
+  for (let set = 0; set < setNum; set++) {
+    setNames.push(dataSheet.getCell(`A${rowPointer}`).value);
+    setTypes.push(dataSheet.getCell(`B${rowPointer}`).value);
+    const individualNum = Number(dataSheet.getCell(`D${rowPointer}`));
+    rowPointer++;
+    for (let i = 0; i < individualNum; i++) {
+      individualNames.push(dataSheet.getCell(`A${rowPointer}`).value);
+      individualCapacities.push(dataSheet.getCell(`C${rowPointer}`).value);
+      individualSetIndices.push(set);
+      const r = [];
+      const w = [];
+      const p = [];
+      for (let c = 0; c < charNum; c++) {
+        r.push(getPropertyRequirement(dataSheet, rowPointer, c + 5));
+        w.push(getPropertyWeight(dataSheet, rowPointer + 1, c + 5));
+        p.push(getPropertyValue(dataSheet, rowPointer + 2, c + 5));
+      }
+      individualRequirements.push(r);
+      individualWeights.push(w);
+      individualProperties.push(p);
+      rowPointer += 3;
+    }
+  }
+  return {
+    characteristics,
+    setNames,
+    setTypes,
+    individualNames,
+    individualCapacities,
+    individualSetIndices,
+    individualProperties,
+    individualRequirements,
+    individualWeights,
+  };
+};
+
+/**
  * Tải dữ liệu bài toán song song từ workbook
+ * @deprecated
  * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
  * @param {number} sheetNumber - Số thứ tự sheet cần đọc
  * @returns {Object} - Dữ liệu bài toán
@@ -192,20 +291,149 @@ export const loadProblemDataParallel = async (workbook, sheetNumber) => {
   };
 };
 
+export const loadProblemInfoGT = async (workbook) => {
+  const problemInfoWorksheet = workbook.getWorksheet(
+    GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME,
+  );
+
+  const problemName = problemInfoWorksheet.getCell("B1").value;
+  const specialPlayerExists = problemInfoWorksheet.getCell("B2").value;
+  const specialPlayerPropsNum = problemInfoWorksheet.getCell("B3").value;
+  const normalPlayerNum = problemInfoWorksheet.getCell("B4").value;
+  const normalPlayerPropsNum = problemInfoWorksheet.getCell("B5").value;
+  const fitnessFunction = problemInfoWorksheet.getCell("B6").value;
+  const playerPayoffFunction = problemInfoWorksheet.getCell("B7").value;
+  const isMaximizing =
+    (await problemInfoWorksheet.getCell("B8")?.value) &&
+    problemInfoWorksheet.getCell("B8")?.value.toString().toLowerCase() ===
+      "true";
+
+  return {
+    problemName,
+    specialPlayerExists,
+    specialPlayerPropsNum,
+    normalPlayerNum,
+    normalPlayerPropsNum,
+    fitnessFunction,
+    playerPayoffFunction,
+    isMaximizing,
+  };
+};
+
+export const loadNormalPlayers = async (
+  workbook,
+  normalPlayerNum,
+  normalPlayerPropsNum,
+) => {
+  let currentRow = 1;
+  const players = [];
+  let errorMessage = null;
+  const normalPlayerWorkSheet = workbook.getWorksheet(
+    GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME,
+  );
+  let currentPlayer = 0;
+
+  // LOAD PLAYERS
+  while (players.length < normalPlayerNum) {
+    const playerNameCell = normalPlayerWorkSheet.getCell(`A${currentRow}`);
+    const playerName = playerNameCell
+      ? playerNameCell.value
+      : `Player ${currentPlayer + 1}`; // because the player name is optional
+    const strategyNumber = normalPlayerWorkSheet.getCell(
+      `B${currentRow}`,
+    ).value;
+    // console.log(`name address: A${currentRow}, name value: ${playerName} , strat number: B${currentRow}`);
+
+    if (!strategyNumber || typeof strategyNumber !== "number") {
+      errorMessage =
+        "Error when loading player#" +
+        (currentPlayer + 1) +
+        " row = " +
+        currentRow +
+        " . Number of strategies is invalid";
+      throw new Error(errorMessage);
+    }
+    const payoffFunction = normalPlayerWorkSheet.getCell(`C${currentRow}`)
+      ? normalPlayerWorkSheet.getCell(`C${currentRow}`).value
+      : null;
+
+    const strategies = [];
+
+    // LOAD STRATEGIES
+    for (let i = 0; i < strategyNumber; i++) {
+      // currentRow + i because the current row is the player name and the strategy number
+      const strategyNameCell = normalPlayerWorkSheet.getCell(
+        `A${currentRow + i + 1}`,
+      );
+
+      const strategyName = strategyNameCell
+        ? strategyNameCell.value
+        : `Strategy ${i + 1}`; // because the strategy name is optional
+      const properties = [];
+      // LOAD PROPERTIES
+      for (let j = 0; j < normalPlayerPropsNum; j++) {
+        // c (1-based)
+        // r (1-based)
+        const propertyCell = normalPlayerWorkSheet.getCell(
+          currentRow + i + 1,
+          j + 2,
+        );
+        if (propertyCell.value) {
+          properties.push(propertyCell.value);
+        }
+      }
+
+      // CHECK IF THE STRATEGY HAS PROPERTIES
+      if (!properties.length) {
+        errorMessage =
+          "Error when loading player#" +
+          (currentPlayer + 1) +
+          " row = " +
+          (currentRow + i) +
+          ". Properties of strategy are invalid";
+        throw new Error(errorMessage);
+      }
+
+      strategies.push({
+        name: strategyName,
+        properties: properties,
+      });
+    }
+
+    // CHECK IF ALL STRATEGIES HAVE THE SAME NUMBER OF PROPERTIES
+    const allStrategiesHaveSameNumOfProps = strategies.every((strategy) => {
+      const firstStrategy = strategies[0];
+      return (strategy.properties.length = firstStrategy.properties.length);
+    });
+
+    if (!allStrategiesHaveSameNumOfProps) {
+      errorMessage = `Error when loading the player#${players.length + 1}.
+        All strategies of a player must have the same number of properties!`;
+      throw new Error(errorMessage);
+    }
+
+    players.push({
+      name: playerName,
+      strategies: strategies,
+      payoffFunction: payoffFunction,
+    });
+    currentRow += strategyNumber + 1;
+    currentPlayer++;
+  }
+
+  return players;
+};
+
 /**
  * Tải dữ liệu Exclude Pairs từ workbook
  * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
- * @param {number} sheetNumber - Số thứ tự sheet cần đọc
  * @param {number} specialPlayerPropsNum
  * @returns {Object} -  Exclude Pairs
  */
-export const loadSpecialPlayer = async (
-  workbook,
-  sheetNumber,
-  specialPlayerPropsNum,
-) => {
-  const sheetName = workbook.worksheets[sheetNumber].name;
-  const specialPlayerWorkSheet = workbook.getWorksheet(sheetName);
+export const loadSpecialPlayer = async (workbook, specialPlayerPropsNum) => {
+  const specialPlayerWorkSheet = workbook.getWorksheet(
+    GAME_THEORY_WORKBOOK.SPECIAL_PLAYER_SHEET_NAME,
+  );
   const properties = [];
   const weights = [];
 
@@ -221,17 +449,52 @@ export const loadSpecialPlayer = async (
   };
 };
 
+export const loadConflictSet = async (workbook) => {
+  const conflictSetWorkSheet = workbook.getWorksheet(
+    GAME_THEORY_WORKBOOK.CONFLICT_MATRIX_SHEET_NAME,
+  );
+  const conflictSet = [];
+  let row = 1;
+  let col = 1;
+  let currentCell = conflictSetWorkSheet.getCell(row, col);
+  // loop until there is a cell contains data
+  while (currentCell.value) {
+    const string = currentCell.value;
+    const conflict = string
+      .replace(/[( )]/g, "")
+      .split(",")
+      .map((item) => parseInt(item));
+    conflictSet.push({
+      leftPlayer: conflict[0],
+      leftPlayerStrategy: conflict[1],
+      rightPlayer: conflict[2],
+      rightPlayerStrategy: conflict[3],
+    });
+
+    col++; // move to the right cell
+    currentCell = conflictSetWorkSheet.getCell(row, col);
+
+    // after moving to the right cell, if the cell is empty, move to the next row
+    if (!currentCell) {
+      row++;
+      col = 0;
+      currentCell = conflictSetWorkSheet.getCell(row, col);
+    }
+  }
+
+  return conflictSet;
+};
+
 /**
  * Tải dữ liệu Exclude Pairs từ workbook
  * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
- * @param {number} sheetNumber - Số thứ tự sheet cần đọc
  * @returns {Object} -  Exclude Pairs
  */
-export const loadExcludePairs = async (workbook, sheetNumber) => {
-  const sheetName = workbook.getWorksheet(sheetNumber).name;
+export const loadExcludePairs = async (workbook) => {
+  const sheet = workbook.getWorksheet(
+    STABLE_MATCHING_WORKBOOK.EXCLUDE_PAIRS_SHEET_NAME,
+  );
   const result = {};
-  if (sheetName !== "Exclude Pairs") return result;
-  const sheet = workbook.getWorksheet(sheetName);
   let index = 2;
   while (
     getCellValueStr(sheet, "A" + index) !== "" &&
@@ -340,65 +603,66 @@ const getCellValueStr = (sheet, address) => {
 /**
  * Get cell value as Number
  * @param {ExcelJS.Worksheet} sheet
- * @param {string} address
+ * @param {number} row
+ * @param {number} col
  * @returns {number}
  *
  * @throws error if error
  */
-export const getCellValueNum = (sheet, address) => {
-  const val = Number(sheet.getCell(address)?.value);
+export const getCellValueNum = (sheet, row, col) => {
+  validateAddress(row, col);
+  const val = Number(sheet.getCell(row, col)?.value);
   if (Number.isNaN(val)) {
-    throw new TypeError("Invalid number format, cell address: " + address);
+    throw new TypeError(
+      `Invalid number format, cell address: R=${row} C=${col}`,
+    );
   }
   return val;
 };
 
-export const getPropertyValue = (sheet, row, column) => {
-  validateAddress(row, column);
-  const fieldAddress = colCache.encode(row, column);
+export const getPropertyValue = (sheet, row, col) => {
+  validateAddress(row, col);
+  const value = Number(sheet.getCell(row, col).value);
   try {
-    const value = Number(sheet.getCell(fieldAddress).value);
     if (Number.isNaN(value)) {
       throw new TypeError(`Invalid type for property value: ${value},
-        field address: ${fieldAddress},
+        field address: R=${row} C=${col},
         expected type: number`);
     } else {
       return value;
     }
   } catch (e) {
     console.error(e);
-    throw new Error(`Error when reading Property Value at: ${fieldAddress}`);
+    throw new Error(`Error when reading Property Value at: R=${row} C=${col}`);
   }
 };
 
-export const getPropertyWeight = (sheet, row, column) => {
-  validateAddress(row, column);
-  const fieldAddress = colCache.encode(row, column);
+export const getPropertyWeight = (sheet, row, col) => {
+  validateAddress(row, col);
   try {
-    const value = Number(sheet.getCell(fieldAddress).value);
+    const value = Number(sheet.getCell(row, col).value);
     if (!Number.isNaN(value)) {
       if (value < 0 || value > 10) {
         throw new RangeError(`Invalid value for property Weight: ${value},
-          field address: ${fieldAddress},
+          field address: R=${row} C=${col},
           expected value in range [0, 10] for Weight`);
       }
       return value;
     } else {
       throw new TypeError(`Invalid type for property Weight: ${value},
-        field address: ${fieldAddress},
+        field address: R=${row} C=${col},
         expected type: number`);
     }
   } catch (e) {
     console.error(e);
-    throw new Error(`Error when reading Property Weight at: ${fieldAddress}`);
+    throw new Error(`Error when reading Property Weight at: R=${row} C=${col}`);
   }
 };
 
-export const getPropertyRequirement = (sheet, row, column) => {
-  validateAddress(row, column);
-  const fieldAddress = colCache.encode(row, column);
+export const getPropertyRequirement = (sheet, row, col) => {
+  validateAddress(row, col);
   try {
-    const { value } = sheet.getCell(fieldAddress);
+    const { value } = sheet.getCell(row, col);
     if (!Number.isNaN(value)) {
       return value;
     } else if (typeof value === "string") {
@@ -406,17 +670,17 @@ export const getPropertyRequirement = (sheet, row, column) => {
         return value;
       } else {
         throw new TypeError(`Invalid string format for property Requirement: ${value},
-          field address: ${fieldAddress},
+          field address: R=${row} C=${col},
           expected value in format: "number:number" or "number++" or "number--"`);
       }
     } else {
       throw new TypeError(`Invalid type for property Requirement: ${value},
-        field address: ${fieldAddress},
+        field address: R=${row} C=${col},
         expected type: string, number`);
     }
   } catch (e) {
     console.error(e);
-    throw new Error(`Error when reading Property Value at: ${fieldAddress}`);
+    throw new Error(`Error when reading Property Value at: R=${row} C=${col}`);
   }
 };
 
