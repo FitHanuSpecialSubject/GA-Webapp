@@ -7,6 +7,7 @@ import DataContext from "../../module/core/context/DataContext";
 import ExcelJS from "exceljs";
 import { Link, useNavigate } from "react-router-dom";
 import "../../module/stableMatching/css/input.scss";
+import guidelines from "../../module/core/asset/workbook/guidelines.xlsx"; // Assuming the file is in the same folder
 
 import Loading from "../../module/core/component/Loading";
 import PopupContext from "../../module/core/context/PopupContext";
@@ -253,9 +254,6 @@ export default function InputPage() {
     const excludePairsWorksheet = workbook.addWorksheet(
       STABLE_MATCHING_WORKBOOK.EXCLUDE_PAIRS_SHEET_NAME,
     );
-    const guidelinesWorksheet = workbook.addWorksheet(
-      STABLE_MATCHING_WORKBOOK.GUIDELINE_SHEET_NAME,
-    );
 
     // Add "Problem Information" worksheet
     problemWorksheet.addRow(["Problem name", problemName]);
@@ -364,193 +362,27 @@ export default function InputPage() {
     excludePairsWorksheet.getCell("A1").value = "Individual";
     excludePairsWorksheet.getCell("B1").value = "Excluded from";
 
-    // Add value to header row and merge cells
-    guidelinesWorksheet.mergeCells("A1:C1");
-    const headerCell = guidelinesWorksheet.getCell("A1");
-    headerCell.value = "HƯỚNG DẪN CÁCH DÙNG FILE INPUT MATCHING THEORY";
-
-    // Set background color to light blue
-    headerCell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "ADD8E6" }, // Light blue color code
-    };
-
-    // Center the text in the merged cells
-    headerCell.alignment = { vertical: "middle", horizontal: "center" };
-
-    // Adjust column widths
-    guidelinesWorksheet.getColumn("A").width = 25; // Set the width of column A to 15
-    guidelinesWorksheet.getColumn("B").width = 100; // Set the width of column B to 15
-    guidelinesWorksheet.getColumn("C").width = 25; // Set the width of column C to 15
-
-    // Add values to the second row
-    const cellValues = ["TÊN Ô", "CHỨC NĂNG", "GHI CHÚ"];
-    const cellStyles = [
-      { bgColor: "8a52f2", textColor: "ffffff" },
-      {
-        bgColor: "0c6125",
-        textColor: "ffffff",
-      },
-      { bgColor: "d479d2", textColor: "ffffff" },
-    ];
-
-    cellValues.forEach((value, index) => {
-      const cell = guidelinesWorksheet.getCell(
-        `${String.fromCharCode(65 + index)}2`,
+    // Load the guidelines.xlsx file
+    try {
+      const guidelinesWorkbook = new ExcelJS.Workbook();
+      const response = await fetch(guidelines); // Fetch the local guidelines.xlsx file
+      const arrayBuffer = await response.arrayBuffer();
+      await guidelinesWorkbook.xlsx.load(arrayBuffer);
+      const guidelinesSheet = workbook.addWorksheet(
+        STABLE_MATCHING_WORKBOOK.GUIDELINE_SHEET_NAME,
       );
-      cell.value = value;
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: cellStyles[index].bgColor },
-      };
-      cell.font = {
-        color: { argb: cellStyles[index].textColor },
-      };
-      cell.alignment = { vertical: "middle", horizontal: "center" };
-    });
-
-    // Add values to the 3rd to 13th row
-
-    const colA = [
-      "Problem name",
-      "Number of set",
-      "Number of individuals",
-      "Number of characteristics",
-      "Fitness function",
-      "Evaluate Function set_1",
-      "Evaluate Function set_2",
-      "Capacity",
-      "Set Many",
-      "Set One",
-      "Requirements",
-    ];
-
-    // Set purple background color and black text for cells B3 to B13
-    colA.forEach((value, index) => {
-      const cell = guidelinesWorksheet.getCell(`A${3 + index}`);
-      cell.value = value;
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "d8bff5" }, // Purple color code
-      };
-      cell.font = {
-        color: { argb: "FF000000" }, // Black text color code
-      };
-      cell.alignment = { vertical: "middle", horizontal: "left" };
-
-      if (index === 4) {
-        const row = guidelinesWorksheet.getRow(7);
-        row.height = 400; // Set the desired height
-      } else if (index === 10) {
-        const row = guidelinesWorksheet.getRow(13);
-        row.height = 100; // Set the desired height
-      } else if (index === 8) {
-        const row = guidelinesWorksheet.getRow(11);
-        row.height = 45; // Set the desired height
-      } else if (index === 9) {
-        const row = guidelinesWorksheet.getRow(12);
-        row.height = 45; // Set the desired height
-      }
-    });
-    const colB = [
-      "Tên problem được lấy từ dữ liệu người dùng nhập trên trang input",
-      "Số lượng các set tham gia được lấy từ dữ liệu người dùng nhập trên trang input",
-      "Số lượng tất cả các cá thể ở mỗi set tham gia được lấy từ dữ liệu người dùng nhập trên trang input",
-      "Tổng số lượng các thuộc tính của các cá thể tham gia được lấy từ dữ liệu người dùng nhập trên trang input",
-      `
-    Hàm fitness được lấy từ dữ liệu người dùng nhập trên trang input
-    Cách nhập hàm:
-    Hiện tại, evaluate function có thể xử lý theo 3 loại biến:
-    *$: R: requirement của các individual đối với 1 characteristic cụ thể
-    *$: P: properties của các individidual đối với 1 characteristic cụ thể
-    *$: W: trọng số của characteristic đối với individual (characteristic đó quan trọng ở mức nào đối với inidividual)
-    *$: Ví dụ cụ thể: P1*R1*W1+P2*R2*W2 sẽ là hàm mà phần mềm có thể xử lý được. Phần mềm không xử lý kiểu hàm cũ, trừ khi người dùng để default
-     * $: i - index of MatchSet in "matches"
-             * $: set - value (1 or 2) represent set 1 (0) or set 2 (1)
-             * $: S(set) - Sum of all payoff scores of "set" evaluate by opposite set
-             * $: M(i) - Value of specific matchSet's satisfaction eg: M0 (satisfactory of Individual no 0)
-             
-             * Supported functions:
-             * #: SIGMA{S1} calculate sum of all MatchSet of a belonging set eg: SIGMA{S1}
-             
-             * Supported mathematical calculations:
-             * Name:    Usage
-             * 1. absolute       : abs(expression)
-             * 2. exponent      : (expression)^(expression)
-             * 3. sin                 : sin(expression)
-             * 4. cos                 : cos(expression)
-             * 5. tan                : tan(expression)
-             * 6. logarithm     : log(expression)(expression)
-             * 7. square root: sqrt(expression)
-    `,
-      "Hàm đánh giá của set 1 được lấy từ dữ liệu người dùng nhập trên trang input",
-      "Hàm đánh giá của set 2 được lấy từ dữ liệu người dùng nhập trên trang input",
-      "Người dùng nhập capacity của từng đối tượng (ví dụ: nếu A có thể match với 2 người thì capacity bằng 2)",
-      "Set 1 là Set Many do người dùng đã tick trong phần lựa chọn ở trang input",
-      "Set 2 là Set One do người dùng đã tick trong phần lựa chọn ở trang input",
-      `Người dùng nhập chỉ số yêu cầu của từng cá thể
-- Về phần các characteristic của các Individual:
-       + Đối với các characteristic dạng chữ, có thể phân tích thành nhiều input khác nhau không có quy luật(ví dụ như skills có thể có cooking, swimming, drawing,...): 
-        Các nhóm cần chia thành từng characteristic theo các input đấy (ví dụ như skills thì sẽ tách ra thành cooking, swimming,... và để thành characteristic riêng biệt)
-        và đánh giá bằng điểm số (ví dụ swimming: 10 điểm, cooking: 6 điểm).
-       +  Đối với các characteristic đánh giá theo mức độ (ví dụ như low, medium, high): 
-       Các nhóm cần chuyển đổi thành dạng số theo thang điểm 10 và giới hạn các mức độ theo từng mốc điểm.`,
-    ];
-
-    // Set purple background color and black text for cells B3 to B13
-    colB.forEach((value, index) => {
-      const cell = guidelinesWorksheet.getCell(`B${3 + index}`);
-      cell.value = value;
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "b4fac7" }, // Green color code
-      };
-      cell.font = {
-        color: { argb: "FF000000" }, // Black text color code
-      };
-      cell.alignment = { vertical: "middle", horizontal: "left" };
-
-      if (index === 4) {
-        cell.alignment = { wrapText: true };
-      } else if (index === 10) {
-        cell.alignment = { wrapText: true };
-      }
-    });
-
-    // Set purple background color and black text for cells C3 to C13
-    for (let rowNumber = 3; rowNumber <= 13; rowNumber++) {
-      const cell = guidelinesWorksheet.getCell(`C${rowNumber}`);
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "fee6ff" }, // Pink color
-      };
+      guidelinesSheet.model = guidelinesWorkbook.getWorksheet(
+        STABLE_MATCHING_WORKBOOK.GUIDELINE_SHEET_NAME,
+      ).model;
+    } catch (error) {
+      console.error("Error loading guidelines.xlsx:", error);
+      displayPopup(
+        "Error",
+        "Failed to load guidelines.xlsx. Please check the file and try again.",
+        true,
+      );
+      return;
     }
-
-    guidelinesWorksheet.mergeCells("C11:C12");
-    const cellC11 = guidelinesWorksheet.getCell("C11");
-    cellC11.value = `Phần này người dùng không cần quá quan tâm vì đây chỉ là note cho backend dễ xử lý hơn`;
-    cellC11.alignment = {
-      vertical: "middle",
-      horizontal: "center",
-      wrapText: true,
-    };
-
-    // Add light gray borders to all cells
-    guidelinesWorksheet.eachRow((row) => {
-      row.eachCell((cell) => {
-        cell.border = {
-          top: { style: "thin", color: { argb: "b0b0b0" } }, // Light gray color
-          left: { style: "thin", color: { argb: "b0b0b0" } },
-          bottom: { style: "thin", color: { argb: "b0b0b0" } },
-          right: { style: "thin", color: { argb: "b0b0b0" } },
-        };
-      });
-    });
 
     // Save the workbook
     const buffer = await workbook.xlsx.writeBuffer();
