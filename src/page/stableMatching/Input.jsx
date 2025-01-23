@@ -363,67 +363,17 @@ export default function InputPage() {
     excludePairsWorksheet.getCell("B1").value = "Excluded from";
 
     // Load the guidelines.xlsx file
-    // Load the guidelines.xlsx file
     try {
       const guidelinesWorkbook = new ExcelJS.Workbook();
       const response = await fetch(guidelines); // Fetch the local guidelines.xlsx file
       const arrayBuffer = await response.arrayBuffer();
       await guidelinesWorkbook.xlsx.load(arrayBuffer);
-
-      // Merge worksheets from guidelines.xlsx into the new workbook
-      guidelinesWorkbook.eachSheet((sheet) => {
-        const newSheet = workbook.addWorksheet(sheet.name); // Add a new sheet with the same name
-
-        // Copy column widths
-        sheet.columns.forEach((col, colIndex) => {
-          if (col && col.width) {
-            newSheet.getColumn(colIndex + 1).width = col.width; // Copy column width
-          }
-        });
-
-        // Copy rows with styles and row heights
-        sheet.eachRow((row) => {
-          const newRow = newSheet.addRow(row.values.slice(1)); // Remove the first empty value (ExcelJS rows start with an empty index at 0)
-
-          // Copy row height
-          if (row.height) {
-            newRow.height = row.height; // Copy row height
-          }
-
-          // Copy styles for each cell in the row
-          row.eachCell({ includeEmpty: true }, (cell, colIndex) => {
-            const newCell = newRow.getCell(colIndex);
-
-            // Copy value
-            newCell.value = cell.value;
-
-            // Copy style properties
-            if (cell.style) {
-              newCell.style = { ...cell.style }; // Copy the cell style
-            }
-
-            // Copy fill (background color)
-            if (cell.fill) {
-              newCell.fill = { ...cell.fill };
-            }
-
-            // Copy font
-            if (cell.font) {
-              newCell.font = { ...cell.font };
-            }
-
-            // Copy border
-            if (cell.border) {
-              newCell.border = { ...cell.border };
-            }
-
-            // Copy alignment
-            if (cell.alignment) {
-              newCell.alignment = { ...cell.alignment };
-            }
-          });
-        });
-      });
+      const guidelinesSheet = workbook.addWorksheet(
+        STABLE_MATCHING_WORKBOOK.GUIDELINE_SHEET_NAME,
+      );
+      guidelinesSheet.model = guidelinesWorkbook.getWorksheet(
+        STABLE_MATCHING_WORKBOOK.GUIDELINE_SHEET_NAME,
+      ).model;
     } catch (error) {
       console.error("Error loading guidelines.xlsx:", error);
       displayPopup(
