@@ -95,7 +95,7 @@ export default function OutputPage() {
       setIsLoading(true);
       await connectWebSocket(); // connect to websocket to get the progress percentage
       const res = await axios.post(
-        `http://${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/api/problem-result-insights/${sessionCode}`,
+        `http://${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}/api/problem-result-insights/${sessionCode}`,
         body,
       );
       setIsLoading(false);
@@ -125,7 +125,7 @@ export default function OutputPage() {
 
   const connectWebSocket = async () => {
     const Sock = new SockJS(
-      `http://${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/ws`,
+      `http://${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}/ws`,
     );
     stompClient = over(Sock);
     await stompClient.connect({}, onConnected, onError);
@@ -135,11 +135,10 @@ export default function OutputPage() {
       "/session/" + sessionCode + "/progress",
       onPrivateMessage,
     );
-    console.log("Connected to websocket server!");
   };
 
   const onError = (err) => {
-    console.log(err);
+    console.error(err);
     // displayPopup("Something went wrong!", "Connect to server failed!, please contact the admin!", true)
   };
 
