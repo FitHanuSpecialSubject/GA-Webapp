@@ -23,6 +23,7 @@ import { v4 } from "uuid";
 import { over } from "stompjs";
 import ExcelJS from "exceljs";
 import { RESULT_WORKBOOK } from "../../const/excel_const";
+import { getBackendAddress } from "../../utils/http_utils";
 
 let stompClient = null;
 export default function OutputPage() {
@@ -95,7 +96,7 @@ export default function OutputPage() {
       setIsLoading(true);
       await connectWebSocket(); // connect to websocket to get the progress percentage
       const res = await axios.post(
-        `http://${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}/api/problem-result-insights/${sessionCode}`,
+        `${getBackendAddress()}/api/problem-result-insights/${sessionCode}`,
         body,
       );
       setIsLoading(false);
@@ -124,9 +125,7 @@ export default function OutputPage() {
   };
 
   const connectWebSocket = async () => {
-    const Sock = new SockJS(
-      `http://${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}/ws`,
-    );
+    const Sock = new SockJS(`${getBackendAddress()}/ws`);
     stompClient = over(Sock);
     await stompClient.connect({}, onConnected, onError);
   };

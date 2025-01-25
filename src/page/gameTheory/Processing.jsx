@@ -10,6 +10,7 @@ import Loading from "../../module/core/component/Loading";
 import ParamSettingBox from "../../module/core/component/ParamSettingBox";
 import PopupContext from "../../module/core/context/PopupContext";
 import { GT_ALGORITHMS } from "../../const/game_theory_const";
+import { getBackendAddress } from "../../utils/http_utils";
 export default function InputProcessingPage() {
   const navigate = useNavigate();
   const { appData, setAppData } = useContext(DataContext);
@@ -51,7 +52,7 @@ export default function InputProcessingPage() {
       };
       setIsLoading(true);
       const res = await axios.post(
-        `http://${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}/api/game-theory-solver`,
+        `${getBackendAddress()}/api/game-theory-solver`,
         body,
       );
       const usedAlgorithm = res.data.data.algorithm;
