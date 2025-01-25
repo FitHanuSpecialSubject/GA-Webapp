@@ -13,10 +13,10 @@ export const STABLE_MATCHING_WORKBOOK = {
 };
 
 export const GAME_THEORY_WORKBOOK = {
-  PROBLEM_INFO_SHEET_NAME: "Problem Information",
-  NORMAL_PLAYER_SHEET_NAME: "Normal Players",
-  SPECIAL_PLAYER_SHEET_NAME: "Special Players",
-  CONFLICT_MATRIX_SHEET_NAME: "Conflict Matrix",
+  PROBLEM_INFO_SHEET_NAME: "Problem information",
+  NORMAL_PLAYER_SHEET_NAME: "Normal player",
+  SPECIAL_PLAYER_SHEET_NAME: "Special player",
+  CONFLICT_MATRIX_SHEET_NAME: "Conflict matrix",
   GUIDELINE_SHEET_NAME: "Guidelines",
 };
 
