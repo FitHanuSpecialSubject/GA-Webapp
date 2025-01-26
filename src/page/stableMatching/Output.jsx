@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../../module/stableMatching/css/output.scss";
 import GraphImage from "../../module/core/asset/image/graph.png";
 import { useContext, useState } from "react";
@@ -43,9 +43,11 @@ export default function MatchingOutputPage() {
   const [maxTimeParam, setMaxTimeParam] = useState(5000);
   const [selectedSet, setSelectedSet] = useState("all");
   const problemType = appData.problemType;
-  if (appData == null) {
-    return <NothingToShow />;
-  }
+  useEffect(() => {
+    if (appData == null) {
+      return <NothingToShow />;
+    }
+  }, []);
   const matchesArray = appData.result.data.matches.matches;
   const leftOversArray = appData.result.data.matches.leftOvers;
   const problemData = appData.problem;
@@ -177,11 +179,10 @@ export default function MatchingOutputPage() {
       "/session/" + sessionCode + "/progress",
       onPrivateMessage,
     );
-    console.log("Connected to websocket server!");
   };
 
   const onError = (err) => {
-    console.log(err);
+    console.error(err);
     // displayPopup("Something went wrong!", "Connect to server failed!, please contact the admin!", true)
   };
 
@@ -206,15 +207,11 @@ export default function MatchingOutputPage() {
 
   // Get data from sever
 
-  console.log(appData.result.data);
   const fitnessValue = appData.result.data.fitnessValue.toFixed(3);
   const usedAlgorithm = appData.result.data.algorithm;
   const runtime = appData.result.data.runtime.toFixed(3);
   const htmlOutput = [];
   const htmlLeftOvers = [];
-
-  console.log(appData);
-
   // Loop through result
 
   let fileContent = "";

@@ -114,10 +114,8 @@ export default function InputProcessingPage() {
         generation: generationParam,
         maxTime: maxTimeParam,
       };
-
       const serviceEndpoint = problemType.endpoint;
       const endpoint = `${getBackendAddress()}${serviceEndpoint}`;
-
       setIsLoading(true);
       const res = await axios.post(endpoint, requestBody);
       const runtime = res.data.data.runtime;

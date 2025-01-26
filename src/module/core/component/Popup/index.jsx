@@ -19,9 +19,6 @@ export default function Popup({
       okCallback();
     }
   };
-  if (okCallback) {
-    okCallback();
-  }
 
   if (!isShow) return null;
   return (

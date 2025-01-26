@@ -614,7 +614,7 @@ export const getCellValueNum = (sheet, row, col) => {
   const val = Number(sheet.getCell(row, col)?.value);
   if (Number.isNaN(val)) {
     throw new TypeError(
-      `Invalid number format, cell address: R=${row} C=${col}`,
+      `Invalid number format, cell address: ${colCache.encode(row, col)}`,
     );
   }
   return val;
@@ -633,7 +633,9 @@ export const getPropertyValue = (sheet, row, col) => {
     }
   } catch (e) {
     console.error(e);
-    throw new Error(`Error when reading Property Value at: R=${row} C=${col}`);
+    throw new Error(
+      `Error when reading Property Value at: ${colCache.encode(row, col)}`,
+    );
   }
 };
 
@@ -655,14 +657,16 @@ export const getPropertyWeight = (sheet, row, col) => {
     }
   } catch (e) {
     console.error(e);
-    throw new Error(`Error when reading Property Weight at: R=${row} C=${col}`);
+    throw new Error(
+      `Error when reading Property Weight at: ${colCache.encode(row, col)}`,
+    );
   }
 };
 
 export const getPropertyRequirement = (sheet, row, col) => {
   validateAddress(row, col);
   try {
-    const { value } = sheet.getCell(row, col);
+    const value = Number(sheet.getCell(row, col).value);
     if (!Number.isNaN(value)) {
       return value;
     } else if (typeof value === "string") {
@@ -670,17 +674,19 @@ export const getPropertyRequirement = (sheet, row, col) => {
         return value;
       } else {
         throw new TypeError(`Invalid string format for property Requirement: ${value},
-          field address: R=${row} C=${col},
+          field address: ${colCache.encode(row, col)},
           expected value in format: "number:number" or "number++" or "number--"`);
       }
     } else {
       throw new TypeError(`Invalid type for property Requirement: ${value},
-        field address: R=${row} C=${col},
+        field address: ${colCache.encode(row, col)},
         expected type: string, number`);
     }
   } catch (e) {
     console.error(e);
-    throw new Error(`Error when reading Property Value at: R=${row} C=${col}`);
+    throw new Error(
+      `Error when reading Property Value at: ${colCache.encode(row, col)}`,
+    );
   }
 };
 

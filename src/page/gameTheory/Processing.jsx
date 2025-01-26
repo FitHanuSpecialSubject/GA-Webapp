@@ -10,6 +10,7 @@ import Loading from "../../module/core/component/Loading";
 import ParamSettingBox from "../../module/core/component/ParamSettingBox";
 import PopupContext from "../../module/core/context/PopupContext";
 import { GT_ALGORITHMS } from "../../const/game_theory_const";
+import { getBackendAddress } from "../../utils/http_utils";
 export default function InputProcessingPage() {
   const navigate = useNavigate();
   const { appData, setAppData } = useContext(DataContext);
@@ -50,13 +51,10 @@ export default function InputProcessingPage() {
         maxTime: maxTimeParam,
       };
       setIsLoading(true);
-      console.log("MAKE a POST request to: ");
       const res = await axios.post(
-        `http://${process.env.REACT_APP_BACKEND_URL}:${process.env.REACT_APP_BACKEND_PORT}/api/game-theory-solver`,
+        `${getBackendAddress()}/api/game-theory-solver`,
         body,
       );
-      // const reswait axios.post(`http://172.20.0.2:${process.env.REACT_APP_BACKEND_PORT}/api/game-theory-solver`, body);
-      console.log(res.data.data);
       const usedAlgorithm = res.data.data.algorithm;
 
       const result = {
@@ -101,7 +99,7 @@ export default function InputProcessingPage() {
         maxTimeParam={maxTimeParam}
         setMaxTimeParam={setMaxTimeParam}
       />
-      {algorithm == "PAES" && (
+      {algorithm === "PAES" && (
         <p style={{ color: "red", textAlign: "center" }}>
           Population size takes no effect for PAES algorithm
         </p>
