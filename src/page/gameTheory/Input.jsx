@@ -350,14 +350,17 @@ export default function InputPage() {
       const arrayBuffer = await response.arrayBuffer();
       await guidelinesWorkbook.xlsx.load(arrayBuffer);
       const guidelinesSheet = workbook.addWorksheet(
-        GAME_THEORY_WORKBOOK.GUIDELINE_SHEET_NAME
+        GAME_THEORY_WORKBOOK.GUIDELINE_SHEET_NAME,
       );
       guidelinesSheet.model = guidelinesWorkbook.getWorksheet(
         GAME_THEORY_WORKBOOK.GUIDELINE_SHEET_NAME,
       ).model;
     } catch (error) {
       console.error(error);
-      displayPopup("Failed to load gtguidelines.xlsx. Please check the file and try again.",true,);
+      displayPopup(
+        "Failed to load gtguidelines.xlsx. Please check the file and try again.",
+        true,
+      );
     }
 
     // Save workbooks
