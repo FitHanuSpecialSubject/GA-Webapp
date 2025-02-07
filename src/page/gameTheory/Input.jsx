@@ -13,6 +13,7 @@ import Loading from "../../module/core/component/Loading";
 import MaxMinCheckbox from "../../module/core/component/MaxMinCheckbox";
 import PopupContext from "../../module/core/context/PopupContext";
 import { validateExcelFile } from "../../utils/file_utils";
+import guidelines from "../../module/core/asset/workbook/guidelinesGT.xlsx";
 import ExcelJS from "exceljs";
 import {
   loadConflictSet,
@@ -337,6 +338,27 @@ export default function InputPage() {
       }
       // add the row4, row5, row6, row7 to the end of sheet3
       sheet3.addRows([row4, row5, row6, row7]);
+    }
+    // Load the guidelines.xlsx file
+    try {
+      const guidelinesWorkbook = new ExcelJS.Workbook();
+      const response = await fetch(guidelines); // Fetch the local guidelines.xlsx file
+      const arrayBuffer = await response.arrayBuffer();
+      await guidelinesWorkbook.xlsx.load(arrayBuffer);
+      const guidelinesSheet = workbook.addWorksheet(
+        workbook.GUIDELINE_SHEET_NAME,
+      );
+      guidelinesSheet.model = guidelinesWorkbook.getWorksheet(
+        workbook.GUIDELINE_SHEET_NAME,
+      ).model;
+    } catch (error) {
+      console.error("Error loading guidelines.xlsx:", error);
+      displayPopup(
+        "Error",
+        "Failed to load guidelines.xlsx. Please check the file and try again.",
+        true,
+      );
+      return;
     }
 
     // Write the sheet4(blank sheet) for user to input conflict matrix
