@@ -21,6 +21,8 @@ import {
   loadSpecialPlayer,
 } from "../../utils/excel_utils";
 import { GAME_THEORY_WORKBOOK } from "../../const/excel_const";
+import GT_GUIDELINE from "../../module/core/asset/workbook/gtguidelines.xlsx";
+
 export default function InputPage() {
   // initialize form data
   const [excelFile, setExcelFile] = useState(null);
@@ -342,6 +344,26 @@ export default function InputPage() {
     // Write the sheet4(blank sheet) for user to input conflict matrix
     workbook.addWorksheet(GAME_THEORY_WORKBOOK.CONFLICT_MATRIX_SHEET_NAME);
 
+    try {
+      const guidelinesWorkbook = new ExcelJS.Workbook();
+      const response = await fetch(GT_GUIDELINE);
+      const arrayBuffer = await response.arrayBuffer();
+      await guidelinesWorkbook.xlsx.load(arrayBuffer);
+      const guidelinesSheet = workbook.addWorksheet(
+        GAME_THEORY_WORKBOOK.GUIDELINE_SHEET_NAME,
+      );
+      guidelinesSheet.model = guidelinesWorkbook.getWorksheet(
+        GAME_THEORY_WORKBOOK.GUIDELINE_SHEET_NAME,
+      ).model;
+    } catch (error) {
+      console.error(error);
+      displayPopup(
+        "Failed to load gtguidelines.xlsx. Please check the file and try again.",
+        true,
+      );
+    }
+
+    // Save workbooks
     const wbout = await workbook.xlsx.writeBuffer();
     const blob = new Blob([wbout]);
     saveAs(blob, "input.xlsx");
