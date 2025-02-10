@@ -19,7 +19,7 @@ export default function Header() {
       <header className="Navbar">
         <div className="container">
           <div className="app-name" onClick={backToHome}>
-            <img src="/logo.png" className="me-2 logo" />
+            <img src="/logo.svg" className="logo" />
             Game Theory & Matching Theory Solver
           </div>
           <div className="nav-item-container">

@@ -36,7 +36,8 @@ export default function InputPage() {
   const [characteristicsNumError, setCharacteristicsNumError] = useState("");
   const [totalIndividualsNumError, setTotalIndividualsNumError] = useState("");
   const [fitnessFunctionError, setFitnessFunctionError] = useState("");
-  const { setAppData, setGuideSectionIndex } = useContext(DataContext);
+  const { setAppData, setGuideSectionIndex, setFavicon } =
+    useContext(DataContext);
   const { displayPopup } = useContext(PopupContext);
   const [colNums, setColNums] = useState(0);
   const [setEvaluateFunction, setSetEvaluateFunction] = useState(
@@ -71,7 +72,9 @@ export default function InputPage() {
       }
     }
   }, [excelFile]);
-
+  useEffect(() => {
+    setFavicon("idle");
+  }, []);
   // Function to read data from the Excel file
   const readExcelFile = async (file) => {
     const reader = new FileReader();
