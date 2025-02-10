@@ -13,7 +13,7 @@ import { SMT_ALGORITHMS } from "../../const/matching_const";
 
 export default function InputProcessingPage() {
   const navigate = useNavigate();
-  const { appData, setAppData } = useContext(DataContext);
+  const { appData, setAppData, setFavicon } = useContext(DataContext);
   const [isLoading, setIsLoading] = useState(false);
   const [algorithm, setAlgorithm] = useState(SMT.DEFAULT_ALGORITHM);
   const [distributedCoreParam, setDistributedCoreParam] = useState(
@@ -72,11 +72,13 @@ export default function InputProcessingPage() {
         displayPopup("Error", "Stable Matching Problem data is missing.", true);
         return;
       }
+      setFavicon("running");
 
       const evaluateFunctions = appData.problem.evaluateFunctions || [];
       for (const func of evaluateFunctions) {
         for (const keyword of SMT_VALIDATE.INVALID_MATH_SYMBOLS) {
           if (func.includes(keyword)) {
+            setFavicon("error");
             return displayPopup(
               "Invalid Evaluate Function(s)",
               `Evaluate function (${func}) contains invalid symbol (${keyword})`,
@@ -88,6 +90,7 @@ export default function InputProcessingPage() {
       // Validate fitness func
       for (const keyword of SMT_VALIDATE.INVALID_MATH_SYMBOLS) {
         if (appData.problem.fitnessFunction.includes(keyword)) {
+          setFavicon("error");
           return displayPopup(
             "Invalid Evaluate Function(s)",
             `Fitness function (${appData.problem.fitnessFunction}) contains invalid symbol (${keyword})`,
@@ -140,10 +143,12 @@ export default function InputProcessingPage() {
       });
 
       setIsLoading(false);
+      setFavicon("success");
       navigate("/matching-theory/result");
     } catch (err) {
       console.error(err);
       // Handle Errors
+      setFavicon("error");
       if (err instanceof AxiosError) {
         let title;
         let message;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../../module/gameTheory/css/output.scss";
 import PlayerResult from "../../module/gameTheory/component/PlayerResult";
 import ExcelImage from "../../module/core/asset/image/excel.png";
@@ -28,7 +28,7 @@ import { getBackendAddress } from "../../utils/http_utils";
 let stompClient = null;
 export default function OutputPage() {
   const navigate = useNavigate();
-  const { appData, setAppData } = useContext(DataContext);
+  const { appData, setAppData, setFavicon } = useContext(DataContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isShowPopup, setIsShowPopup] = useState(false);
   const { displayPopup } = useContext(PopupContext);
@@ -46,6 +46,9 @@ export default function OutputPage() {
   if (appData == null) {
     return <NothingToShow />;
   }
+  useEffect(() => {
+    setFavicon("success");
+  }, []);
 
   const handleExportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
@@ -80,6 +83,7 @@ export default function OutputPage() {
 
   const handlePopupOk = async () => {
     try {
+      setFavicon("running");
       setIsShowPopup(false);
       const body = {
         specialPlayer: appData.problem.specialPlayer,
@@ -112,8 +116,10 @@ export default function OutputPage() {
       };
       setAppData({ ...appData, insights });
       closeWebSocketConnection();
+      setFavicon("success");
       navigate("/insights"); // navigate to insights page
     } catch (err) {
+      setFavicon("error");
       console.error(err);
       setIsLoading(false);
       displayPopup(

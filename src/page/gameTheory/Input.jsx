@@ -49,7 +49,8 @@ export default function InputPage() {
 
   const [excelFileError, setExcelFileError] = useState("");
 
-  const { setAppData, setGuideSectionIndex } = useContext(DataContext);
+  const { setAppData, setGuideSectionIndex, setFavicon } =
+    useContext(DataContext);
   const { displayPopup } = useContext(PopupContext);
 
   const navigate = useNavigate();
@@ -73,7 +74,9 @@ export default function InputPage() {
       }
     }
   }, [excelFile]);
-
+  useEffect(() => {
+    setFavicon("idle");
+  }, []);
   // read file
   const readExcelFile = async (file) => {
     const reader = new FileReader();
@@ -278,7 +281,9 @@ export default function InputPage() {
     const payoffFunction = playerPayoffFunction;
 
     // write problem information to sheet1
-    const sheet1 = workbook.addWorksheet("Sheet 1");
+    const sheet1 = workbook.addWorksheet(
+      GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME,
+    );
     sheet1.addRows([
       ["Problem name", problemName],
       ["Special Player exists (0 - No, 1 -Yes) ", specialPlayerExists ? 1 : 0],

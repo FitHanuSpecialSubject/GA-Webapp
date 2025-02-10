@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "../module/core/component/Navbar";
 import InputPage from "../page/gameTheory/Input";
 import "../module/core/css/index.scss";
@@ -19,6 +19,7 @@ function App() {
   const [popupMessage, setPopupMessage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [popupOkCallBack] = useState();
+  const [favicon, setFavicon] = useState("idle");
   const displayPopup = (title, message, error) => {
     setShowPopup(true);
     setPopupTitle(title);
@@ -29,9 +30,21 @@ function App() {
   };
   const StableMatchingRouter = stableMatchingRouter();
   const GameTheoryRouter = gameTheoryRouter();
+  useEffect(() => {
+    document.querySelector("link[rel~='icon']").href = `/${favicon}.svg`;
+  }, [favicon]);
+  useEffect(() => {
+    setFavicon("idle");
+  }, []);
   return (
     <DataContext.Provider
-      value={{ appData, setAppData, guideSectionIndex, setGuideSectionIndex }}
+      value={{
+        appData,
+        setAppData,
+        guideSectionIndex,
+        setGuideSectionIndex,
+        setFavicon,
+      }}
     >
       <PopupContext.Provider value={{ displayPopup }}>
         <div className="App">

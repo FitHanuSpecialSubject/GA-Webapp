@@ -27,7 +27,7 @@ import { RESULT_WORKBOOK } from "../../const/excel_const";
 let stompClient = null;
 export default function MatchingOutputPage() {
   const navigate = useNavigate();
-  const { appData, setAppData } = useContext(DataContext);
+  const { appData, setAppData, setFavicon } = useContext(DataContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isShowPopup, setIsShowPopup] = useState(false);
   const { displayPopup } = useContext(PopupContext);
@@ -115,6 +115,7 @@ export default function MatchingOutputPage() {
 
   const handlePopupOk = async () => {
     try {
+      setFavicon("running");
       const evaluateFunctions = appData.problem.evaluateFunctions || [];
 
       setIsShowPopup(false);
@@ -145,7 +146,7 @@ export default function MatchingOutputPage() {
       await connectWebSocket(); // connect to websocket to get the progress percentage
       const res = await axios.post(endpoint, body);
       setIsLoading(false);
-
+      setFavicon("success");
       const insights = {
         data: res.data.data,
         params: {
@@ -166,6 +167,7 @@ export default function MatchingOutputPage() {
         "Get insights failed!, please contact the admin!",
         true,
       );
+      setFavicon("error");
     }
   };
 

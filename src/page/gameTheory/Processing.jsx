@@ -13,7 +13,7 @@ import { GT_ALGORITHMS } from "../../const/game_theory_const";
 import { getBackendAddress } from "../../utils/http_utils";
 export default function InputProcessingPage() {
   const navigate = useNavigate();
-  const { appData, setAppData } = useContext(DataContext);
+  const { appData, setAppData, setFavicon } = useContext(DataContext);
   const [isLoading, setIsLoading] = useState(false);
   const [algorithm, setAlgorithm] = useState("NSGAII");
   const [distributedCoreParam, setDistributedCoreParam] = useState("all");
@@ -50,6 +50,7 @@ export default function InputProcessingPage() {
         generation: generationParam,
         maxTime: maxTimeParam,
       };
+      setFavicon("running");
       setIsLoading(true);
       const res = await axios.post(
         `${getBackendAddress()}/api/game-theory-solver`,
@@ -72,6 +73,7 @@ export default function InputProcessingPage() {
       navigate("/result");
     } catch (err) {
       console.error(err);
+      setFavicon("error");
       setIsLoading(false);
       displayPopup(
         "Running failed",
