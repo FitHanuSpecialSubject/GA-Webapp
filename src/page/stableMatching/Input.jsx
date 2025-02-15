@@ -85,6 +85,39 @@ export default function InputPage() {
         const data = reader.result;
         const workbook = await new ExcelJS.Workbook().xlsx.load(data);
 
+        if (!workbook.getWorksheet("Dataset")) {
+          displayPopup(
+            "Excel Error",
+            "The sheet 'Dataset' is missing. Please check the file.",
+            true,
+          );
+          setExcelFile(null);
+          setIsLoading(false);
+          return;
+        }
+
+        if (!workbook.getWorksheet("Exclude Pairs")) {
+          displayPopup(
+            "Excel Error",
+            "The sheet 'Exclude Pairs' is missing. Please check the file.",
+            true,
+          );
+          setExcelFile(null);
+          setIsLoading(false);
+          return;
+        }
+
+        if (!workbook.getWorksheet("Problem Information")) {
+          displayPopup(
+            "Excel Error",
+            "The sheet 'Problem Information' is missing. Please check the file.",
+            true,
+          );
+          setExcelFile(null);
+          setIsLoading(false);
+          return;
+        }
+
         let problemInfo;
         let excludePairs;
         let dataset;

@@ -95,7 +95,7 @@ export default function InputPage() {
           setIsLoading(false);
           displayPopup(
             "Something went wrong!",
-            "Error when loading the Problem Information sheet",
+            "Looks like your file doesn't have a Problem Information sheet.",
             true,
           );
         }
@@ -117,7 +117,7 @@ export default function InputPage() {
             setIsLoading(false);
             displayPopup(
               "Something went wrong!",
-              "Error when loading the Special Player sheet",
+              "Looks like your file doesn't have a Special Player sheet",
               true,
             );
           }
@@ -132,7 +132,7 @@ export default function InputPage() {
             let errorMessage = error;
             console.error(error);
             if (!errorMessage) {
-              errorMessage = `Error when loading Normal Player sheet.`;
+              errorMessage = `Looks like your file doesn't have a Normal Player sheet.`;
             }
             setIsLoading(false);
             displayPopup("Something went wrong!", errorMessage, true);
@@ -145,7 +145,7 @@ export default function InputPage() {
             setIsLoading(false);
             displayPopup(
               "Something went wrong!",
-              "Error when loading the Conflict Matrix sheet",
+              "Looks like your file doesn't have a Conflict matrix sheet",
               true,
             );
           }
@@ -166,7 +166,7 @@ export default function InputPage() {
             setIsLoading(false);
             displayPopup(
               "Something went wrong!",
-              "Error when loading the Conflict Matrix sheet",
+              "Looks like your file doesn't have a Conflict matrix sheet",
               true,
             );
           } // sheet 2 is the conflict set sheet
