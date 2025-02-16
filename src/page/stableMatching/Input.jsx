@@ -436,7 +436,6 @@ export default function InputPage() {
     setSetIndividuals(Array.from({ length: value }, () => ""));
     setSetEvaluateFunction(Array.from({ length: value }, () => "DEFAULT"));
     setSetMany(Array.from({ length: value }, () => ""));
-    console.log(setEvaluateFunction);
   };
   const generateTable = () => {
     const table = [];
