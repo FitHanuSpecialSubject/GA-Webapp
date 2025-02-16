@@ -137,21 +137,25 @@ export default function InputPage() {
       );
     }
   };
+  useEffect(() => {
+    if (problemType) {
+      displayPopup("Invalid Form!", problemType, true);
+      setProblemType("");
+    }
+  }, [problemType]);
 
   const handleGetExcelTemplate = () => {
-    if (fitnessFunction.length === 0) {
-      setFitnessFunction("DEFAULT");
-    }
     if (validateForm()) {
       downloadExcel().then();
-    } else {
-      displayPopup(
-        "Invalid Form!",
-        // "Make sure you have filled all the required fields.",
-        problemType,
-        true,
-      );
     }
+    // else {
+    //   displayPopup(
+    //     "Invalid Form!",
+    //     "Make sure you have filled all the required fields.",
+    //     problemType,
+    //     true,
+    //   );
+    // }
   };
 
   const validateForm = () => {
@@ -202,11 +206,15 @@ export default function InputPage() {
     }
 
     // Kiểm tra số lượng cá nhân
-    if (!totalIndividualsNum || totalIndividualsNum > maxTotalIndividuals) {
+    if (
+      !totalIndividualsNum ||
+      totalIndividualsNum > maxTotalIndividuals ||
+      totalIndividualsNum < 2
+    ) {
       setTotalIndividualsNumError(
-        `The number of individuals must be from 1 to ${maxTotalIndividuals}`,
+        `The number of individuals must be from 2 to ${maxTotalIndividuals}`,
       );
-      msg = `The number of individuals must be from 1 to ${maxTotalIndividuals}`;
+      msg = `The number of individuals must be from 2 to ${maxTotalIndividuals}`;
       error = true;
     } else {
       setTotalIndividualsNumError("");
@@ -221,9 +229,9 @@ export default function InputPage() {
     //   setFitnessFunctionError("");
     // }
     // Kiểm tra số lượng tập
-    if (!setNum || setNum > maxSets) {
-      setSetNumError(`Number of set must be from 1 to ${maxSets}`);
-      msg = `Number of set must be from 1 to ${maxSets}`;
+    if (!setNum || setNum > maxSets || setNum < 2) {
+      setSetNumError(`Number of set must be from 2 to ${maxSets}`);
+      msg = `Number of set must be from 2 to ${maxSets}`;
       error = true;
     } else {
       setSetNumError("");
@@ -244,15 +252,17 @@ export default function InputPage() {
       setFitnessFunction("DEFAULT");
     } else {
       if (!validFunctionPattern.test(fitnessFunction)) {
-        setFitnessFunctionError("Function value contains an invalid character");
-        msg = "Function value contains an invalid character";
+        setFitnessFunctionError(
+          "Function value contains an invalid character or unsupported function",
+        );
+        msg =
+          "Function value contains an invalid character or unsupported function";
         error = true;
       } else {
         setFitnessFunctionError("");
       }
     }
 
-    // vì if không bỏ qua việc hàm rỗng nên báo lỗi khi để rỗng
     setEvaluateFunction.forEach((evaluateFunction, index) => {
       // tự động chuyển thành default nếu rỗng
       if (!evaluateFunction) {

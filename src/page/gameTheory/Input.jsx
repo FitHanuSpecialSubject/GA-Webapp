@@ -205,17 +205,25 @@ export default function InputPage() {
       );
     }
   };
+
+  useEffect(() => {
+    if (problemType) {
+      displayPopup("Invalid Form!", problemType, true);
+      setProblemType("");
+    }
+  }, [problemType]);
+
   const handleGetExcelTemplate = () => {
     if (validateForm()) {
       downloadExcel().then();
-    } else {
-      displayPopup(
-        "Invalid Form!",
-        // "Make sure you have filled all the required fields.",
-        problemType,
-        true,
-      );
     }
+    // else {
+    //   displayPopup(
+    //     "Invalid Form!",
+    //     "Make sure you have filled all the required fields.",
+    //     true,
+    //   );
+    // }
   };
 
   // Potential bug: the error message only shows after the first time the user clicks the button
@@ -250,6 +258,7 @@ export default function InputPage() {
     // check if the number of normal players is in range [2, 1000], any future update will require to update this range
     if (!normalPlayerNum) {
       setNormalPlayerNumError("Normal player number must not be empty");
+      msg = "Normal player number must not be empty";
       error = true;
     } else if (
       parseInt(normalPlayerNum) < 2 ||
