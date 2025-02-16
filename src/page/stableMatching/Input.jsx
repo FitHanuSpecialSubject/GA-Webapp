@@ -28,9 +28,10 @@ export default function InputPage() {
   const [setNum, setSetNum] = useState(undefined);
   const [characteristicsNum, setCharacteristicsNum] = useState(undefined);
   const [totalIndividualsNum, setTotalIndividualsNum] = useState(undefined);
-  const [fitnessFunction, setFitnessFunction] = useState("");
+  const [fitnessFunction, setFitnessFunction] = useState("DEFAULT");
   const [isLoading, setIsLoading] = useState(false);
   const [excelFileError, setExcelFileError] = useState("");
+  const [problemType, setProblemType] = useState("");
   const [problemNameError, setProblemNameError] = useState("");
   const [setNumError, setSetNumError] = useState("");
   const [characteristicsNumError, setCharacteristicsNumError] = useState("");
@@ -41,7 +42,7 @@ export default function InputPage() {
   const { displayPopup } = useContext(PopupContext);
   const [colNums, setColNums] = useState(0);
   const [setEvaluateFunction, setSetEvaluateFunction] = useState(
-    Array.from({ length: colNums }, () => ""),
+    Array.from({ length: colNums }, () => "DEFAULT"),
   );
   const [setIndividuals, setSetIndividuals] = useState(
     Array.from({ length: colNums }, () => ""),
@@ -136,29 +137,41 @@ export default function InputPage() {
       );
     }
   };
+  useEffect(() => {
+    if (problemType) {
+      displayPopup("Invalid Form!", problemType, true);
+      setProblemType("");
+    }
+  }, [problemType]);
 
   const handleGetExcelTemplate = () => {
     if (validateForm()) {
       downloadExcel().then();
-    } else {
-      displayPopup(
-        "Invalid Form!",
-        "Make sure you have filled all the required fields.",
-        true,
-      );
     }
+    // else {
+    //   displayPopup(
+    //     "Invalid Form!",
+    //     "Make sure you have filled all the required fields.",
+    //     problemType,
+    //     true,
+    //   );
+    // }
   };
 
   const validateForm = () => {
     let error = false;
+    let msg = "";
     const maxSets = SMT.MAX_SET; // Số lượng tập tối đa
     const maxCharacteristics = 20; // Số lượng đặc điểm tối đa
     const maxTotalIndividuals = 10000; // Số lượng cá nhân tối đa
 
     const validFunctionPattern = /^[a-zA-Z0-9s+\-*/^()]+$/;
     // check if the problem name is empty
-    if (!problemName) {
-      setProblemNameError("Problem name must not be empty");
+    if (problemName.length == 0 || problemName.length > 255) {
+      setProblemNameError(
+        "Problem name must not be empty or exceed 255 characters",
+      );
+      msg = "Problem name must not be empty or exceed 255 characters";
       error = true;
     } else {
       setProblemNameError("");
@@ -167,6 +180,7 @@ export default function InputPage() {
     // check if the number of set is empty
     if (!setNum) {
       setSetNumError("Number of set must not be empty");
+      msg = "Number of set must not be empty";
       error = true;
     } else {
       setSetNumError("");
@@ -175,6 +189,7 @@ export default function InputPage() {
     // check if the number of characteristics is empty
     if (!characteristicsNum) {
       setCharacteristicsNumError("Number of characteristics must not be empty");
+      msg = "Number of characteristics must not be empty";
       error = true;
     } else {
       setCharacteristicsNumError("");
@@ -190,16 +205,33 @@ export default function InputPage() {
       setTotalIndividualsNumError("");
     }
 
-    // check if the number of strategies is empty
-    if (!fitnessFunction) {
-      setFitnessFunctionError("Fitness function must not be empty");
+    // Kiểm tra số lượng cá nhân
+    if (
+      !totalIndividualsNum ||
+      totalIndividualsNum > maxTotalIndividuals ||
+      totalIndividualsNum < 2
+    ) {
+      setTotalIndividualsNumError(
+        `The number of individuals must be from 2 to ${maxTotalIndividuals}`,
+      );
+      msg = `The number of individuals must be from 2 to ${maxTotalIndividuals}`;
       error = true;
     } else {
-      setFitnessFunctionError("");
+      setTotalIndividualsNumError("");
     }
+
+    //  Kiểm tra xem hàm fitness có rỗng không
+    // if (!fitnessFunction) {
+    //   setFitnessFunctionError("Fitness function must not be empty");
+    //   msg = "Fitness function must not be empty";
+    //   error = true;
+    // } else {
+    //   setFitnessFunctionError("");
+    // }
     // Kiểm tra số lượng tập
-    if (!setNum || setNum > maxSets) {
-      setSetNumError(`Number of set must be from 1 to ${maxSets}`);
+    if (!setNum || setNum > maxSets || setNum < 2) {
+      setSetNumError(`Number of set must be from 2 to ${maxSets}`);
+      msg = `Number of set must be from 2 to ${maxSets}`;
       error = true;
     } else {
       setSetNumError("");
@@ -210,38 +242,46 @@ export default function InputPage() {
       setCharacteristicsNumError(
         `The number of characteristics must be from 1 to ${maxCharacteristics}`,
       );
+      msg = `The number of characteristics must be from 1 to ${maxCharacteristics}`;
       error = true;
     } else {
       setCharacteristicsNumError("");
     }
 
-    // Kiểm tra số lượng cá nhân
-    if (!totalIndividualsNum || totalIndividualsNum > maxTotalIndividuals) {
-      setTotalIndividualsNumError(
-        `The number of individuals must be from 1 to ${maxTotalIndividuals}`,
-      );
-      error = true;
+    if (fitnessFunction.length === 0) {
+      setFitnessFunction("DEFAULT");
     } else {
-      setTotalIndividualsNumError("");
+      if (!validFunctionPattern.test(fitnessFunction)) {
+        setFitnessFunctionError(
+          "Function value contains an invalid character or unsupported function",
+        );
+        msg =
+          "Function value contains an invalid character or unsupported function";
+        error = true;
+      } else {
+        setFitnessFunctionError("");
+      }
     }
 
-    // fitness
-    if (!fitnessFunction || !validFunctionPattern.test(fitnessFunction)) {
-      setFitnessFunctionError("Function value contains an invalid character");
-      error = true;
-    } else {
-      setFitnessFunctionError("");
-    }
     setEvaluateFunction.forEach((evaluateFunction, index) => {
-      if (!evaluateFunction || !validFunctionPattern.test(evaluateFunction)) {
+      // tự động chuyển thành default nếu rỗng
+      if (!evaluateFunction) {
+        setSetEvaluateFunction((prevState) => {
+          const newState = [...prevState];
+          newState[index] = "DEFAULT";
+          return newState;
+        });
+      } else if (!validFunctionPattern.test(evaluateFunction)) {
         setSetEvaluateFunction((prevState) => {
           const newState = [...prevState];
           newState[index] = "Function value contains an invalid character";
+          msg = "Function value contains an invalid character";
           return newState;
         });
         error = true;
       }
     });
+    setProblemType(msg);
     // if there is no error, return true
     return !error;
   };
@@ -419,9 +459,19 @@ export default function InputPage() {
     setSetNum(value);
     setColNums(value);
     setSetIndividuals(Array.from({ length: value }, () => ""));
-    setSetEvaluateFunction(Array.from({ length: value }, () => ""));
+    setSetEvaluateFunction(Array.from({ length: value }, () => "DEFAULT"));
     setSetMany(Array.from({ length: value }, () => ""));
   };
+
+  const handleFitnessFunctionChange = (e) => {
+    const value = e.target.value;
+    if (value.length === 0) {
+      setFitnessFunction("DEFAULT");
+    } else {
+      setFitnessFunction(value);
+    }
+  };
+
   const generateTable = () => {
     const table = [];
     for (let i = 0; i < 4; i++) {
@@ -474,6 +524,8 @@ export default function InputPage() {
                 type="text"
                 className="input-table-data"
                 placeholder={`Evaluate Function Set_${k + 1}`}
+                // Thiếu value nên ban đầu không render được default value
+                value={setEvaluateFunction[k]}
                 onChange={(e) => {
                   const newSetEvaluateFunction = [...setEvaluateFunction];
                   newSetEvaluateFunction[k] = e.target.value;
@@ -577,6 +629,7 @@ export default function InputPage() {
               type="text"
               error={fitnessFunctionError}
               handleOnChange={(e) => setFitnessFunction(e.target.value)}
+              onBlur={handleFitnessFunctionChange}
               value={fitnessFunction}
               description="The fitness function is a mathematical function that represents the payoff that a player receives for a specific combination of strategies played by all the players in the game"
               guideSectionIndex={5}
