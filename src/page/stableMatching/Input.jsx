@@ -139,6 +139,9 @@ export default function InputPage() {
   };
 
   const handleGetExcelTemplate = () => {
+    if (fitnessFunction.length === 0) {
+      setFitnessFunction("DEFAULT");
+    }
     if (validateForm()) {
       downloadExcel().then();
     } else {
@@ -210,13 +213,13 @@ export default function InputPage() {
     }
 
     //  Kiểm tra xem hàm fitness có rỗng không
-    if (!fitnessFunction) {
-      setFitnessFunctionError("Fitness function must not be empty");
-      msg = "Fitness function must not be empty";
-      error = true;
-    } else {
-      setFitnessFunctionError("");
-    }
+    // if (!fitnessFunction) {
+    //   setFitnessFunctionError("Fitness function must not be empty");
+    //   msg = "Fitness function must not be empty";
+    //   error = true;
+    // } else {
+    //   setFitnessFunctionError("");
+    // }
     // Kiểm tra số lượng tập
     if (!setNum || setNum > maxSets) {
       setSetNumError(`Number of set must be from 1 to ${maxSets}`);
@@ -237,16 +240,28 @@ export default function InputPage() {
       setCharacteristicsNumError("");
     }
 
-    // fitness
-    if (!fitnessFunction || !validFunctionPattern.test(fitnessFunction)) {
-      setFitnessFunctionError("Function value contains an invalid character");
-      msg = "Function value contains an invalid character";
-      error = true;
+    if (fitnessFunction.length === 0) {
+      setFitnessFunction("DEFAULT");
     } else {
-      setFitnessFunctionError("");
+      if (!validFunctionPattern.test(fitnessFunction)) {
+        setFitnessFunctionError("Function value contains an invalid character");
+        msg = "Function value contains an invalid character";
+        error = true;
+      } else {
+        setFitnessFunctionError("");
+      }
     }
+
+    // vì if không bỏ qua việc hàm rỗng nên báo lỗi khi để rỗng
     setEvaluateFunction.forEach((evaluateFunction, index) => {
-      if (!evaluateFunction || !validFunctionPattern.test(evaluateFunction)) {
+      // tự động chuyển thành default nếu rỗng
+      if (!evaluateFunction) {
+        setSetEvaluateFunction((prevState) => {
+          const newState = [...prevState];
+          newState[index] = "DEFAULT";
+          return newState;
+        });
+      } else if (!validFunctionPattern.test(evaluateFunction)) {
         setSetEvaluateFunction((prevState) => {
           const newState = [...prevState];
           newState[index] = "Function value contains an invalid character";
@@ -437,6 +452,16 @@ export default function InputPage() {
     setSetEvaluateFunction(Array.from({ length: value }, () => "DEFAULT"));
     setSetMany(Array.from({ length: value }, () => ""));
   };
+
+  const handleFitnessFunctionChange = (e) => {
+    const value = e.target.value;
+    if (value.length === 0) {
+      setFitnessFunction("DEFAULT");
+    } else {
+      setFitnessFunction(value);
+    }
+  };
+
   const generateTable = () => {
     const table = [];
     for (let i = 0; i < 4; i++) {
@@ -594,6 +619,7 @@ export default function InputPage() {
               type="text"
               error={fitnessFunctionError}
               handleOnChange={(e) => setFitnessFunction(e.target.value)}
+              onBlur={handleFitnessFunctionChange}
               value={fitnessFunction}
               description="The fitness function is a mathematical function that represents the payoff that a player receives for a specific combination of strategies played by all the players in the game"
               guideSectionIndex={5}
