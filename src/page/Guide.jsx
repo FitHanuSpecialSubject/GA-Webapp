@@ -18,6 +18,7 @@ export default function GuidePage() {
   const problemSMRef = useRef();
   const backendSMRef = useRef();
   const outputSMRef = useRef();
+  const excelSMRef = useRef();
 
   const refArray = [
     gettingStartedRef,
@@ -34,6 +35,7 @@ export default function GuidePage() {
     problemSMRef,
     backendSMRef,
     outputSMRef,
+    excelSMRef,
   ];
 
   const { guideSectionIndex, setGuideSectionIndex } = useContext(DataContext);
@@ -74,6 +76,7 @@ export default function GuidePage() {
     observer.observe(problemSMRef.current);
     observer.observe(backendSMRef.current);
     observer.observe(outputSMRef.current);
+    observer.observe(excelSMRef.current);
     return () => observer.disconnect();
   }, []);
 
@@ -223,6 +226,14 @@ export default function GuidePage() {
           onClick={() => scrollTo(outputSMRef)}
         >
           Outputs
+        </div>
+        <div
+          className={`sidebar__item__title ${
+            guideFor == "sm" ? "d-block" : "d-none"
+          } ${checkIfHightlight(13)}`}
+          onClick={() => scrollTo(excelSMRef)}
+        >
+          Input to Excel
         </div>
       </div>
 
@@ -1100,6 +1111,68 @@ export default function GuidePage() {
             voluptas, reiciendis placeat laboriosam ipsum quis dolorem nam qui
             accusantium consectetur provident.
           </p>
+        </section>
+        {/* <div
+          className={`sidebar__item__title ${guideFor == "sm" ? "d-block" : "d-none"} ${checkIfHightlight(9)}`}
+          onClick={() => scrollTo(inputToExcelRef)}
+        >
+          Input to Excel
+        </div> */}
+        <section
+          className={`section ${guideFor == "sm" ? "d-block" : "d-none"}`}
+          ref={excelSMRef}
+          id="9"
+        >
+          <h1>Input to Excel</h1>
+          <div className="steps">
+            <b>Input problem data</b>
+            <ol>
+              <li>Enter the name of your problem (Text)</li>
+              <li>
+                Enter the number of sets
+                <ul>
+                  <li>
+                    The system will display a corresponding table after you fill
+                    in the information in Step 2.
+                  </li>
+                  <li>
+                    Determine which set is one/many, then tick the blank box if
+                    that set is many. As instructed below:
+                    <ul>
+                      <li>
+                        {`Set many: Capacity = 1 The number of individuals in the
+                        set {">"} the opponent's set`}
+                      </li>
+                      <li>{`Set one: Capacity > 1 The number of individuals in the set {"<"} the opponent's set`}</li>
+                    </ul>
+                    Fill in the information in the blank box:
+                    <ul>
+                      <li>
+                        <b>Num individuals of Set_x:</b> The number of
+                        individuals of the corresponding set
+                      </li>
+                      <li>
+                        <b>Evaluate Function Set_x:</b> The evaluation function
+                        corresponding to that set
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>Enter the number of characteristics of both sets</li>
+              <li>Enter the number of total individuals of both sets</li>
+              <li>Enter the fitness function which you initialize</li>
+              <li>
+                Click the button <b>Get Excel Templates</b> to receive the Excel
+                file that contains all the information you entered above
+              </li>
+              <li>
+                Select or drag and drop the Excel file you just received at the
+                dotted line and the <b>Choose a file</b> button for the system
+                to process your problem
+              </li>
+            </ol>
+          </div>
         </section>
       </div>
     </div>
