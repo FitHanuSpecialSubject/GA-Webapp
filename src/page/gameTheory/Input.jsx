@@ -30,12 +30,13 @@ export default function InputPage() {
   const [problemName, setProblemName] = useState("");
   const [specialPlayerExists, setSpecialPlayerExists] = useState("");
   const [specialPlayerPropsNum, setSpecialPlayerPropsNum] = useState(null);
-  const [normalPlayerNum, setNormalPlayerNum] = useState(null);
-  const [normalPlayerPropsNum, setNormalPlayerPropsNum] = useState(null);
-  const [fitnessFunction, setFitnessFunction] = useState("");
-  const [playerPayoffFunction, setPlayerPayoffFunction] = useState("");
+  const [normalPlayerNum, setNormalPlayerNum] = useState("");
+  const [normalPlayerPropsNum, setNormalPlayerPropsNum] = useState("");
+  const [fitnessFunction, setFitnessFunction] = useState("DEFAULT");
+  const [playerPayoffFunction, setPlayerPayoffFunction] = useState("DEFAULT");
   const [isMaximizing, setIsMaximizing] = useState(false);
 
+  const [problemType, setProblemType] = useState("");
   const [problemNameError, setProblemNameError] = useState("");
   const [specialPlayerPropsNumError, setSpecialPlayerPropsNumError] =
     useState("");
@@ -208,18 +209,24 @@ export default function InputPage() {
     } else {
       displayPopup(
         "Invalid Form!",
-        "Make sure you have filled all the required fields.",
+        // "Make sure you have filled all the required fields.",
+        problemType,
         true,
       );
     }
   };
 
+  // Potential bug: the error message only shows after the first time the user clicks the button
   const validateForm = () => {
     let error = false;
+    let msg = "";
 
     // check if the problem name is empty
-    if (!problemName) {
-      setProblemNameError("Problem name must not be empty");
+    if (problemName.length == 0 || problemName.length > 255) {
+      setProblemNameError(
+        "Problem name must not be empty or exceed 255 characters",
+      );
+      msg = "Problem name must not be empty or exceed 255 characters";
       error = true;
     } else {
       setProblemNameError("");
@@ -236,20 +243,41 @@ export default function InputPage() {
         setSpecialPlayerPropsNumError("");
       }
     }
-
     // check if the number of normal players is empty
+    // check if the number of normal players is in range [2, 1000], any future update will require to update this range
     if (!normalPlayerNum) {
       setNormalPlayerNumError("Normal player number must not be empty");
+      error = true;
+    } else if (
+      parseInt(normalPlayerNum) < 2 ||
+      parseInt(normalPlayerNum) > 1000
+    ) {
+      setNormalPlayerNumError(
+        "Normal player number must be between 2 and 1000",
+      );
+      msg = "Normal player number must be between 2 and 1000";
       error = true;
     } else {
       setNormalPlayerNumError("");
     }
 
     // check if the number of normal player properties is empty
+    /** check if the number of normal players' characteristics is in
+    range [1, 20], any future update will require to update this range **/
     if (!normalPlayerPropsNum) {
       setNormalPlayerPropsNumError(
         "Normal player properties must not be empty",
       );
+      msg = "Normal player properties must not be empty";
+      error = true;
+    } else if (
+      parseInt(normalPlayerPropsNum) < 1 ||
+      parseInt(normalPlayerPropsNum) > 20
+    ) {
+      setNormalPlayerPropsNumError(
+        "Normal player properties must be between 1 and 20",
+      );
+      msg = "Normal player properties must be between 1 and 20";
       error = true;
     } else {
       setNormalPlayerPropsNumError("");
@@ -258,6 +286,7 @@ export default function InputPage() {
     // check if the number of strategies is empty
     if (!fitnessFunction) {
       setFitnessFunctionError("Fitness function must not be empty");
+      msg = "Fitness function must not be empty";
       error = true;
     } else {
       setFitnessFunctionError("");
@@ -266,10 +295,13 @@ export default function InputPage() {
     // check if the number of strategies is empty
     if (!playerPayoffFunction) {
       setPlayerPayoffFunctionError("Player payoff function must not be empty");
+      msg = "Player payoff function must not be empty";
       error = true;
     } else {
       setPlayerPayoffFunctionError("");
     }
+
+    setProblemType(msg);
 
     // if there is no error, return true
     return !error;
