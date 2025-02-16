@@ -284,21 +284,27 @@ export default function InputPage() {
     }
 
     // check if the number of strategies is empty
-    if (!fitnessFunction) {
-      setFitnessFunctionError("Fitness function must not be empty");
-      msg = "Fitness function must not be empty";
-      error = true;
-    } else {
-      setFitnessFunctionError("");
+    // if (!fitnessFunction) {
+    //   setFitnessFunctionError("Fitness function must not be empty");
+    //   msg = "Fitness function must not be empty";
+    //   error = true;
+    // } else {
+    //   setFitnessFunctionError("");
+    // }
+    if (fitnessFunction.length == 0) {
+      setFitnessFunction("DEFAULT");
     }
 
     // check if the number of strategies is empty
-    if (!playerPayoffFunction) {
-      setPlayerPayoffFunctionError("Player payoff function must not be empty");
-      msg = "Player payoff function must not be empty";
-      error = true;
-    } else {
-      setPlayerPayoffFunctionError("");
+    // if (!playerPayoffFunction) {
+    //   setPlayerPayoffFunctionError("Player payoff function must not be empty");
+    //   msg = "Player payoff function must not be empty";
+    //   error = true;
+    // } else {
+    //   setPlayerPayoffFunctionError("");
+    // }
+    if (playerPayoffFunction.length == 0) {
+      setPlayerPayoffFunction("DEFAULT");
     }
 
     setProblemType(msg);
