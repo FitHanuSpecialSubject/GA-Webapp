@@ -151,9 +151,9 @@ export default function InputPage() {
 
   const validateForm = () => {
     let error = false;
-    const maxSets = 10; // Số lượng tập tối đa
-    const maxCharacteristics = 15; // Số lượng đặc điểm tối đa
-    const maxTotalIndividuals = 100; // Số lượng cá nhân tối đa
+    const maxSets = SMT.MAX_SET; // Số lượng tập tối đa
+    const maxCharacteristics = 20; // Số lượng đặc điểm tối đa
+    const maxTotalIndividuals = 10000; // Số lượng cá nhân tối đa
 
     const validFunctionPattern = /^[a-zA-Z0-9s+\-*/^()]+$/;
     // check if the problem name is empty
