@@ -43,6 +43,8 @@ export default function InputPage() {
   const [normalPlayerNumError, setNormalPlayerNumError] = useState("");
   const [normalPlayerPropsNumError, setNormalPlayerPropsNumError] =
     useState("");
+  /** Nếu function và payoff để trống thì thành value mặc định rồi nên chỗ này không cần
+  check ở hiện tại, sau này có thêm function khác thì check sau **/
   const [fitnessFunctionError, setFitnessFunctionError] = useState("");
   const [playerPayoffFunctionError, setPlayerPayoffFunctionError] =
     useState("");
@@ -220,6 +222,7 @@ export default function InputPage() {
   const validateForm = () => {
     let error = false;
     let msg = "";
+    const validFunctionPattern = /^[a-zA-Z0-9s+\-*/^()]+$/;
 
     // check if the problem name is empty
     if (problemName.length == 0 || problemName.length > 255) {
@@ -291,10 +294,6 @@ export default function InputPage() {
     // } else {
     //   setFitnessFunctionError("");
     // }
-    if (fitnessFunction.length == 0) {
-      setFitnessFunction("DEFAULT");
-    }
-
     // check if the number of strategies is empty
     // if (!playerPayoffFunction) {
     //   setPlayerPayoffFunctionError("Player payoff function must not be empty");
@@ -303,8 +302,27 @@ export default function InputPage() {
     // } else {
     //   setPlayerPayoffFunctionError("");
     // }
+
+    // function phải viết liền dấu (không có khoảng trắng, vd: p1-p2)
+    if (fitnessFunction.length == 0) {
+      setFitnessFunction("DEFAULT");
+    } else {
+      if (!validFunctionPattern.test(fitnessFunction)) {
+        setFitnessFunctionError("Fitness function is invalid");
+        msg = "Fitness function is invalid";
+        error = true;
+      }
+    }
+
+    // function phải viết liền dấu (không có khoảng trắng, vd: p1-p2)
     if (playerPayoffFunction.length == 0) {
       setPlayerPayoffFunction("DEFAULT");
+    } else {
+      if (!validFunctionPattern.test(playerPayoffFunction)) {
+        setPlayerPayoffFunctionError("Player payoff function is invalid");
+        msg = "Player payoff function is invalid";
+        error = true;
+      }
     }
 
     setProblemType(msg);
