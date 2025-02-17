@@ -12,6 +12,7 @@ export default function InputPage({ setFile, setProblemType, problemType }) {
       <select
         className="form-select mb-4"
         onChange={(e) => setProblemType(e.target.value)}
+        value={problemType}
       >
         <option value="">Choose problem type</option>
         <option value="SMT">Stable Matching Theory</option>
@@ -26,7 +27,7 @@ export default function InputPage({ setFile, setProblemType, problemType }) {
       />
     </div>
   );
-};
+}
 
 InputPage.propTypes = {
   setFile: PropTypes.func,

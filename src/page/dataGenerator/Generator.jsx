@@ -14,14 +14,20 @@ export default function GeneratingPage({ file, setFile, problemType }) {
     try {
       reader.readAsArrayBuffer(f);
       reader.onload = async () => {
-        const data = reader.result;
-        const workbook = await new ExcelJS.Workbook().xlsx.load(data);
-        if (problemType === "SMT") {
-          const info = generatorSMTReader(workbook);
-          setWorkbook(workbook);
-          setInfo(info);
-        } else {
-          null;
+        try {
+          const data = reader.result;
+          const workbook = await new ExcelJS.Workbook().xlsx.load(data);
+          if (problemType === "SMT") {
+            const info = generatorSMTReader(workbook);
+            setWorkbook(workbook);
+            setInfo(info);
+          } else {
+            null;
+          }
+        } catch (e) {
+          console.error(e);
+          setFile(null);
+          displayPopup("Error", e.message, true);
         }
       };
     } catch (e) {
