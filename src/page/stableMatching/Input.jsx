@@ -220,15 +220,6 @@ export default function InputPage() {
       setTotalIndividualsNumError("");
     }
 
-    //  Kiểm tra xem hàm fitness có rỗng không
-    // if (!fitnessFunction) {
-    //   setFitnessFunctionError("Fitness function must not be empty");
-    //   msg = "Fitness function must not be empty";
-    //   error = true;
-    // } else {
-    //   setFitnessFunctionError("");
-    // }
-    // Kiểm tra số lượng tập
     if (!setNum || setNum > maxSets || setNum < 2) {
       setSetNumError(`Number of set must be from 2 to ${maxSets}`);
       msg = `Number of set must be from 2 to ${maxSets}`;
@@ -263,24 +254,43 @@ export default function InputPage() {
       }
     }
 
+    // Chưa tìm được phương pháp ghi đè lên giá trị sau khi popup lỗi rồi sửa lại bỏ trống thành default
+    // check hàm fitness của từng set
     setEvaluateFunction.forEach((evaluateFunction, index) => {
-      // tự động chuyển thành default nếu rỗng
       if (!evaluateFunction) {
         setSetEvaluateFunction((prevState) => {
           const newState = [...prevState];
           newState[index] = "DEFAULT";
           return newState;
         });
-      } else if (!validFunctionPattern.test(evaluateFunction)) {
-        setSetEvaluateFunction((prevState) => {
-          const newState = [...prevState];
-          newState[index] = "Function value contains an invalid character";
+      } else {
+        if (!validFunctionPattern.test(evaluateFunction)) {
+          setSetEvaluateFunction((prevState) => {
+            const newState = [...prevState];
+            newState[index] = "Function value contains an invalid character";
+            return newState;
+          });
           msg = "Function value contains an invalid character";
-          return newState;
-        });
+          error = true;
+        }
+      }
+    });
+
+    // check từng indiviuals của từng thằng trong set hợp lệ chưa
+    setIndividuals.forEach((element) => {
+      if (element.length == 0) {
+        (msg = "The number of individuals in every set must not be empty"),
+          (error = true);
+      } else if (
+        parseInt(element) < 0 ||
+        parseInt(element) > totalIndividualsNum
+      ) {
+        msg =
+          "The number of individuals is every set must not reach over the total individuals";
         error = true;
       }
     });
+
     setProblemType(msg);
     // if there is no error, return true
     return !error;
@@ -454,15 +464,6 @@ export default function InputPage() {
   };
 
   // Initialize table of individual per set
-  const handleColumnsChange = (e) => {
-    const value = e.target.value;
-    setSetNum(value);
-    setColNums(value);
-    setSetIndividuals(Array.from({ length: value }, () => ""));
-    setSetEvaluateFunction(Array.from({ length: value }, () => "DEFAULT"));
-    setSetMany(Array.from({ length: value }, () => ""));
-  };
-
   const handleFitnessFunctionChange = (e) => {
     const value = e.target.value;
     if (value.length === 0) {
@@ -470,6 +471,14 @@ export default function InputPage() {
     } else {
       setFitnessFunction(value);
     }
+  };
+  const handleColumnsChange = (e) => {
+    const value = e.target.value;
+    setSetNum(value);
+    setColNums(value);
+    setSetIndividuals(Array.from({ length: value }, () => ""));
+    setSetEvaluateFunction(Array.from({ length: value }, () => "DEFAULT"));
+    setSetMany(Array.from({ length: value }, () => ""));
   };
 
   const generateTable = () => {
@@ -525,7 +534,7 @@ export default function InputPage() {
                 className="input-table-data"
                 placeholder={`Evaluate Function Set_${k + 1}`}
                 // Thiếu value nên ban đầu không render được default value
-                value={setEvaluateFunction[k]}
+                // value={setEvaluateFunction[k]}
                 onChange={(e) => {
                   const newSetEvaluateFunction = [...setEvaluateFunction];
                   newSetEvaluateFunction[k] = e.target.value;
