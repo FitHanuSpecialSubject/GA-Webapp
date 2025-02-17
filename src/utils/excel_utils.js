@@ -8,6 +8,7 @@ import {
 import ExcelJS from "exceljs";
 import colCache from "exceljs/lib/utils/col-cache";
 import { RESULT_WORKBOOK } from "../const/excel_const";
+import { genRandom } from "./common_utils";
 
 /**
  * Tạo một sheet từ thông tin cấu hình máy tính.
@@ -698,4 +699,84 @@ const validateAddress = (row, column) => {
     throw new Error("Invalid column index: " + column);
   }
   return true;
+};
+
+/**
+ * Get problem information for Generator
+ * @param {ExcelJS.Workbook} workbook
+ * @returns {Object} - Problem data
+ */
+export const generatorSMTReader = (workbook) => {
+  const { GUIDELINE_SHEET_NAME: _, ...essentialSheet } =
+    STABLE_MATCHING_WORKBOOK;
+  for (const sheetName of Object.values(essentialSheet)) {
+    if (!workbook.worksheets.find((ws) => ws.name === sheetName)) {
+      throw new Error(`Sheet missing: ${sheetName}`);
+    }
+  }
+  const problemName = workbook
+    .getWorksheet(STABLE_MATCHING_WORKBOOK.PROBLEM_INFO_SHEET_NAME)
+    .getCell("B1").value;
+  const numberOfCharacteristic = Number(
+    workbook
+      .getWorksheet(STABLE_MATCHING_WORKBOOK.PROBLEM_INFO_SHEET_NAME)
+      .getCell("B4").value,
+  );
+  const numberOfSet = Number(
+    workbook
+      .getWorksheet(STABLE_MATCHING_WORKBOOK.PROBLEM_INFO_SHEET_NAME)
+      .getCell("B2").value,
+  );
+  const characteristic = [];
+  const dataSheet = workbook.getWorksheet(
+    STABLE_MATCHING_WORKBOOK.DATASET_SHEET_NAME,
+  );
+  for (let i = 5; i < 5 + numberOfCharacteristic; i++) {
+    const cname = dataSheet.getCell(1, i).value;
+    if (!cname) {
+      throw new Error(
+        "Missing characteristic. Maybe there are some conflicts between Information sheet and Dataset sheet.",
+      );
+    }
+    characteristic.push(cname);
+  }
+  return {
+    problemName,
+    characteristic,
+    numberOfSet,
+  };
+};
+
+/**
+ * Write data to Excel file | Data Generator
+ * @param {ExcelJS.Workbook} workbook
+ * @param {Object} ranges
+ * @param {Object} types
+ * @param {Object} data
+ * @returns {ExcelJS.Workbook}
+ */
+export const generatorSMTWriter = (workbook, ranges, types, data) => {
+  const dataSheet = workbook.getWorksheet(
+    STABLE_MATCHING_WORKBOOK.DATASET_SHEET_NAME,
+  );
+  const order = ["r", "w", "p"];
+  let currentRow = 1;
+  for (let i = 0; i < data.numberOfSet; i++) {
+    const numberOfIndividual = Number(dataSheet.getCell(currentRow, 4));
+    for (let j = 0; j < numberOfIndividual; j++) {
+      for (let k = 0; k < data.characteristic.length; k++) {
+        const col = 5 + k;
+        for (let l = 1; l <= order.length; l++) {
+          dataSheet.getCell(currentRow + l, col).value = genRandom(
+            ranges[i][order[l - 1]][k],
+            types[i][order[l - 1]][k],
+          );
+          dataSheet.getCell(currentRow + l, col).style.numFmt = "0.00";
+        }
+      }
+      currentRow += 3;
+    }
+    currentRow++;
+  }
+  return workbook;
 };
