@@ -53,29 +53,29 @@ export default function SMTGenerator({ data, workbook }) {
   };
   useEffect(() => {
     if (data == null || rwpRange.length > 0 || valueType.length > 0) return;
-    const clone = [];
-    const clone2 = [];
+    const valueTypeInit = [];
+    const rangeInit = [];
     for (let i = 0; i < data.numberOfSet; i++) {
-      clone[i] = {
+      valueTypeInit[i] = {
         r: [],
         w: [],
         p: [],
       };
-      clone2[i] = {
+      rangeInit[i] = {
         r: [],
         w: [],
         p: [],
       };
     }
-    setRwpRange(clone);
+    setRwpRange(rangeInit);
     for (let i = 0; i < data.characteristic.length; i++) {
       for (let j = 0; j < data.numberOfSet; j++) {
-        clone2[j].r[i] = false;
-        clone2[j].w[i] = false;
-        clone2[j].p[i] = false;
+        valueTypeInit[j].r[i] = false;
+        valueTypeInit[j].w[i] = false;
+        valueTypeInit[j].p[i] = false;
       }
     }
-    setValueType(clone2);
+    setValueType(valueTypeInit);
   }, [data]);
   return (
     <div className="container">
@@ -123,7 +123,7 @@ export default function SMTGenerator({ data, workbook }) {
             <>
               <div className="fs-4 fw-bold mb-2">
                 Configuration |{" "}
-                <span className="text-secondary">{"Set " + (s+1)}</span>
+                <span className="text-secondary">{"Set " + (s + 1)}</span>
               </div>
               {data.characteristic.map((c, i) => {
                 return (

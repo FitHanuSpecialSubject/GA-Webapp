@@ -759,19 +759,19 @@ export const generatorSMTWriter = (workbook, ranges, types, data) => {
   const dataSheet = workbook.getWorksheet(
     STABLE_MATCHING_WORKBOOK.DATASET_SHEET_NAME,
   );
-  const order = ["r", "w", "p"];
+  const fields = ["r", "w", "p"];
   let currentRow = 1;
-  for (let i = 0; i < data.numberOfSet; i++) {
+  for (let set = 0; set < data.numberOfSet; set++) {
     const numberOfIndividual = Number(dataSheet.getCell(currentRow, 4));
-    for (let j = 0; j < numberOfIndividual; j++) {
+    for (let individual = 0; individual < numberOfIndividual; individual++) {
       for (let k = 0; k < data.characteristic.length; k++) {
         const col = 5 + k;
-        for (let l = 1; l <= order.length; l++) {
-          dataSheet.getCell(currentRow + l, col).value = genRandom(
-            ranges[i][order[l - 1]][k],
-            types[i][order[l - 1]][k],
+        for (let f = 1; f <= fields.length; f++) {
+          dataSheet.getCell(currentRow + f, col).value = genRandom(
+            ranges[set][fields[f - 1]][k],
+            types[set][fields[f - 1]][k],
           );
-          dataSheet.getCell(currentRow + l, col).style.numFmt = "0.00";
+          dataSheet.getCell(currentRow + f, col).style.numFmt = "0.00";
         }
       }
       currentRow += 3;
