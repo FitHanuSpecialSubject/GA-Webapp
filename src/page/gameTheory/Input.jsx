@@ -22,6 +22,7 @@ import {
 } from "../../utils/excel_utils";
 import { GAME_THEORY_WORKBOOK } from "../../const/excel_const";
 import GT_GUIDELINE from "../../module/core/asset/workbook/gtguidelines.xlsx";
+import { REQUIRED_SHEETS } from "../../module/core/context/sheetNames";
 
 export default function InputPage() {
   // initialize form data
@@ -87,6 +88,19 @@ export default function InputPage() {
       reader.onload = async () => {
         const data = reader.result;
         const workbook = await new ExcelJS.Workbook().xlsx.load(data);
+
+        const problemSheet = workbook.getWorksheet(REQUIRED_SHEETS[0]);
+        if (!problemSheet) {
+          displayPopup(
+            "Excel Error",
+            `The sheet '${REQUIRED_SHEETS[0]}' is missing. Please check the file.`,
+            true,
+          );
+          setExcelFile(null);
+          setIsLoading(false);
+          return;
+        }
+
         let problemInfo;
         try {
           problemInfo = await loadProblemInfoGT(workbook);
@@ -95,83 +109,95 @@ export default function InputPage() {
           setIsLoading(false);
           displayPopup(
             "Something went wrong!",
-            "Looks like your file doesn't have a Problem Information sheet.",
+            `Looks like your file doesn't have a '${REQUIRED_SHEETS[0]}' sheet.`,
             true,
           );
         }
 
-        if (!problemInfo) return; // stop processing in case of error
+        if (!problemInfo) return;
 
         let specialPlayers = null;
         let players = null;
         let conflictSet = null;
 
-        if (problemInfo.specialPlayerExists) {
+        const specialPlayerRequired = problemSheet.getCell("B2").value === 1;
+        if (specialPlayerRequired) {
+          if (!workbook.getWorksheet(REQUIRED_SHEETS[3])) {
+            displayPopup(
+              "Excel Error",
+              `The sheet '${REQUIRED_SHEETS[3]}' is missing. Please check the file.`,
+              true,
+            );
+            setExcelFile(null);
+            setIsLoading(false);
+            return;
+          }
           try {
             specialPlayers = await loadSpecialPlayer(
               workbook,
               specialPlayerPropsNum,
-            ); // sheet 1 is the special player sheet
+            );
           } catch (e) {
             console.error(e);
             setIsLoading(false);
             displayPopup(
               "Something went wrong!",
-              "Looks like your file doesn't have a Special Player sheet",
+              `Looks like your file doesn't have a '${REQUIRED_SHEETS[0]}' sheet`,
               true,
             );
           }
-          if (!specialPlayers) return; // stop processing in case of error
-          try {
-            players = await loadNormalPlayers(
-              workbook,
-              problemInfo.normalPlayerNum,
-              problemInfo.normalPlayerPropsNum,
-            );
-          } catch (error) {
-            let errorMessage = error;
-            console.error(error);
-            if (!errorMessage) {
-              errorMessage = `Looks like your file doesn't have a Normal Player sheet.`;
-            }
-            setIsLoading(false);
-            displayPopup("Something went wrong!", errorMessage, true);
-          }
-          if (!players) return; // stop processing in case of error
-          try {
-            conflictSet = await loadConflictSet(workbook); // sheet 3 is the conflict set sheet
-          } catch (error) {
-            console.error(error);
-            setIsLoading(false);
-            displayPopup(
-              "Something went wrong!",
-              "Looks like your file doesn't have a Conflict matrix sheet",
-              true,
-            );
-          }
-          if (!conflictSet) return; // stop processing in case of error
-        } else {
+          if (!specialPlayers) return;
+        }
+
+        if (!workbook.getWorksheet(REQUIRED_SHEETS[1])) {
+          displayPopup(
+            "Excel Error",
+            `The sheet '${REQUIRED_SHEETS[1]}' is missing. Please check the file.`,
+            true,
+          );
+          setExcelFile(null);
+          setIsLoading(false);
+          return;
+        }
+        try {
           players = await loadNormalPlayers(
             workbook,
             problemInfo.normalPlayerNum,
             problemInfo.normalPlayerPropsNum,
-            setIsLoading,
-            displayPopup,
-          ); // sheet 1 is the normal player sheet because there is no special player sheet
-          if (!players) return; // stop processing in case of error
-          try {
-            conflictSet = await loadConflictSet(workbook); // sheet 3 is the conflict set sheet
-          } catch (error) {
-            console.error(error);
-            setIsLoading(false);
-            displayPopup(
-              "Something went wrong!",
-              "Looks like your file doesn't have a Conflict matrix sheet",
-              true,
-            );
-          } // sheet 2 is the conflict set sheet
-          if (!conflictSet) return; // stop processing in case of error
+          );
+        } catch (error) {
+          console.error(error);
+          setIsLoading(false);
+          displayPopup(
+            "Something went wrong!",
+            `Looks like your file doesn't have a '${REQUIRED_SHEETS[1]}' sheet.`,
+            true,
+          );
         }
+        if (!players) return;
+
+        if (!workbook.getWorksheet(REQUIRED_SHEETS[2])) {
+          displayPopup(
+            "Excel Error",
+            `The sheet '${REQUIRED_SHEETS[2]}' is missing. Please check the file.`,
+            true,
+          );
+          setExcelFile(null);
+          setIsLoading(false);
+          return;
+        }
+        try {
+          conflictSet = await loadConflictSet(workbook);
+        } catch (error) {
+          console.error(error);
+          setIsLoading(false);
+          displayPopup(
+            "Something went wrong!",
+            `Looks like your file doesn't have a '${REQUIRED_SHEETS[2]}' sheet`,
+            true,
+          );
+        }
+        if (!conflictSet) return;
 
         setAppData({
           problem: {
@@ -197,11 +223,12 @@ export default function InputPage() {
       setIsLoading(false);
       displayPopup(
         "Something went wrong!",
-        "Check the input file again for contact the admin!",
+        "Check the input file again or contact the admin!",
         true,
       );
     }
   };
+
   const handleGetExcelTemplate = () => {
     if (validateForm()) {
       downloadExcel().then();

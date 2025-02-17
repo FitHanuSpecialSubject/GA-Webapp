@@ -13,6 +13,7 @@ import Loading from "../../module/core/component/Loading";
 import PopupContext from "../../module/core/context/PopupContext";
 import { SMT } from "../../consts";
 import { validateExcelFile } from "../../utils/file_utils";
+import { REQUIRED_SHEETS } from "../../module/core/context/sheetNames";
 import {
   loadExcludePairs,
   loadDataset,
@@ -85,37 +86,17 @@ export default function InputPage() {
         const data = reader.result;
         const workbook = await new ExcelJS.Workbook().xlsx.load(data);
 
-        if (!workbook.getWorksheet("Dataset")) {
-          displayPopup(
-            "Excel Error",
-            "The sheet 'Dataset' is missing. Please check the file.",
-            true,
-          );
-          setExcelFile(null);
-          setIsLoading(false);
-          return;
-        }
-
-        if (!workbook.getWorksheet("Exclude Pairs")) {
-          displayPopup(
-            "Excel Error",
-            "The sheet 'Exclude Pairs' is missing. Please check the file.",
-            true,
-          );
-          setExcelFile(null);
-          setIsLoading(false);
-          return;
-        }
-
-        if (!workbook.getWorksheet("Problem Information")) {
-          displayPopup(
-            "Excel Error",
-            "The sheet 'Problem Information' is missing. Please check the file.",
-            true,
-          );
-          setExcelFile(null);
-          setIsLoading(false);
-          return;
+        for (const sheetName of REQUIRED_SHEETS) {
+          if (!workbook.getWorksheet(sheetName)) {
+            displayPopup(
+              "Excel Error",
+              `The sheet '${sheetName}' is missing. Please check the file.`,
+              true,
+            );
+            setExcelFile(null);
+            setIsLoading(false);
+            return;
+          }
         }
 
         let problemInfo;
