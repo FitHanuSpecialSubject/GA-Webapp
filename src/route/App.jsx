@@ -10,6 +10,7 @@ import PopupContext from "../module/core/context/PopupContext";
 import Popup from "../module/core/component/Popup";
 import stableMatchingRouter from "./stableMatching";
 import gameTheoryRouter from "./gameTheory";
+import dataGeneratorRouter from "./DataGenerator";
 
 function App() {
   const [appData, setAppData] = useState(null);
@@ -30,6 +31,7 @@ function App() {
   };
   const StableMatchingRouter = stableMatchingRouter();
   const GameTheoryRouter = gameTheoryRouter();
+  const DataGeneratorRouter = dataGeneratorRouter();
   useEffect(() => {
     document.querySelector("link[rel~='icon']").href = `/${favicon}.svg`;
   }, [favicon]);
@@ -52,6 +54,7 @@ function App() {
           <Routes>
             {StableMatchingRouter}
             {GameTheoryRouter}
+            {DataGeneratorRouter}
             <Route path="/insights" element={<InsightPage />} />
             <Route path="*" element={<InputPage />} />
           </Routes>

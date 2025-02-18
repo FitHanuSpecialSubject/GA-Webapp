@@ -40,16 +40,19 @@ export default function Header() {
               Matching Problem
             </Link>
             <Link
+              to="/generator"
+              className={
+                path === "/generator" ? "nav-item highlight" : "nav-item"
+              }
+            >
+              Data Generator
+            </Link>
+            <Link
               to="/guide"
-              className={path == "/guide" ? "nav-item highlight" : "nav-item"}
+              className={path === "/guide" ? "nav-item highlight" : "nav-item"}
             >
               Guide
             </Link>
-            <div
-              className={path == "/about" ? "nav-item highlight" : "nav-item"}
-            >
-              About
-            </div>
           </div>
         </div>
       </header>
