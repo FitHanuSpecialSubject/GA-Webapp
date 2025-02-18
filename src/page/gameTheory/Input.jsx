@@ -22,7 +22,6 @@ import {
 } from "../../utils/excel_utils";
 import { GAME_THEORY_WORKBOOK } from "../../const/excel_const";
 import GT_GUIDELINE from "../../module/core/asset/workbook/gtguidelines.xlsx";
-import { REQUIRED_SHEETS } from "../../module/core/context/sheetNames";
 
 export default function InputPage() {
   // initialize form data
@@ -89,11 +88,13 @@ export default function InputPage() {
         const data = reader.result;
         const workbook = await new ExcelJS.Workbook().xlsx.load(data);
 
-        const problemSheet = workbook.getWorksheet(REQUIRED_SHEETS[0]);
+        const problemSheet = workbook.getWorksheet(
+          GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME,
+        );
         if (!problemSheet) {
           displayPopup(
             "Excel Error",
-            `The sheet '${REQUIRED_SHEETS[0]}' is missing. Please check the file.`,
+            `The sheet '${GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME}' is missing. Please check the file.`,
             true,
           );
           setExcelFile(null);
@@ -109,9 +110,10 @@ export default function InputPage() {
           setIsLoading(false);
           displayPopup(
             "Something went wrong!",
-            `Looks like your file doesn't have a '${REQUIRED_SHEETS[0]}' sheet.`,
+            `Have problems with '${GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME}' .`,
             true,
           );
+          return;
         }
 
         if (!problemInfo) return;
@@ -122,10 +124,14 @@ export default function InputPage() {
 
         const specialPlayerRequired = problemSheet.getCell("B2").value === 1;
         if (specialPlayerRequired) {
-          if (!workbook.getWorksheet(REQUIRED_SHEETS[3])) {
+          if (
+            !workbook.getWorksheet(
+              GAME_THEORY_WORKBOOK.SPECIAL_PLAYER_SHEET_NAME,
+            )
+          ) {
             displayPopup(
               "Excel Error",
-              `The sheet '${REQUIRED_SHEETS[3]}' is missing. Please check the file.`,
+              `The sheet '${GAME_THEORY_WORKBOOK.SPECIAL_PLAYER_SHEET_NAME}' is missing. Please check the file.`,
               true,
             );
             setExcelFile(null);
@@ -142,17 +148,20 @@ export default function InputPage() {
             setIsLoading(false);
             displayPopup(
               "Something went wrong!",
-              `Looks like your file doesn't have a '${REQUIRED_SHEETS[0]}' sheet`,
+              `Looks like your file doesn't have a '${GAME_THEORY_WORKBOOK.SPECIAL_PLAYER_SHEET_NAME}' sheet`,
               true,
             );
+            return;
           }
           if (!specialPlayers) return;
         }
 
-        if (!workbook.getWorksheet(REQUIRED_SHEETS[1])) {
+        if (
+          !workbook.getWorksheet(GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME)
+        ) {
           displayPopup(
             "Excel Error",
-            `The sheet '${REQUIRED_SHEETS[1]}' is missing. Please check the file.`,
+            `The sheet '${GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME}' is missing. Please check the file.`,
             true,
           );
           setExcelFile(null);
@@ -170,16 +179,21 @@ export default function InputPage() {
           setIsLoading(false);
           displayPopup(
             "Something went wrong!",
-            `Looks like your file doesn't have a '${REQUIRED_SHEETS[1]}' sheet.`,
+            `Error loading data from '${GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME}' sheet.`,
             true,
           );
+          return;
         }
         if (!players) return;
 
-        if (!workbook.getWorksheet(REQUIRED_SHEETS[2])) {
+        if (
+          !workbook.getWorksheet(
+            GAME_THEORY_WORKBOOK.CONFLICT_MATRIX_SHEET_NAME,
+          )
+        ) {
           displayPopup(
             "Excel Error",
-            `The sheet '${REQUIRED_SHEETS[2]}' is missing. Please check the file.`,
+            `The sheet '${GAME_THEORY_WORKBOOK.CONFLICT_MATRIX_SHEET_NAME}' is missing. Please check the file.`,
             true,
           );
           setExcelFile(null);
@@ -193,9 +207,10 @@ export default function InputPage() {
           setIsLoading(false);
           displayPopup(
             "Something went wrong!",
-            `Looks like your file doesn't have a '${REQUIRED_SHEETS[2]}' sheet`,
+            `Looks like your file doesn't have a '${GAME_THEORY_WORKBOOK.CONFLICT_MATRIX_SHEET_NAME}' sheet`,
             true,
           );
+          return;
         }
         if (!conflictSet) return;
 

@@ -13,7 +13,6 @@ import Loading from "../../module/core/component/Loading";
 import PopupContext from "../../module/core/context/PopupContext";
 import { SMT } from "../../consts";
 import { validateExcelFile } from "../../utils/file_utils";
-import { REQUIRED_SHEETS } from "../../module/core/context/sheetNames";
 import {
   loadExcludePairs,
   loadDataset,
@@ -86,7 +85,7 @@ export default function InputPage() {
         const data = reader.result;
         const workbook = await new ExcelJS.Workbook().xlsx.load(data);
 
-        for (const sheetName of REQUIRED_SHEETS) {
+        for (const sheetName of Object.values(STABLE_MATCHING_WORKBOOK)) {
           if (!workbook.getWorksheet(sheetName)) {
             displayPopup(
               "Excel Error",
