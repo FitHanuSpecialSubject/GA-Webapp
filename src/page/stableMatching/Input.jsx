@@ -86,6 +86,19 @@ export default function InputPage() {
         const data = reader.result;
         const workbook = await new ExcelJS.Workbook().xlsx.load(data);
 
+        for (const sheetName of Object.values(STABLE_MATCHING_WORKBOOK)) {
+          if (!workbook.getWorksheet(sheetName)) {
+            displayPopup(
+              "Excel Error",
+              `The sheet '${sheetName}' is missing. Please check the file.`,
+              true,
+            );
+            setExcelFile(null);
+            setIsLoading(false);
+            return;
+          }
+        }
+
         let problemInfo;
         let excludePairs;
         let dataset;

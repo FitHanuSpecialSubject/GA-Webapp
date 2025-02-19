@@ -90,6 +90,21 @@ export default function InputPage() {
       reader.onload = async () => {
         const data = reader.result;
         const workbook = await new ExcelJS.Workbook().xlsx.load(data);
+
+        const problemSheet = workbook.getWorksheet(
+          GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME,
+        );
+        if (!problemSheet) {
+          displayPopup(
+            "Excel Error",
+            `The sheet '${GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME}' is missing. Please check the file.`,
+            true,
+          );
+          setExcelFile(null);
+          setIsLoading(false);
+          return;
+        }
+
         let problemInfo;
         try {
           problemInfo = await loadProblemInfoGT(workbook);
@@ -98,83 +113,109 @@ export default function InputPage() {
           setIsLoading(false);
           displayPopup(
             "Something went wrong!",
-            "Error when loading the Problem Information sheet",
+            `Have problems with '${GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME}' .`,
             true,
           );
+          return;
         }
 
-        if (!problemInfo) return; // stop processing in case of error
+        if (!problemInfo) return;
 
         let specialPlayers = null;
         let players = null;
         let conflictSet = null;
 
-        if (problemInfo.specialPlayerExists) {
+        const specialPlayerRequired = problemSheet.getCell("B2").value === 1;
+        if (specialPlayerRequired) {
+          if (
+            !workbook.getWorksheet(
+              GAME_THEORY_WORKBOOK.SPECIAL_PLAYER_SHEET_NAME,
+            )
+          ) {
+            displayPopup(
+              "Excel Error",
+              `The sheet '${GAME_THEORY_WORKBOOK.SPECIAL_PLAYER_SHEET_NAME}' is missing. Please check the file.`,
+              true,
+            );
+            setExcelFile(null);
+            setIsLoading(false);
+            return;
+          }
           try {
             specialPlayers = await loadSpecialPlayer(
               workbook,
               specialPlayerPropsNum,
-            ); // sheet 1 is the special player sheet
+            );
           } catch (e) {
             console.error(e);
             setIsLoading(false);
             displayPopup(
               "Something went wrong!",
-              "Error when loading the Special Player sheet",
+              `Looks like your file doesn't have a '${GAME_THEORY_WORKBOOK.SPECIAL_PLAYER_SHEET_NAME}' sheet`,
               true,
             );
+            return;
           }
-          if (!specialPlayers) return; // stop processing in case of error
-          try {
-            players = await loadNormalPlayers(
-              workbook,
-              problemInfo.normalPlayerNum,
-              problemInfo.normalPlayerPropsNum,
-            );
-          } catch (error) {
-            let errorMessage = error;
-            console.error(error);
-            if (!errorMessage) {
-              errorMessage = `Error when loading Normal Player sheet.`;
-            }
-            setIsLoading(false);
-            displayPopup("Something went wrong!", errorMessage, true);
-          }
-          if (!players) return; // stop processing in case of error
-          try {
-            conflictSet = await loadConflictSet(workbook); // sheet 3 is the conflict set sheet
-          } catch (error) {
-            console.error(error);
-            setIsLoading(false);
-            displayPopup(
-              "Something went wrong!",
-              "Error when loading the Conflict Matrix sheet",
-              true,
-            );
-          }
-          if (!conflictSet) return; // stop processing in case of error
-        } else {
+          if (!specialPlayers) return;
+        }
+
+        if (
+          !workbook.getWorksheet(GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME)
+        ) {
+          displayPopup(
+            "Excel Error",
+            `The sheet '${GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME}' is missing. Please check the file.`,
+            true,
+          );
+          setExcelFile(null);
+          setIsLoading(false);
+          return;
+        }
+        try {
           players = await loadNormalPlayers(
             workbook,
             problemInfo.normalPlayerNum,
             problemInfo.normalPlayerPropsNum,
-            setIsLoading,
-            displayPopup,
-          ); // sheet 1 is the normal player sheet because there is no special player sheet
-          if (!players) return; // stop processing in case of error
-          try {
-            conflictSet = await loadConflictSet(workbook); // sheet 3 is the conflict set sheet
-          } catch (error) {
-            console.error(error);
-            setIsLoading(false);
-            displayPopup(
-              "Something went wrong!",
-              "Error when loading the Conflict Matrix sheet",
-              true,
-            );
-          } // sheet 2 is the conflict set sheet
-          if (!conflictSet) return; // stop processing in case of error
+          );
+        } catch (error) {
+          console.error(error);
+          setIsLoading(false);
+          displayPopup(
+            "Something went wrong!",
+            `Error loading data from '${GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME}' sheet.`,
+            true,
+          );
+          return;
         }
+        if (!players) return;
+
+        if (
+          !workbook.getWorksheet(
+            GAME_THEORY_WORKBOOK.CONFLICT_MATRIX_SHEET_NAME,
+          )
+        ) {
+          displayPopup(
+            "Excel Error",
+            `The sheet '${GAME_THEORY_WORKBOOK.CONFLICT_MATRIX_SHEET_NAME}' is missing. Please check the file.`,
+            true,
+          );
+          setExcelFile(null);
+          setIsLoading(false);
+          return;
+        }
+        try {
+          conflictSet = await loadConflictSet(workbook);
+        } catch (error) {
+          console.error(error);
+          setIsLoading(false);
+          displayPopup(
+            "Something went wrong!",
+            `Looks like your file doesn't have a '${GAME_THEORY_WORKBOOK.CONFLICT_MATRIX_SHEET_NAME}' sheet`,
+            true,
+          );
+          return;
+        }
+        if (!conflictSet) return;
 
         setAppData({
           problem: {
@@ -200,7 +241,7 @@ export default function InputPage() {
       setIsLoading(false);
       displayPopup(
         "Something went wrong!",
-        "Check the input file again for contact the admin!",
+        "Check the input file again or contact the admin!",
         true,
       );
     }
@@ -212,7 +253,6 @@ export default function InputPage() {
       setProblemType("");
     }
   }, [problemType]);
-
   const handleGetExcelTemplate = () => {
     if (validateForm()) {
       downloadExcel().then();
