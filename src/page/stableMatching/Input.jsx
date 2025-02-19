@@ -18,7 +18,7 @@ import {
   loadDataset,
   loadProblemInfoSMT,
 } from "../../utils/excel_utils";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 import { STABLE_MATCHING_WORKBOOK } from "../../const/excel_const";
 
 export default function InputPage() {
@@ -28,9 +28,10 @@ export default function InputPage() {
   const [setNum, setSetNum] = useState(undefined);
   const [characteristicsNum, setCharacteristicsNum] = useState(undefined);
   const [totalIndividualsNum, setTotalIndividualsNum] = useState(undefined);
-  const [fitnessFunction, setFitnessFunction] = useState("");
+  const [fitnessFunction, setFitnessFunction] = useState("DEFAULT");
   const [isLoading, setIsLoading] = useState(false);
   const [excelFileError, setExcelFileError] = useState("");
+  const [problemType, setProblemType] = useState("");
   const [problemNameError, setProblemNameError] = useState("");
   const [setNumError, setSetNumError] = useState("");
   const [characteristicsNumError, setCharacteristicsNumError] = useState("");
@@ -41,7 +42,7 @@ export default function InputPage() {
   const { displayPopup } = useContext(PopupContext);
   const [colNums, setColNums] = useState(0);
   const [setEvaluateFunction, setSetEvaluateFunction] = useState(
-    Array.from({ length: colNums }, () => ""),
+    Array.from({ length: colNums }, () => "DEFAULT"),
   );
   const [setIndividuals, setSetIndividuals] = useState(
     Array.from({ length: colNums }, () => ""),
@@ -149,29 +150,41 @@ export default function InputPage() {
       );
     }
   };
+  useEffect(() => {
+    if (problemType) {
+      displayPopup("Invalid Form!", problemType, true);
+      setProblemType("");
+    }
+  }, [problemType]);
 
   const handleGetExcelTemplate = () => {
     if (validateForm()) {
       downloadExcel().then();
-    } else {
-      displayPopup(
-        "Invalid Form!",
-        "Make sure you have filled all the required fields.",
-        true,
-      );
     }
+    // else {
+    //   displayPopup(
+    //     "Invalid Form!",
+    //     "Make sure you have filled all the required fields.",
+    //     problemType,
+    //     true,
+    //   );
+    // }
   };
 
   const validateForm = () => {
     let error = false;
-    const maxSets = 10; // Số lượng tập tối đa
-    const maxCharacteristics = 15; // Số lượng đặc điểm tối đa
-    const maxTotalIndividuals = 100; // Số lượng cá nhân tối đa
+    let msg = "";
+    const maxSets = SMT.MAX_SET; // Số lượng tập tối đa
+    const maxCharacteristics = 20; // Số lượng đặc điểm tối đa
+    const maxTotalIndividuals = 10000; // Số lượng cá nhân tối đa
 
     const validFunctionPattern = /^[a-zA-Z0-9s+\-*/^()]+$/;
     // check if the problem name is empty
-    if (!problemName) {
-      setProblemNameError("Problem name must not be empty");
+    if (problemName.length == 0 || problemName.length > 255) {
+      setProblemNameError(
+        "Problem name must not be empty or exceed 255 characters",
+      );
+      msg = "Problem name must not be empty or exceed 255 characters";
       error = true;
     } else {
       setProblemNameError("");
@@ -180,6 +193,7 @@ export default function InputPage() {
     // check if the number of set is empty
     if (!setNum) {
       setSetNumError("Number of set must not be empty");
+      msg = "Number of set must not be empty";
       error = true;
     } else {
       setSetNumError("");
@@ -188,6 +202,7 @@ export default function InputPage() {
     // check if the number of characteristics is empty
     if (!characteristicsNum) {
       setCharacteristicsNumError("Number of characteristics must not be empty");
+      msg = "Number of characteristics must not be empty";
       error = true;
     } else {
       setCharacteristicsNumError("");
@@ -203,16 +218,24 @@ export default function InputPage() {
       setTotalIndividualsNumError("");
     }
 
-    // check if the number of strategies is empty
-    if (!fitnessFunction) {
-      setFitnessFunctionError("Fitness function must not be empty");
+    // Kiểm tra số lượng cá nhân
+    if (
+      !totalIndividualsNum ||
+      totalIndividualsNum > maxTotalIndividuals ||
+      totalIndividualsNum < 2
+    ) {
+      setTotalIndividualsNumError(
+        `The number of individuals must be from 2 to ${maxTotalIndividuals}`,
+      );
+      msg = `The number of individuals must be from 2 to ${maxTotalIndividuals}`;
       error = true;
     } else {
-      setFitnessFunctionError("");
+      setTotalIndividualsNumError("");
     }
-    // Kiểm tra số lượng tập
-    if (!setNum || setNum > maxSets) {
-      setSetNumError(`Number of set must be from 1 to ${maxSets}`);
+
+    if (!setNum || setNum > maxSets || setNum < 2) {
+      setSetNumError(`Number of set must be from 2 to ${maxSets}`);
+      msg = `Number of set must be from 2 to ${maxSets}`;
       error = true;
     } else {
       setSetNumError("");
@@ -223,38 +246,65 @@ export default function InputPage() {
       setCharacteristicsNumError(
         `The number of characteristics must be from 1 to ${maxCharacteristics}`,
       );
+      msg = `The number of characteristics must be from 1 to ${maxCharacteristics}`;
       error = true;
     } else {
       setCharacteristicsNumError("");
     }
 
-    // Kiểm tra số lượng cá nhân
-    if (!totalIndividualsNum || totalIndividualsNum > maxTotalIndividuals) {
-      setTotalIndividualsNumError(
-        `The number of individuals must be from 1 to ${maxTotalIndividuals}`,
-      );
-      error = true;
+    if (fitnessFunction.length === 0) {
+      setFitnessFunction("DEFAULT");
     } else {
-      setTotalIndividualsNumError("");
+      if (!validFunctionPattern.test(fitnessFunction)) {
+        setFitnessFunctionError(
+          "Function value contains an invalid character or unsupported function",
+        );
+        msg =
+          "Function value contains an invalid character or unsupported function";
+        error = true;
+      } else {
+        setFitnessFunctionError("");
+      }
     }
 
-    // fitness
-    if (!fitnessFunction || !validFunctionPattern.test(fitnessFunction)) {
-      setFitnessFunctionError("Function value contains an invalid character");
-      error = true;
-    } else {
-      setFitnessFunctionError("");
-    }
+    // Chưa tìm được phương pháp ghi đè lên giá trị sau khi popup lỗi rồi sửa lại bỏ trống thành default
+    // check hàm fitness của từng set
     setEvaluateFunction.forEach((evaluateFunction, index) => {
-      if (!evaluateFunction || !validFunctionPattern.test(evaluateFunction)) {
+      if (!evaluateFunction) {
         setSetEvaluateFunction((prevState) => {
           const newState = [...prevState];
-          newState[index] = "Function value contains an invalid character";
+          newState[index] = "DEFAULT";
           return newState;
         });
+      } else {
+        if (!validFunctionPattern.test(evaluateFunction)) {
+          setSetEvaluateFunction((prevState) => {
+            const newState = [...prevState];
+            newState[index] = "Function value contains an invalid character";
+            return newState;
+          });
+          msg = "Function value contains an invalid character";
+          error = true;
+        }
+      }
+    });
+
+    // check từng indiviuals của từng thằng trong set hợp lệ chưa
+    setIndividuals.forEach((element) => {
+      if (element.length == 0) {
+        (msg = "The number of individuals in every set must not be empty"),
+          (error = true);
+      } else if (
+        parseInt(element) < 0 ||
+        parseInt(element) > totalIndividualsNum
+      ) {
+        msg =
+          "The number of individuals is every set must not reach over the total individuals";
         error = true;
       }
     });
+
+    setProblemType(msg);
     // if there is no error, return true
     return !error;
   };
@@ -427,14 +477,23 @@ export default function InputPage() {
   };
 
   // Initialize table of individual per set
+  const handleFitnessFunctionChange = (e) => {
+    const value = e.target.value;
+    if (value.length === 0) {
+      setFitnessFunction("DEFAULT");
+    } else {
+      setFitnessFunction(value);
+    }
+  };
   const handleColumnsChange = (e) => {
     const value = e.target.value;
     setSetNum(value);
     setColNums(value);
     setSetIndividuals(Array.from({ length: value }, () => ""));
-    setSetEvaluateFunction(Array.from({ length: value }, () => ""));
+    setSetEvaluateFunction(Array.from({ length: value }, () => "DEFAULT"));
     setSetMany(Array.from({ length: value }, () => ""));
   };
+
   const generateTable = () => {
     const table = [];
     for (let i = 0; i < 4; i++) {
@@ -487,6 +546,8 @@ export default function InputPage() {
                 type="text"
                 className="input-table-data"
                 placeholder={`Evaluate Function Set_${k + 1}`}
+                // Thiếu value nên ban đầu không render được default value
+                // value={setEvaluateFunction[k]}
                 onChange={(e) => {
                   const newSetEvaluateFunction = [...setEvaluateFunction];
                   newSetEvaluateFunction[k] = e.target.value;
@@ -507,28 +568,28 @@ export default function InputPage() {
     );
   };
 
-  const [showGuideline, setShowGuideline] = useState(false);
-  const [showGuidelineText, setShowGuidelineText] = useState(false);
-  const handleShowGuideline = () => {
-    setShowGuideline(!showGuideline);
-    setShowGuidelineText(!showGuidelineText);
-  };
+  // const [showGuideline, setShowGuideline] = useState(false);
+  // const [showGuidelineText, setShowGuidelineText] = useState(false);
+  // const handleShowGuideline = () => {
+  //   setShowGuideline(!showGuideline);
+  //   setShowGuidelineText(!showGuidelineText);
+  // };
 
-  const [isExpanded, setIsExpanded] = useState(false);
+  // const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleToggle = () => {
-    setIsExpanded(!isExpanded);
-  };
+  // const handleToggle = () => {
+  //   setIsExpanded(!isExpanded);
+  // };
 
   return (
     <>
       <div className="input-page">
-        <button className="show-guideline-btn" onClick={handleShowGuideline}>
+        {/* <button className="show-guideline-btn" onClick={handleShowGuideline}>
           {showGuideline ? "Hide Guideline" : "Show Guideline"}
         </button>
         {showGuidelineText && (
           <GuidelineText isExpanded={isExpanded} handleToggle={handleToggle} />
-        )}
+        )} */}
 
         <Loading isLoading={isLoading} />
         <p className="header-text">Enter information about your problem</p>
@@ -590,6 +651,7 @@ export default function InputPage() {
               type="text"
               error={fitnessFunctionError}
               handleOnChange={(e) => setFitnessFunction(e.target.value)}
+              onBlur={handleFitnessFunctionChange}
               value={fitnessFunction}
               description="The fitness function is a mathematical function that represents the payoff that a player receives for a specific combination of strategies played by all the players in the game"
               guideSectionIndex={5}
@@ -636,78 +698,78 @@ export default function InputPage() {
   );
 }
 
-function GuidelineText({ handleToggle, isExpanded }) {
-  return (
-    <div className="guideline-text">
-      <h5>Step 1: Enter the name of your problem (Text)</h5>
-      <h5>
-        Step 2: Enter the number of sets{" "}
-        <span
-          onClick={handleToggle}
-          className="toggle-icon"
-          style={{
-            cursor: "pointer",
-            color: "gray",
-          }}
-        >
-          {isExpanded ? "(▼)" : "(▶)"}
-        </span>
-      </h5>
-      {isExpanded && (
-        <div className="subsection" id="subsection">
-          <p>
-            The system will display a corresponding table after you fill in the
-            information in Step 2.
-          </p>
+// function GuidelineText({ handleToggle, isExpanded }) {
+//   return (
+//     <div className="guideline-text">
+//       <h5>Step 1: Enter the name of your problem (Text)</h5>
+//       <h5>
+//         Step 2: Enter the number of sets{" "}
+//         <span
+//           onClick={handleToggle}
+//           className="toggle-icon"
+//           style={{
+//             cursor: "pointer",
+//             color: "gray",
+//           }}
+//         >
+//           {isExpanded ? "(▼)" : "(▶)"}
+//         </span>
+//       </h5>
+//       {isExpanded && (
+//         <div className="subsection" id="subsection">
+//           <p>
+//             The system will display a corresponding table after you fill in the
+//             information in Step 2.
+//           </p>
 
-          <p>
-            Determine which set is one/many, then tick the blank box if that set
-            is many. As instructed below:
-          </p>
+//           <p>
+//             Determine which set is one/many, then tick the blank box if that set
+//             is many. As instructed below:
+//           </p>
 
-          <ul>
-            <li>
-              {`Set many: Capacity = 1
-                      The number of individuals in the set {">"} the opponent's set`}
-            </li>
-            <li>
-              {`Set one: Capacity > 1
-                      The number of individuals in the set {"<"} the opponent's set`}
-            </li>
-          </ul>
+//           <ul>
+//             <li>
+//               {`Set many: Capacity = 1
+//                       The number of individuals in the set {">"} the opponent's set`}
+//             </li>
+//             <li>
+//               {`Set one: Capacity > 1
+//                       The number of individuals in the set {"<"} the opponent's set`}
+//             </li>
+//           </ul>
 
-          <p>
-            Fill in the information in the blank box:
-            <ul>
-              <li>
-                <b>Num individuals of Set_x</b>- the number of individuals of
-                the corresponding set
-              </li>
-              <li>
-                <b>Evaluate Function Set_x</b> - the evaluation function
-                corresponding to that set
-              </li>
-            </ul>
-          </p>
-        </div>
-      )}
+//           <p>
+//             Fill in the information in the blank box:
+//             <ul>
+//               <li>
+//                 <b>Num individuals of Set_x</b>- the number of individuals of
+//                 the corresponding set
+//               </li>
+//               <li>
+//                 <b>Evaluate Function Set_x</b> - the evaluation function
+//                 corresponding to that set
+//               </li>
+//             </ul>
+//           </p>
+//         </div>
+//       )}
 
-      <h5>Step 3: Enter the number of characteristics of both sets</h5>
-      <h5>Step 4: Enter the number of total individuals of both sets</h5>
-      <h5>Step 5: Enter the fitness function which you initialize</h5>
-      <h5>
-        Step 6: Click the button <b>Get Excel Templates</b> to receive the Excel
-        file that contains all the information you entered above
-      </h5>
-      <h5>
-        Step 7: Select or drag and drop the Excel file you just received at the
-        dotted line and the <b>Choose a file</b> button for the system to
-        process your problem
-      </h5>
-    </div>
-  );
-}
-GuidelineText.propTypes = {
-  handleToggle: PropTypes.func.isRequired,
-  isExpanded: PropTypes.bool.isRequired,
-};
+//       <h5>Step 3: Enter the number of characteristics of both sets</h5>
+//       <h5>Step 4: Enter the number of total individuals of both sets</h5>
+//       <h5>Step 5: Enter the fitness function which you initialize</h5>
+//       <h5>
+//         Step 6: Click the button <b>Get Excel Templates</b> to receive the Excel
+//         file that contains all the information you entered above
+//       </h5>
+//       <h5>
+//         Step 7: Select or drag and drop the Excel file you just received at the
+//         dotted line and the <b>Choose a file</b> button for the system to
+//         process your problem
+//       </h5>
+//     </div>
+//   );
+// }
+// GuidelineText.propTypes = {
+//   handleToggle: PropTypes.func.isRequired,
+//   isExpanded: PropTypes.bool.isRequired,
+// };

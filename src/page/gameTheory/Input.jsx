@@ -30,18 +30,21 @@ export default function InputPage() {
   const [problemName, setProblemName] = useState("");
   const [specialPlayerExists, setSpecialPlayerExists] = useState("");
   const [specialPlayerPropsNum, setSpecialPlayerPropsNum] = useState(null);
-  const [normalPlayerNum, setNormalPlayerNum] = useState(null);
-  const [normalPlayerPropsNum, setNormalPlayerPropsNum] = useState(null);
-  const [fitnessFunction, setFitnessFunction] = useState("");
-  const [playerPayoffFunction, setPlayerPayoffFunction] = useState("");
+  const [normalPlayerNum, setNormalPlayerNum] = useState("");
+  const [normalPlayerPropsNum, setNormalPlayerPropsNum] = useState("");
+  const [fitnessFunction, setFitnessFunction] = useState("DEFAULT");
+  const [playerPayoffFunction, setPlayerPayoffFunction] = useState("DEFAULT");
   const [isMaximizing, setIsMaximizing] = useState(false);
 
+  const [problemType, setProblemType] = useState("");
   const [problemNameError, setProblemNameError] = useState("");
   const [specialPlayerPropsNumError, setSpecialPlayerPropsNumError] =
     useState("");
   const [normalPlayerNumError, setNormalPlayerNumError] = useState("");
   const [normalPlayerPropsNumError, setNormalPlayerPropsNumError] =
     useState("");
+  /** Nếu function và payoff để trống thì thành value mặc định rồi nên chỗ này không cần
+  check ở hiện tại, sau này có thêm function khác thì check sau **/
   const [fitnessFunctionError, setFitnessFunctionError] = useState("");
   const [playerPayoffFunctionError, setPlayerPayoffFunctionError] =
     useState("");
@@ -244,24 +247,37 @@ export default function InputPage() {
     }
   };
 
+  useEffect(() => {
+    if (problemType) {
+      displayPopup("Invalid Form!", problemType, true);
+      setProblemType("");
+    }
+  }, [problemType]);
   const handleGetExcelTemplate = () => {
     if (validateForm()) {
       downloadExcel().then();
-    } else {
-      displayPopup(
-        "Invalid Form!",
-        "Make sure you have filled all the required fields.",
-        true,
-      );
     }
+    // else {
+    //   displayPopup(
+    //     "Invalid Form!",
+    //     "Make sure you have filled all the required fields.",
+    //     true,
+    //   );
+    // }
   };
 
+  // Potential bug: the error message only shows after the first time the user clicks the button
   const validateForm = () => {
     let error = false;
+    let msg = "";
+    const validFunctionPattern = /^[a-zA-Z0-9s+\-*/^()]+$/;
 
     // check if the problem name is empty
-    if (!problemName) {
-      setProblemNameError("Problem name must not be empty");
+    if (problemName.length == 0 || problemName.length > 255) {
+      setProblemNameError(
+        "Problem name must not be empty or exceed 255 characters",
+      );
+      msg = "Problem name must not be empty or exceed 255 characters";
       error = true;
     } else {
       setProblemNameError("");
@@ -278,40 +294,87 @@ export default function InputPage() {
         setSpecialPlayerPropsNumError("");
       }
     }
-
     // check if the number of normal players is empty
+    // check if the number of normal players is in range [2, 1000], any future update will require to update this range
     if (!normalPlayerNum) {
       setNormalPlayerNumError("Normal player number must not be empty");
+      msg = "Normal player number must not be empty";
+      error = true;
+    } else if (
+      parseInt(normalPlayerNum) < 2 ||
+      parseInt(normalPlayerNum) > 1000
+    ) {
+      setNormalPlayerNumError(
+        "Normal player number must be between 2 and 1000",
+      );
+      msg = "Normal player number must be between 2 and 1000";
       error = true;
     } else {
       setNormalPlayerNumError("");
     }
 
     // check if the number of normal player properties is empty
+    /** check if the number of normal players' characteristics is in
+    range [1, 20], any future update will require to update this range **/
     if (!normalPlayerPropsNum) {
       setNormalPlayerPropsNumError(
         "Normal player properties must not be empty",
       );
+      msg = "Normal player properties must not be empty";
+      error = true;
+    } else if (
+      parseInt(normalPlayerPropsNum) < 1 ||
+      parseInt(normalPlayerPropsNum) > 20
+    ) {
+      setNormalPlayerPropsNumError(
+        "Normal player properties must be between 1 and 20",
+      );
+      msg = "Normal player properties must be between 1 and 20";
       error = true;
     } else {
       setNormalPlayerPropsNumError("");
     }
 
     // check if the number of strategies is empty
-    if (!fitnessFunction) {
-      setFitnessFunctionError("Fitness function must not be empty");
-      error = true;
+    // if (!fitnessFunction) {
+    //   setFitnessFunctionError("Fitness function must not be empty");
+    //   msg = "Fitness function must not be empty";
+    //   error = true;
+    // } else {
+    //   setFitnessFunctionError("");
+    // }
+    // check if the number of strategies is empty
+    // if (!playerPayoffFunction) {
+    //   setPlayerPayoffFunctionError("Player payoff function must not be empty");
+    //   msg = "Player payoff function must not be empty";
+    //   error = true;
+    // } else {
+    //   setPlayerPayoffFunctionError("");
+    // }
+
+    // function phải viết liền dấu (không có khoảng trắng, vd: p1-p2)
+    if (fitnessFunction.length == 0) {
+      setFitnessFunction("DEFAULT");
     } else {
-      setFitnessFunctionError("");
+      if (!validFunctionPattern.test(fitnessFunction)) {
+        setFitnessFunctionError("Fitness function is invalid");
+        msg = "Fitness function is invalid";
+        error = true;
+      }
     }
 
-    // check if the number of strategies is empty
-    if (!playerPayoffFunction) {
-      setPlayerPayoffFunctionError("Player payoff function must not be empty");
-      error = true;
+    // function phải viết liền dấu (không có khoảng trắng, vd: p1-p2)
+    if (playerPayoffFunction.length == 0) {
+      setPlayerPayoffFunction("DEFAULT");
     } else {
-      setPlayerPayoffFunctionError("");
+      if (!validFunctionPattern.test(playerPayoffFunction)) {
+        setPlayerPayoffFunctionError("Player payoff function is invalid");
+        msg = "Player payoff function is invalid";
+        error = true;
+      }
     }
+
+    setProblemType(msg);
 
     // if there is no error, return true
     return !error;
