@@ -4,6 +4,7 @@ import ExcelJS from "exceljs";
 import PropTypes from "prop-types";
 import { generatorGTReader, generatorSMTReader } from "../../utils/excel_utils";
 import SMTGenerator from "../../module/dataGenerator/SMTGenerator";
+import GTGenerator from "../../module/dataGenerator/GTGenerator";
 
 export default function GeneratingPage({ file, setFile, problemType }) {
   const { displayPopup } = useContext(PopupContext);
@@ -52,7 +53,7 @@ export default function GeneratingPage({ file, setFile, problemType }) {
       ) : problemType === "SMT" ? (
         <SMTGenerator data={info} workbook={workbook} />
       ) : (
-        "Game Theory currently unsupported."
+        <GTGenerator data={info} workbook={workbook} />
       )}
     </>
   );
