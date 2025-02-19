@@ -121,7 +121,7 @@ export default function SMTGenerator({ data, workbook }) {
           .map((e, i) => i)
           .map((s) => (
             <>
-              <div className="fs-4 fw-bold mb-2">
+              <div className="fs-4 fw-bold mb-2" key={s}>
                 Configuration |{" "}
                 <span className="text-secondary">{"Set " + (s + 1)}</span>
               </div>

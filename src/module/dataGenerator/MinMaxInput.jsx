@@ -20,6 +20,14 @@ const MinMaxInput = ({ field, index, setRange, setType, set }) => {
       setValid(false);
     }
   }, [virtualRange]);
+  const validateInput = (e) => {
+    if (Number(e.target.value) < Number(e.target.min)) {
+      e.target.value = e.target.min;
+    }
+    if (Number(e.target.value) > Number(e.target.max)) {
+      e.target.value = e.target.max;
+    }
+  };
   return (
     <>
       <div className="input-group mb-1">
@@ -30,26 +38,29 @@ const MinMaxInput = ({ field, index, setRange, setType, set }) => {
           }
           type="number"
           placeholder="min"
-          onChange={(e) =>
+          onChange={(e) => {
+            validateInput(e);
             setVirtualRange({
               ...virtualRange,
               min: Number(e.target.value === "" ? NaN : e.target.value),
-            })
-          }
+            });
+          }}
         />
         <input
           min={0}
           className={
             "form-control " + (valid ? "border-black" : "border-danger")
           }
+          max={field === "w" ? 10 : Number.POSITIVE_INFINITY}
           type="number"
           placeholder="max"
-          onChange={(e) =>
+          onChange={(e) => {
+            validateInput(e);
             setVirtualRange({
               ...virtualRange,
               max: Number(e.target.value === "" ? NaN : e.target.value),
-            })
-          }
+            });
+          }}
         />
       </div>
       <div className="small">
