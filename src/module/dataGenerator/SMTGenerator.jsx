@@ -70,6 +70,24 @@ export default function SMTGenerator({ data, workbook }) {
       // Do nothing
     }
   };
+  const sameSet = (set, index) => {
+    const range = [...rwpRange];
+    for (let i = 0; i < data.characteristic.length; i++) {
+      for (const field of ["r", "w", "p"]) {
+        range[set][field][i] = [...range[set][field][index]];
+      }
+    }
+    setRwpRange(range);
+  };
+  const sameCharacteristic = (set, index) => {
+    const range = [...rwpRange];
+    for (let i = 0; i < data.numberOfSet; i++) {
+      for (const field of ["r", "w", "p"]) {
+        range[i][field][index] = [...range[set][field][index]];
+      }
+    }
+    setRwpRange(range);
+  };
   useEffect(() => {
     if (data == null || rwpRange.length > 0 || valueType.length > 0) return;
     const valueTypeInit = [];
@@ -158,19 +176,39 @@ export default function SMTGenerator({ data, workbook }) {
                                 setType={setType}
                               />
                             </div>
-                            <div className="btn-group w-100">
-                              <button
-                                className="btn btn-outline-primary"
-                                onClick={() => copyValue(s, i)}
-                              >
-                                Copy value
-                              </button>
-                              <button
-                                className="btn btn-primary"
-                                onClick={() => pasteValue(s, i)}
-                              >
-                                Paste value
-                              </button>
+                            <div className="row">
+                              <div className="col-6 mb-2">
+                                <button
+                                  className="btn btn-outline-primary w-100"
+                                  onClick={() => copyValue(s, i)}
+                                >
+                                  Copy
+                                </button>
+                              </div>
+                              <div className="col-6 mb-2">
+                                <button
+                                  className="btn btn-outline-primary w-100"
+                                  onClick={() => pasteValue(s, i)}
+                                >
+                                  Paste
+                                </button>
+                              </div>
+                              <div className="col-12 mb-2">
+                                <button
+                                  className="btn btn-outline-primary w-100"
+                                  onClick={() => sameSet(s, i)}
+                                >
+                                  Same for this set
+                                </button>
+                              </div>
+                              <div className="col-12 mb-2">
+                                <button
+                                  className="btn btn-outline-primary w-100"
+                                  onClick={() => sameCharacteristic(s, i)}
+                                >
+                                  Same for this characteristic
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
