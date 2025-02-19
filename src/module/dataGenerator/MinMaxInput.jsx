@@ -37,7 +37,7 @@ const MinMaxInput = ({ field, index, setType, set }) => {
             "form-control " + (validation ? "border-black" : "border-danger")
           }
           value={
-            range.length > 0 && range[set][field][index] !== undefined
+            range.length > 0 && range[set][field][index][0] !== undefined
               ? range[set][field][index][0]
               : ""
           }
@@ -58,7 +58,7 @@ const MinMaxInput = ({ field, index, setType, set }) => {
           }
           max={field === "w" ? 10 : Number.POSITIVE_INFINITY}
           value={
-            range.length > 0 && range[set][field][index] !== undefined
+            range.length > 0 && range[set][field][index][1] !== undefined
               ? range[set][field][index][1]
               : ""
           }

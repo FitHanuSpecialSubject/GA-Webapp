@@ -50,11 +50,7 @@ export default function GeneratingPage({ file, setFile, problemType }) {
       {Object.keys(info).length === 0 ? (
         <p>Loading data...</p>
       ) : problemType === "SMT" ? (
-        <SMTGenerator
-          data={info}
-          workbook={workbook}
-          setWorkbook={setWorkbook}
-        />
+        <SMTGenerator data={info} workbook={workbook} />
       ) : (
         "Game Theory currently unsupported."
       )}
