@@ -36,7 +36,6 @@ export default function GeneratingPage({ file, setFile, problemType }) {
       displayPopup("Error", e.message, true);
     }
   };
-
   useEffect(() => {
     if (file == null) return;
     readFile(file);
@@ -47,7 +46,7 @@ export default function GeneratingPage({ file, setFile, problemType }) {
         className="m-auto mb-2 btn btn-danger"
         onClick={() => setFile(null)}
       >
-        Import another problem
+        Remove this problem
       </button>
       {Object.keys(info).length === 0 ? (
         <></>

@@ -1,65 +1,75 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import { GameTheoryGeneratorContext } from "./SMTGenerator";
 
-const MinMaxInput = ({ field, index, setRange, setType, set }) => {
-  const [virtualRange, setVirtualRange] = useState({
-    min: NaN,
-    max: NaN,
-  });
-  const [valid, setValid] = useState(false);
+const MinMaxInput = ({ field, index, setType, set }) => {
+  const [validation, setValidation] = useState(false);
+  const { range, setRange } = useContext(GameTheoryGeneratorContext);
   useEffect(() => {
-    if (
-      !Number.isNaN(virtualRange.min) &&
-      !Number.isNaN(virtualRange.max) &&
-      virtualRange.min <= virtualRange.max
-    ) {
-      setRange(field, index, set, virtualRange.min, virtualRange.max);
-      setValid(true);
-    } else {
-      setRange(field, index, set, -1907, -1907);
-      setValid(false);
+    if (range.length === 0) return;
+    if (range[set][field][index].filter((e) => e !== undefined).length === 0) {
+      return;
     }
-  }, [virtualRange]);
+    setValidation(
+      Number(range[set][field][index][0]) <=
+        Number(range[set][field][index][1]),
+    );
+  }, [range]);
   const validateInput = (e) => {
-    if (Number(e.target.value) < Number(e.target.min)) {
-      e.target.value = e.target.min;
+    if (
+      Number(e.target.value) < Number(e.target.min) ||
+      e.target.value === ""
+    ) {
+      return e.target.min;
     }
     if (Number(e.target.value) > Number(e.target.max)) {
-      e.target.value = e.target.max;
+      return e.target.max;
     }
+    return e.target.value;
   };
   return (
     <>
       <div className="input-group mb-1">
         <input
           min={0}
+          max={field === "w" ? 10 : Number.POSITIVE_INFINITY}
           className={
-            "form-control " + (valid ? "border-black" : "border-danger")
+            "form-control " + (validation ? "border-black" : "border-danger")
+          }
+          value={
+            range.length > 0 && range[set][field][index] !== undefined
+              ? range[set][field][index][0]
+              : ""
           }
           type="number"
           placeholder="min"
           onChange={(e) => {
-            validateInput(e);
-            setVirtualRange({
-              ...virtualRange,
-              min: Number(e.target.value === "" ? NaN : e.target.value),
-            });
+            const val = validateInput(e);
+            const clone = [...range];
+            clone[set][field][index][0] = Number(val);
+            setRange(clone);
+            e.target.value = val;
           }}
         />
         <input
           min={0}
           className={
-            "form-control " + (valid ? "border-black" : "border-danger")
+            "form-control " + (validation ? "border-black" : "border-danger")
           }
           max={field === "w" ? 10 : Number.POSITIVE_INFINITY}
+          value={
+            range.length > 0 && range[set][field][index] !== undefined
+              ? range[set][field][index][1]
+              : ""
+          }
           type="number"
           placeholder="max"
           onChange={(e) => {
-            validateInput(e);
-            setVirtualRange({
-              ...virtualRange,
-              max: Number(e.target.value === "" ? NaN : e.target.value),
-            });
+            const val = validateInput(e);
+            const clone = [...range];
+            clone[set][field][index][1] = Number(val);
+            setRange(clone);
+            e.target.value = val;
           }}
         />
       </div>
@@ -83,6 +93,7 @@ MinMaxInput.propTypes = {
   setRange: PropTypes.func,
   setType: PropTypes.func,
   set: PropTypes.number,
+  range: PropTypes.array,
 };
 
 export default MinMaxInput;
