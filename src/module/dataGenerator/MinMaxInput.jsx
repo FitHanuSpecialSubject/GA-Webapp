@@ -42,7 +42,7 @@ const MinMaxInput = ({ field, index, setType, set }) => {
               : ""
           }
           type="number"
-          placeholder="min"
+          placeholder="Lower bound"
           onChange={(e) => {
             const val = validateInput(e);
             const clone = [...range];
@@ -63,7 +63,7 @@ const MinMaxInput = ({ field, index, setType, set }) => {
               : ""
           }
           type="number"
-          placeholder="max"
+          placeholder="Upper bound"
           onChange={(e) => {
             const val = validateInput(e);
             const clone = [...range];
