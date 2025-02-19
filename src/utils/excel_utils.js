@@ -780,3 +780,39 @@ export const generatorSMTWriter = (workbook, ranges, types, data) => {
   }
   return workbook;
 };
+
+/**
+ * Get problem information for Generator
+ * @param {ExcelJS.Workbook} workbook
+ * @returns {Object} - Problem data
+ */
+export const generatorGTReader = (workbook) => {
+  const {
+    GUIDELINE_SHEET_NAME: _,
+    SPECIAL_PLAYER_SHEET_NAME: _2,
+    ...essentialSheet
+  } = GAME_THEORY_WORKBOOK;
+  for (const sheetName of Object.values(essentialSheet)) {
+    if (!workbook.worksheets.find((ws) => ws.name === sheetName)) {
+      throw new Error(`Sheet missing: ${sheetName}`);
+    }
+  }
+  const problemName = workbook
+    .getWorksheet(GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME)
+    .getCell("B1").value;
+  const numberOfPlayer = Number(
+    workbook
+      .getWorksheet(GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME)
+      .getCell("B4").value,
+  );
+  const numberOfProperty = Number(
+    workbook
+      .getWorksheet(GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME)
+      .getCell("B5").value,
+  );
+  return {
+    problemName,
+    numberOfPlayer,
+    numberOfProperty,
+  };
+};

@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { GameTheoryGeneratorContext } from "./SMTGenerator";
+import { StableMatchingGeneratorContext } from "./SMTGenerator";
 
 const MinMaxInput = ({ field, index, setType, set }) => {
   const [validation, setValidation] = useState(false);
-  const { range, setRange } = useContext(GameTheoryGeneratorContext);
+  const { range, setRange } = useContext(StableMatchingGeneratorContext);
   useEffect(() => {
     if (range.length === 0) return;
     if (range[set][field][index].filter((e) => e !== undefined).length === 0) {

@@ -7,7 +7,7 @@ import { saveAs } from "file-saver";
 import { generatorSMTWriter } from "../../utils/excel_utils";
 import { SMTProblemInfo } from "../../page/dataGenerator/ProblemInfo";
 
-export const GameTheoryGeneratorContext = createContext(null);
+export const StableMatchingGeneratorContext = createContext(null);
 
 export default function SMTGenerator({ data, workbook }) {
   const [infoVisible, setInfoVisible] = useState(true);
@@ -116,7 +116,7 @@ export default function SMTGenerator({ data, workbook }) {
     setValueType(valueTypeInit);
   }, [data]);
   return (
-    <GameTheoryGeneratorContext.Provider
+    <StableMatchingGeneratorContext.Provider
       value={{
         data,
         range: rwpRange,
@@ -223,7 +223,7 @@ export default function SMTGenerator({ data, workbook }) {
           Generate
         </button>
       </div>
-    </GameTheoryGeneratorContext.Provider>
+    </StableMatchingGeneratorContext.Provider>
   );
 }
 

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import PopupContext from "../../module/core/context/PopupContext";
 import ExcelJS from "exceljs";
 import PropTypes from "prop-types";
-import { generatorSMTReader } from "../../utils/excel_utils";
+import { generatorGTReader, generatorSMTReader } from "../../utils/excel_utils";
 import SMTGenerator from "../../module/dataGenerator/SMTGenerator";
 
 export default function GeneratingPage({ file, setFile, problemType }) {
@@ -17,13 +17,12 @@ export default function GeneratingPage({ file, setFile, problemType }) {
         try {
           const data = reader.result;
           const workbook = await new ExcelJS.Workbook().xlsx.load(data);
-          if (problemType === "SMT") {
-            const info = generatorSMTReader(workbook);
-            setWorkbook(workbook);
-            setInfo(info);
-          } else {
-            null;
-          }
+          const info =
+            problemType === "SMT"
+              ? generatorSMTReader(workbook)
+              : generatorGTReader(workbook);
+          setWorkbook(workbook);
+          setInfo(info);
         } catch (e) {
           console.error(e);
           setFile(null);
@@ -49,7 +48,7 @@ export default function GeneratingPage({ file, setFile, problemType }) {
         Remove this problem
       </button>
       {Object.keys(info).length === 0 ? (
-        <></>
+        <p>Loading data...</p>
       ) : problemType === "SMT" ? (
         <SMTGenerator
           data={info}
