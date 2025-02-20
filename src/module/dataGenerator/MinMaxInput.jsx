@@ -1,55 +1,75 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import { StableMatchingGeneratorContext } from "./SMTGenerator";
+import { GameTheoryGeneratorContext } from "./GTGenerator";
 
-const MinMaxInput = ({ field, index, setRange, setType, set }) => {
-  const [virtualRange, setVirtualRange] = useState({
-    min: NaN,
-    max: NaN,
-  });
-  const [valid, setValid] = useState(false);
+const validateInput = (e) => {
+  if (Number(e.target.value) < Number(e.target.min) || e.target.value === "") {
+    return e.target.min;
+  }
+  if (Number(e.target.value) > Number(e.target.max)) {
+    return e.target.max;
+  }
+  return e.target.value;
+};
+
+const SMTMinMaxInput = ({ field, index, setType, set }) => {
+  const [validation, setValidation] = useState(false);
+  const { range, setRange } = useContext(StableMatchingGeneratorContext);
   useEffect(() => {
-    if (
-      !Number.isNaN(virtualRange.min) &&
-      !Number.isNaN(virtualRange.max) &&
-      virtualRange.min <= virtualRange.max
-    ) {
-      setRange(field, index, set, virtualRange.min, virtualRange.max);
-      setValid(true);
-    } else {
-      setRange(field, index, set, -1907, -1907);
-      setValid(false);
+    if (range.length === 0) return;
+    if (range[set][field][index].filter((e) => e !== undefined).length === 0) {
+      return;
     }
-  }, [virtualRange]);
+    setValidation(
+      Number(range[set][field][index][0]) <=
+        Number(range[set][field][index][1]),
+    );
+  }, [range]);
   return (
     <>
       <div className="input-group mb-1">
         <input
           min={0}
+          max={field === "w" ? 10 : Number.POSITIVE_INFINITY}
           className={
-            "form-control " + (valid ? "border-black" : "border-danger")
+            "form-control " + (validation ? "border-black" : "border-danger")
+          }
+          value={
+            range.length > 0 && range[set][field][index][0] !== undefined
+              ? range[set][field][index][0]
+              : ""
           }
           type="number"
-          placeholder="min"
-          onChange={(e) =>
-            setVirtualRange({
-              ...virtualRange,
-              min: Number(e.target.value === "" ? NaN : e.target.value),
-            })
-          }
+          placeholder="Lower bound"
+          onChange={(e) => {
+            const val = validateInput(e);
+            const clone = [...range];
+            clone[set][field][index][0] = Number(val);
+            setRange(clone);
+            e.target.value = val;
+          }}
         />
         <input
           min={0}
           className={
-            "form-control " + (valid ? "border-black" : "border-danger")
+            "form-control " + (validation ? "border-black" : "border-danger")
+          }
+          max={field === "w" ? 10 : Number.POSITIVE_INFINITY}
+          value={
+            range.length > 0 && range[set][field][index][1] !== undefined
+              ? range[set][field][index][1]
+              : ""
           }
           type="number"
-          placeholder="max"
-          onChange={(e) =>
-            setVirtualRange({
-              ...virtualRange,
-              max: Number(e.target.value === "" ? NaN : e.target.value),
-            })
-          }
+          placeholder="Upper bound"
+          onChange={(e) => {
+            const val = validateInput(e);
+            const clone = [...range];
+            clone[set][field][index][1] = Number(val);
+            setRange(clone);
+            e.target.value = val;
+          }}
         />
       </div>
       <div className="small">
@@ -66,12 +86,88 @@ const MinMaxInput = ({ field, index, setRange, setType, set }) => {
   );
 };
 
-MinMaxInput.propTypes = {
+const GTMinMaxInput = ({ index }) => {
+  const [validation, setValidation] = useState(false);
+  const { range, setRange, type, setType } = useContext(
+    GameTheoryGeneratorContext,
+  );
+  useEffect(() => {
+    if (
+      range.length === 0 ||
+      range[index].filter((e) => e !== undefined).length < 2
+    ) {
+      return;
+    }
+    setValidation(Number(range[index][0]) <= Number(range[index][1]));
+  }, [range]);
+  return (
+    <>
+      <div className="input-group mb-1">
+        <input
+          className={
+            "form-control " + (validation ? "border-black" : "border-danger")
+          }
+          value={
+            range.length > 0 && range[index][0] !== undefined
+              ? range[index][0]
+              : ""
+          }
+          type="number"
+          placeholder="Lower bound"
+          onChange={(e) => {
+            const clone = [...range];
+            clone[index][0] = Number(e.target.value);
+            setRange(clone);
+          }}
+        />
+        <input
+          className={
+            "form-control " + (validation ? "border-black" : "border-danger")
+          }
+          value={
+            range.length > 0 && range[index][1] !== undefined
+              ? range[index][1]
+              : ""
+          }
+          type="number"
+          placeholder="Upper bound"
+          onChange={(e) => {
+            const clone = [...range];
+            clone[index][1] = Number(e.target.value);
+            setRange(clone);
+          }}
+        />
+      </div>
+      <div className="small">
+        <label className="d-flex align-items-center justify-content-center">
+          <input
+            type="checkbox"
+            value={type.length > 0 ? type[index] : false}
+            className="form-check-input mt-0 me-1 border-primary"
+            onChange={(e) => {
+              const clone = [...type];
+              clone[index] = e.target.checked;
+              setType(clone);
+            }}
+          />
+          Decimal value
+        </label>
+      </div>
+    </>
+  );
+};
+
+GTMinMaxInput.propTypes = {
+  index: PropTypes.number,
+};
+
+SMTMinMaxInput.propTypes = {
   field: PropTypes.string,
   index: PropTypes.number,
   setRange: PropTypes.func,
   setType: PropTypes.func,
   set: PropTypes.number,
+  range: PropTypes.array,
 };
 
-export default MinMaxInput;
+export { SMTMinMaxInput, GTMinMaxInput };

@@ -25,6 +25,9 @@ export default function InputPage({ setFile, setProblemType, problemType }) {
         accept=".xlsx"
         onChange={handleFileChange}
       />
+      <div className={"small mt-3"}>
+        Empty data file could be generated from Problem Page
+      </div>
     </div>
   );
 }
