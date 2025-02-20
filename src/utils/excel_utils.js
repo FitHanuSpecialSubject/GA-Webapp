@@ -379,7 +379,7 @@ export const loadNormalPlayers = async (
           currentRow + i + 1,
           j + 2,
         );
-        if (propertyCell.value) {
+        if (propertyCell.value !== null) {
           properties.push(propertyCell.value);
         }
       }
