@@ -54,7 +54,7 @@ export const GTProblemInfo = ({ data, infoVisible }) => {
             <div className="small">{data.numberOfPlayer}</div>
           </div>
           <div className="col">
-            <div className="fw-bold">Characteristics</div>
+            <div className="fw-bold">Number of property</div>
             <div className="small">{data.numberOfProperty}</div>
           </div>
         </div>

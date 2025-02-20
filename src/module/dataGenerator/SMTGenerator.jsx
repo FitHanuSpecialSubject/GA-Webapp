@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import ExcelJS from "exceljs";
-import MinMaxInput from "./MinMaxInput";
+import { SMTMinMaxInput } from "./MinMaxInput";
 import PopupContext from "../core/context/PopupContext";
 import { saveAs } from "file-saver";
 import { generatorSMTWriter } from "../../utils/excel_utils";
@@ -60,6 +60,9 @@ export default function SMTGenerator({ data, workbook }) {
     }
   };
   const pasteValue = (set, index) => {
+    if (clipboard === null) {
+      return;
+    }
     try {
       const range = [...rwpRange];
       for (const field of ["r", "w", "p"]) {
@@ -151,7 +154,7 @@ export default function SMTGenerator({ data, workbook }) {
                             <p className="fs-5 fw-bold">{c}</p>
                             <div className="mb-2">
                               <div className="mb-1">Requirements</div>
-                              <MinMaxInput
+                              <SMTMinMaxInput
                                 field="r"
                                 set={s}
                                 index={i}
@@ -160,7 +163,7 @@ export default function SMTGenerator({ data, workbook }) {
                             </div>
                             <div className="mb-2">
                               <div className="mb-1">Weights</div>
-                              <MinMaxInput
+                              <SMTMinMaxInput
                                 field="w"
                                 set={s}
                                 index={i}
@@ -169,7 +172,7 @@ export default function SMTGenerator({ data, workbook }) {
                             </div>
                             <div className="mb-4">
                               <div className="mb-1">Properties</div>
-                              <MinMaxInput
+                              <SMTMinMaxInput
                                 field="p"
                                 set={s}
                                 index={i}

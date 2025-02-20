@@ -816,3 +816,33 @@ export const generatorGTReader = (workbook) => {
     numberOfProperty,
   };
 };
+
+/**
+ * Write data to Excel file | Data Generator
+ * @param {ExcelJS.Workbook} workbook
+ * @param {Object} range
+ * @param {Object} type
+ * @param {Object} data
+ * @returns {ExcelJS.Workbook}
+ */
+export const generatorGTWriter = (workbook, range, type, data) => {
+  const dataSheet = workbook.getWorksheet(
+    GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME,
+  );
+  let currentRow = 1;
+  for (let player = 0; player < data.numberOfPlayer; player++) {
+    const numberOfStrat = Number(dataSheet.getCell(currentRow, 2));
+    for (let p = 1; p <= data.numberOfProperty; p++) {
+      const r = range[p - 1];
+      for (let strat = 1; strat <= numberOfStrat; strat++) {
+        dataSheet.getCell(currentRow + strat, p + 1).value = genRandom(
+          r,
+          type[p - 1],
+        );
+        dataSheet.getCell(currentRow + strat, p + 1).style.numFmt = "0.00";
+      }
+    }
+    currentRow += numberOfStrat + 1;
+  }
+  return workbook;
+};
