@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import "../../module/gameTheory/css/input.scss";
 import SpecialPlayerInput from "../../module/gameTheory/component/specialPlayerInput";
 import Input from "../../module/core/component/input";
-import ExcelImage from "../../module/core/asset/image/excel.png";
 import { saveAs } from "file-saver";
 import { useContext } from "react";
 import DataContext from "../../module/core/context/DataContext";
@@ -22,6 +21,7 @@ import {
 } from "../../utils/excel_utils";
 import { GAME_THEORY_WORKBOOK } from "../../const/excel_const";
 import GT_GUIDELINE from "../../module/core/asset/workbook/gtguidelines.xlsx";
+import { FaRegFileExcel } from "react-icons/fa6";
 
 export default function InputPage() {
   // initialize form data
@@ -273,7 +273,7 @@ export default function InputPage() {
     const validFunctionPattern = /^[a-zA-Z0-9s+\-*/^()]+$/;
 
     // check if the problem name is empty
-    if (problemName.length == 0 || problemName.length > 255) {
+    if (problemName.length === 0 || problemName.length > 255) {
       setProblemNameError(
         "Problem name must not be empty or exceed 255 characters",
       );
@@ -353,7 +353,7 @@ export default function InputPage() {
     // }
 
     // function phải viết liền dấu (không có khoảng trắng, vd: p1-p2)
-    if (fitnessFunction.length == 0) {
+    if (fitnessFunction.length === 0) {
       setFitnessFunction("DEFAULT");
     } else {
       if (!validFunctionPattern.test(fitnessFunction)) {
@@ -364,7 +364,7 @@ export default function InputPage() {
     }
 
     // function phải viết liền dấu (không có khoảng trắng, vd: p1-p2)
-    if (playerPayoffFunction.length == 0) {
+    if (playerPayoffFunction.length === 0) {
       setPlayerPayoffFunction("DEFAULT");
     } else {
       if (!validFunctionPattern.test(playerPayoffFunction)) {
@@ -585,9 +585,12 @@ export default function InputPage() {
             />
           </div>
         </div>
-        <div className="btn" onClick={handleGetExcelTemplate}>
-          <p>Get Excel Template</p>
-          <img src={ExcelImage} alt="" />
+        <div
+          className="btn btn-success d-flex justify-content-center border-1 p-3"
+          onClick={handleGetExcelTemplate}
+        >
+          <FaRegFileExcel className="me-0 fs-4" />
+          Get Excel Template
         </div>
 
         <div className="guide-box">

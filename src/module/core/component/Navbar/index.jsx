@@ -18,21 +18,24 @@ export default function Header() {
     <>
       <header className="Navbar">
         <div className="container">
-          <div className="app-name" onClick={backToHome}>
-            <img src="/logo.svg" className="logo" />
+          <div
+            className="app-name fw-semibold d-flex align-items-center"
+            onClick={backToHome}
+          >
+            <img src="/logo.svg" className="logo" alt="Logo" />
             Game Theory & Matching Theory Solver
           </div>
           <div className="nav-item-container">
             <Link
               to="/"
-              className={path == "/" ? "nav-item highlight" : "nav-item"}
+              className={path === "/" ? "nav-item highlight" : "nav-item"}
             >
               Game Theory
             </Link>
             <Link
               to="/matching-theory/input"
               className={
-                path == "/matching-theory/input"
+                path === "/matching-theory/input"
                   ? "nav-item highlight"
                   : "nav-item"
               }
