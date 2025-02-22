@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import "../../module/stableMatching/css/output.scss";
-import GraphImage from "../../module/core/asset/image/graph.png";
 import { useContext, useState } from "react";
 import DataContext from "../../module/core/context/DataContext";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +22,7 @@ import {
 } from "../../utils/excel_utils.js";
 import ExcelJS from "exceljs";
 import { RESULT_WORKBOOK } from "../../const/excel_const";
+import { FaChartLine } from "react-icons/fa6";
 
 let stompClient = null;
 export default function MatchingOutputPage() {
@@ -328,9 +328,12 @@ export default function MatchingOutputPage() {
             maxTimeParam={maxTimeParam}
             setMaxTimeParam={setMaxTimeParam}
           />
-          <div className="btn insight-btn" onClick={handleGetMoreInsights}>
-            <img src={GraphImage} alt="" />
-            <p className="mb-0">Get more insights</p>
+          <div
+            className="align-self-center btn btn-outline-primary d-flex justify-content-center border-1 p-3"
+            onClick={handleGetMoreInsights}
+          >
+            <FaChartLine className="me-0 fs-4" />
+            Get more insights
           </div>
         </div>
 

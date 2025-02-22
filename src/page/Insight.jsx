@@ -4,10 +4,10 @@ import NothingToShow from "../module/core/component/NothingToShow";
 import { Chart, registerables } from "chart.js";
 import DataContext from "../module/core/context/DataContext";
 import { saveAs } from "file-saver";
-import ExcelImage from "../module/core/asset/image/excel.png";
 import { exportInsights } from "../utils/excel_utils";
 import InsightsGraph from "../module/core/component/InsightsGraph";
 import InsightsTable from "../module/core/component/InsightsTable";
+import { FaRegFileExcel } from "react-icons/fa6";
 
 export default function InsightPage() {
   const { appData } = useContext(DataContext);
@@ -30,13 +30,16 @@ export default function InsightPage() {
 
   return (
     <div className="insight-page">
-      <h1 className="problem-name">{appData.problem.name}</h1>
-      <p className="header-text">Insights</p>
-      <div className="row">
-        <div className="btn" onClick={handleExportToExcel}>
-          <p>Export to Excel</p>
-          <img src={ExcelImage} alt="" />
-        </div>
+      <div className="text-center small px-5">
+        {appData.problem.nameOfProblem}
+      </div>
+      <div className="fs-1 fw-bold">Insights</div>
+      <div
+        className="btn btn-success d-flex align-self-center justify-content-center border-1 p-3"
+        onClick={handleExportToExcel}
+      >
+        <FaRegFileExcel className="me-0 fs-4" />
+        Get Excel Template
       </div>
       <div className="fitness-table">
         <InsightsTable fitnessValues={appData.insights.data.fitnessValues} />

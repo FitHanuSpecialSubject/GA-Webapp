@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Navbar from "../module/core/component/Navbar";
 import InputPage from "../page/gameTheory/Input";
-import "../module/core/css/index.scss";
+import "../module/core/asset/css/index.scss";
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import DataContext from "../module/core/context/DataContext";

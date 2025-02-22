@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import "../../module/gameTheory/css/output.scss";
 import PlayerResult from "../../module/gameTheory/component/PlayerResult";
-import ExcelImage from "../../module/core/asset/image/excel.png";
-import GraphImage from "../../module/core/asset/image/graph.png";
 import { useContext, useState } from "react";
 import DataContext from "../../module/core/context/DataContext";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +22,7 @@ import { over } from "stompjs";
 import ExcelJS from "exceljs";
 import { RESULT_WORKBOOK } from "../../const/excel_const";
 import { getBackendAddress } from "../../utils/http_utils";
+import { FaChartLine, FaRegFileExcel } from "react-icons/fa6";
 
 let stompClient = null;
 export default function OutputPage() {
@@ -186,12 +185,6 @@ export default function OutputPage() {
       <br />
       <p className="below-headertext">Optimal solution</p>
       <div className="output-container">
-        <div className="row">
-          <div className="btn" onClick={handleExportToExcel}>
-            <p>Export to Excel</p>
-            <img src={ExcelImage} alt="" />
-          </div>
-        </div>
         <div className="param-box">
           <ParamSettingBox
             distributedCoreParam={distributedCoreParam}
@@ -203,13 +196,22 @@ export default function OutputPage() {
             maxTimeParam={maxTimeParam}
             setMaxTimeParam={setMaxTimeParam}
           />
-          <div className="btn insight-btn" onClick={handleGetMoreInsights}>
-            <p>Get more insights</p>
-            <img src={GraphImage} alt="" />
+          <div
+            className="align-self-center btn btn-outline-primary d-flex justify-content-center border-1 p-3"
+            onClick={handleGetMoreInsights}
+          >
+            <FaChartLine className="me-0 fs-4" />
+            Get more insights
           </div>
         </div>
       </div>
-      <br />
+      <div
+        className="btn align-self-center mb-3 btn-success d-flex justify-content-center border-1 p-3"
+        onClick={handleExportToExcel}
+      >
+        <FaRegFileExcel className="me-0 fs-4" />
+        Get Excel Template
+      </div>
       <p className="below-headertext">
         {" "}
         Fitness value: {appData.result.data.fitnessValue}

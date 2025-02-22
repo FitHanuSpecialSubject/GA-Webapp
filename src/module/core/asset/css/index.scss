@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Monda&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 
 :root {
   --blacK: black;
@@ -10,7 +10,7 @@
 * {
   margin: 0;
   padding: 0;
-  font-family: "Monda", sans-serif;
+  font-family: "Inter", serif;
   transition: all 0.1s ease-in-out;
 }
 
@@ -33,17 +33,6 @@
   font-size: 12px;
   line-height: 20px;
   cursor: pointer;
-
-  img {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-  }
-
-  &:hover {
-    background: black;
-    color: white;
-  }
 }
 
 .bold {

@@ -6,6 +6,8 @@ import { GTProblemInfo } from "../../page/dataGenerator/ProblemInfo";
 import { GTMinMaxInput } from "./MinMaxInput";
 import PopupContext from "../core/context/PopupContext";
 import { generatorGTWriter } from "../../utils/excel_utils";
+import { FaCopy, FaDeleteLeft, FaFileExport, FaPaste } from "react-icons/fa6";
+import FunctionButton from "./FunctionButton";
 
 export const GameTheoryGeneratorContext = createContext(null);
 
@@ -52,6 +54,37 @@ export default function GTGenerator({ data, workbook }) {
     }
     setRange(clone);
   };
+  const clearValue = (index) => {
+    const clone = [...range];
+    clone[index] = [];
+    setRange(clone);
+  };
+  const functionButtons = [
+    {
+      icon: <FaCopy />,
+      disableCondition: false,
+      desc: "Copy value",
+      callback: copyValue,
+    },
+    {
+      icon: <FaPaste />,
+      disableCondition: clipboard === null,
+      desc: "Paste value",
+      callback: pasteValue,
+    },
+    {
+      icon: <FaFileExport />,
+      disableCondition: false,
+      desc: "Same for other properties",
+      callback: sameProperty,
+    },
+    {
+      icon: <FaDeleteLeft />,
+      disableCondition: false,
+      desc: "Clear value for this characteristic",
+      callback: clearValue,
+    },
+  ];
   useEffect(() => {
     if (Object.keys(data).length === 0 || range.length > 0 || type.length > 0) {
       return;
@@ -83,7 +116,24 @@ export default function GTGenerator({ data, workbook }) {
               <div className="col-4 mb-4" key={i}>
                 <div className="card">
                   <div className="card-body p-4">
-                    <div className="h5 fw-bold">{"Property " + (i + 1)}</div>
+                    <div className="btn-group w-100 mb-4">
+                      {functionButtons.map((e) => {
+                        return (
+                          <FunctionButton
+                            key={e.desc}
+                            callback={e.callback}
+                            callbackParams={[i]}
+                            className="btn btn-outline-dark"
+                            icon={e.icon}
+                            disableCondition={e.disableCondition}
+                            desc={e.desc}
+                          />
+                        );
+                      })}
+                    </div>
+                    <div className="h5 fw-bold text-center mb-3">
+                      {"Property " + (i + 1)}
+                    </div>
                     <GTMinMaxInput index={i} />
                     <div className="row mt-3">
                       <div className="col-6 mb-2">

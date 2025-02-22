@@ -6,6 +6,13 @@ import PopupContext from "../core/context/PopupContext";
 import { saveAs } from "file-saver";
 import { generatorSMTWriter } from "../../utils/excel_utils";
 import { SMTProblemInfo } from "../../page/dataGenerator/ProblemInfo";
+import {
+  FaCopy,
+  FaFileArrowDown,
+  FaFileExport,
+  FaPaste,
+} from "react-icons/fa6";
+import FunctionButton from "./FunctionButton";
 
 export const StableMatchingGeneratorContext = createContext(null);
 
@@ -118,6 +125,32 @@ export default function SMTGenerator({ data, workbook }) {
     setRwpRange(rangeInit);
     setValueType(valueTypeInit);
   }, [data]);
+  const functionButtons = [
+    {
+      icon: <FaCopy />,
+      disableCondition: false,
+      desc: "Copy value",
+      callback: copyValue,
+    },
+    {
+      icon: <FaPaste />,
+      disableCondition: clipboard === null,
+      desc: "Paste value",
+      callback: pasteValue,
+    },
+    {
+      icon: <FaFileExport />,
+      disableCondition: false,
+      desc: "Same for other characteristics in this set",
+      callback: sameSet,
+    },
+    {
+      icon: <FaFileArrowDown />,
+      disableCondition: false,
+      desc: "Same for this characteristic in other sets",
+      callback: sameCharacteristic,
+    },
+  ];
   return (
     <StableMatchingGeneratorContext.Provider
       value={{
@@ -151,6 +184,21 @@ export default function SMTGenerator({ data, workbook }) {
                       <div className="col-4" key={String(s) + " " + c}>
                         <div className="card mb-4 bg-light-subtle border-2 rounded-4">
                           <div className="card-body text-center p-4">
+                            <div className="btn-group w-100 mb-4">
+                              {functionButtons.map((e) => {
+                                return (
+                                  <FunctionButton
+                                    key={e.desc}
+                                    callback={e.callback}
+                                    callbackParams={[s, i]}
+                                    className="btn btn-outline-dark"
+                                    icon={e.icon}
+                                    disableCondition={e.disableCondition}
+                                    desc={e.desc}
+                                  />
+                                );
+                              })}
+                            </div>
                             <p className="fs-5 fw-bold">{c}</p>
                             <div className="mb-2">
                               <div className="mb-1">Requirements</div>
@@ -178,40 +226,6 @@ export default function SMTGenerator({ data, workbook }) {
                                 index={i}
                                 setType={setType}
                               />
-                            </div>
-                            <div className="row">
-                              <div className="col-6 mb-2">
-                                <button
-                                  className="btn btn-outline-primary w-100"
-                                  onClick={() => copyValue(s, i)}
-                                >
-                                  Copy
-                                </button>
-                              </div>
-                              <div className="col-6 mb-2">
-                                <button
-                                  className="btn btn-outline-primary w-100"
-                                  onClick={() => pasteValue(s, i)}
-                                >
-                                  Paste
-                                </button>
-                              </div>
-                              <div className="col-12 mb-2">
-                                <button
-                                  className="btn btn-outline-primary w-100"
-                                  onClick={() => sameSet(s, i)}
-                                >
-                                  Same for this set
-                                </button>
-                              </div>
-                              <div className="col-12 mb-2">
-                                <button
-                                  className="btn btn-outline-primary w-100"
-                                  onClick={() => sameCharacteristic(s, i)}
-                                >
-                                  Same for this characteristic
-                                </button>
-                              </div>
                             </div>
                           </div>
                         </div>

@@ -1,7 +1,6 @@
 /* eslint max-len: 0 */
 import React, { useContext, useEffect, useState } from "react";
 import Input from "../../module/core/component/input";
-import ExcelImage from "../../module/core/asset/image/excel.png";
 import { saveAs } from "file-saver";
 import DataContext from "../../module/core/context/DataContext";
 import ExcelJS from "exceljs";
@@ -20,6 +19,7 @@ import {
 } from "../../utils/excel_utils";
 // import PropTypes from "prop-types";
 import { STABLE_MATCHING_WORKBOOK } from "../../const/excel_const";
+import { FaRegFileExcel } from "react-icons/fa6";
 
 export default function InputPage() {
   // initialize from data
@@ -180,7 +180,7 @@ export default function InputPage() {
 
     const validFunctionPattern = /^[a-zA-Z0-9s+\-*/^()]+$/;
     // check if the problem name is empty
-    if (problemName.length == 0 || problemName.length > 255) {
+    if (problemName.length === 0 || problemName.length > 255) {
       setProblemNameError(
         "Problem name must not be empty or exceed 255 characters",
       );
@@ -291,9 +291,9 @@ export default function InputPage() {
 
     // check từng indiviuals của từng thằng trong set hợp lệ chưa
     setIndividuals.forEach((element) => {
-      if (element.length == 0) {
-        (msg = "The number of individuals in every set must not be empty"),
-          (error = true);
+      if (element.length === 0) {
+        msg = "The number of individuals in every set must not be empty";
+        error = true;
       } else if (
         parseInt(element) < 0 ||
         parseInt(element) > totalIndividualsNum
@@ -645,7 +645,7 @@ export default function InputPage() {
             />
           </div>
 
-          <div className="row">
+          <div className="row mb-4">
             <Input
               message="Fitness function"
               type="text"
@@ -658,9 +658,12 @@ export default function InputPage() {
               // iconStyle={{fontSize: '1.2em', verticalAlign: 'center'}}
             />
           </div>
-          <div className="btn" onClick={handleGetExcelTemplate}>
-            <p>Get Excel Template</p>
-            <img src={ExcelImage} alt="" />
+          <div
+            className="btn btn-success d-flex justify-content-center border-1 p-3"
+            onClick={handleGetExcelTemplate}
+          >
+            <FaRegFileExcel className="me-0 fs-4" />
+            Get Excel Template
           </div>
         </div>
         <div className="guide-box">
@@ -697,79 +700,3 @@ export default function InputPage() {
     </>
   );
 }
-
-// function GuidelineText({ handleToggle, isExpanded }) {
-//   return (
-//     <div className="guideline-text">
-//       <h5>Step 1: Enter the name of your problem (Text)</h5>
-//       <h5>
-//         Step 2: Enter the number of sets{" "}
-//         <span
-//           onClick={handleToggle}
-//           className="toggle-icon"
-//           style={{
-//             cursor: "pointer",
-//             color: "gray",
-//           }}
-//         >
-//           {isExpanded ? "(▼)" : "(▶)"}
-//         </span>
-//       </h5>
-//       {isExpanded && (
-//         <div className="subsection" id="subsection">
-//           <p>
-//             The system will display a corresponding table after you fill in the
-//             information in Step 2.
-//           </p>
-
-//           <p>
-//             Determine which set is one/many, then tick the blank box if that set
-//             is many. As instructed below:
-//           </p>
-
-//           <ul>
-//             <li>
-//               {`Set many: Capacity = 1
-//                       The number of individuals in the set {">"} the opponent's set`}
-//             </li>
-//             <li>
-//               {`Set one: Capacity > 1
-//                       The number of individuals in the set {"<"} the opponent's set`}
-//             </li>
-//           </ul>
-
-//           <p>
-//             Fill in the information in the blank box:
-//             <ul>
-//               <li>
-//                 <b>Num individuals of Set_x</b>- the number of individuals of
-//                 the corresponding set
-//               </li>
-//               <li>
-//                 <b>Evaluate Function Set_x</b> - the evaluation function
-//                 corresponding to that set
-//               </li>
-//             </ul>
-//           </p>
-//         </div>
-//       )}
-
-//       <h5>Step 3: Enter the number of characteristics of both sets</h5>
-//       <h5>Step 4: Enter the number of total individuals of both sets</h5>
-//       <h5>Step 5: Enter the fitness function which you initialize</h5>
-//       <h5>
-//         Step 6: Click the button <b>Get Excel Templates</b> to receive the Excel
-//         file that contains all the information you entered above
-//       </h5>
-//       <h5>
-//         Step 7: Select or drag and drop the Excel file you just received at the
-//         dotted line and the <b>Choose a file</b> button for the system to
-//         process your problem
-//       </h5>
-//     </div>
-//   );
-// }
-// GuidelineText.propTypes = {
-//   handleToggle: PropTypes.func.isRequired,
-//   isExpanded: PropTypes.bool.isRequired,
-// };
