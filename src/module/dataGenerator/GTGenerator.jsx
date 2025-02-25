@@ -9,7 +9,7 @@ import { generatorGTWriter } from "../../utils/excel_utils";
 import { FaCopy, FaDeleteLeft, FaFileExport, FaPaste } from "react-icons/fa6";
 import FunctionButton from "./FunctionButton";
 
-export const GameTheoryGeneratorContext = createContext(null);
+const GameTheoryGeneratorContext = createContext(null);
 
 export default function GTGenerator({ data, workbook }) {
   const [infoVisible, setInfoVisible] = useState(true);
@@ -135,32 +135,6 @@ export default function GTGenerator({ data, workbook }) {
                       {"Property " + (i + 1)}
                     </div>
                     <GTMinMaxInput index={i} />
-                    <div className="row mt-3">
-                      <div className="col-6 mb-2">
-                        <button
-                          className="btn btn-outline-primary w-100"
-                          onClick={() => copyValue(i)}
-                        >
-                          Copy
-                        </button>
-                      </div>
-                      <div className="col-6 mb-2">
-                        <button
-                          className="btn btn-outline-primary w-100"
-                          onClick={() => pasteValue(i)}
-                        >
-                          Paste
-                        </button>
-                      </div>
-                      <div className="col-12 mb-2">
-                        <button
-                          className="btn btn-outline-primary w-100"
-                          onClick={() => sameProperty(i)}
-                        >
-                          Same for all property
-                        </button>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -182,3 +156,5 @@ GTGenerator.propTypes = {
   data: PropTypes.object,
   workbook: ExcelJS.Workbook,
 };
+
+export { GameTheoryGeneratorContext };
