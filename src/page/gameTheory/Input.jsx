@@ -622,7 +622,12 @@ export default function InputPage() {
           <label htmlFor="select-file" id="select-file-label">
             Choose a file
           </label>
-          <input type="file" id="select-file" onChange={handleFileInput} />
+          <input
+            accept=".xlsx"
+            type="file"
+            id="select-file"
+            onChange={handleFileInput}
+          />
         </div>
       </div>
     </>
