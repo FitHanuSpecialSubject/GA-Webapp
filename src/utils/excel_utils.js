@@ -667,7 +667,7 @@ export const getPropertyWeight = (sheet, row, col) => {
 export const getPropertyRequirement = (sheet, row, col) => {
   validateAddress(row, col);
   try {
-    const value = sheet.getCell(row, col);
+    const value = sheet.getCell(row, col).value;
     if (!Number.isNaN(value)) {
       return value;
     } else if (typeof value === "string") {
@@ -831,7 +831,12 @@ export const generatorGTWriter = (workbook, range, type, data) => {
   );
   let currentRow = 1;
   for (let player = 0; player < data.numberOfPlayer; player++) {
-    const numberOfStrat = Number(dataSheet.getCell(currentRow, 2));
+    const numberOfStrat = Number(dataSheet.getCell(currentRow, 2).value);
+    if (Number.isNaN(numberOfStrat)) {
+      throw new Error(
+        "Invalid number of strategy at cell: " + colCache.encode(currentRow, 2),
+      );
+    }
     for (let p = 1; p <= data.numberOfProperty; p++) {
       const r = range[p - 1];
       for (let strat = 1; strat <= numberOfStrat; strat++) {

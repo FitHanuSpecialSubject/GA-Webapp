@@ -1,14 +1,14 @@
 import React, { useContext, useState, useEffect } from "react";
 import "../../module/stableMatching/css/processing.scss";
 import { useNavigate } from "react-router-dom";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import DataContext from "../../module/core/context/DataContext";
 import NothingToShow from "../../module/core/component/NothingToShow";
 import Loading from "../../module/core/component/Loading";
 import ParamSettingBox from "../../module/core/component/ParamSettingBox";
 import PopupContext from "../../module/core/context/PopupContext";
 import { SMT, SMT_VALIDATE } from "../../consts";
-import { getBackendAddress } from "../../utils/http_utils";
+import { axiosErrorHandler, getBackendAddress } from "../../utils/http_utils";
 import { SMT_ALGORITHMS } from "../../const/matching_const";
 
 export default function InputProcessingPage() {
@@ -146,41 +146,10 @@ export default function InputProcessingPage() {
       setFavicon("success");
       navigate("/matching-theory/result");
     } catch (err) {
-      console.error(err);
-      // Handle Errors
       setFavicon("error");
-      if (err instanceof AxiosError) {
-        let title;
-        let message;
-
-        if (err.response) {
-          title = `Server responded with status ${err.response.status}`;
-          message = (
-            <div>
-              <strong>Error: </strong>
-              {err.response.data.error}
-              <br />
-              <strong>Chi tiết lỗi: </strong>
-              {err.response.data.message}
-            </div>
-          );
-        } else if (err.request) {
-          title = "No response received";
-          message = "Server maybe down at the moment!";
-        } else {
-          title = "Error setting up request";
-          message = `${err.message}`;
-        }
-        setIsLoading(false);
-        displayPopup(title, message, true);
-      } else {
-        setIsLoading(false);
-        displayPopup(
-          "Running failed",
-          "An unknown error occurred! Please contact the admin!",
-          true,
-        );
-      }
+      const { title, message } = axiosErrorHandler(err);
+      setIsLoading(false);
+      displayPopup(title, <div>{message}</div>, true);
     }
   };
 

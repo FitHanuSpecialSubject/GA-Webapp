@@ -44,6 +44,7 @@ export default function Input({
           placeholder={message}
           onChange={internalOnchangeEvent}
           value={value == null ? undefined : value}
+          className="pe-2"
         />
         <i
           className="info fa-solid fa-info"
