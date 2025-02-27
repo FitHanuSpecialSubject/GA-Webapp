@@ -667,7 +667,7 @@ export const getPropertyWeight = (sheet, row, col) => {
 export const getPropertyRequirement = (sheet, row, col) => {
   validateAddress(row, col);
   try {
-    const value = sheet.getCell(row, col);
+    const value = sheet.getCell(row, col).value;
     if (!Number.isNaN(value)) {
       return value;
     } else if (typeof value === "string") {
