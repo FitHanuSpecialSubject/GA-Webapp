@@ -30,10 +30,15 @@ export default function GTGenerator({ data, workbook }) {
         );
       }
     }
-    const processedWorkbook = generatorGTWriter(workbook, range, type, data);
-    const buffer = await processedWorkbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: "application/octet-stream" });
-    saveAs(blob, data.problemName + ".xlsx");
+    try {
+      const processedWorkbook = generatorGTWriter(workbook, range, type, data);
+      const buffer = await processedWorkbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/octet-stream" });
+      saveAs(blob, data.problemName + ".xlsx");
+    } catch (e) {
+      console.error(e);
+      displayPopup("Cannot generate data", e.message, true);
+    }
   };
   const copyValue = (index) => {
     setClipboard(range[index]);
@@ -135,32 +140,6 @@ export default function GTGenerator({ data, workbook }) {
                       {"Property " + (i + 1)}
                     </div>
                     <GTMinMaxInput index={i} />
-                    <div className="row mt-3">
-                      <div className="col-6 mb-2">
-                        <button
-                          className="btn btn-outline-primary w-100"
-                          onClick={() => copyValue(i)}
-                        >
-                          Copy
-                        </button>
-                      </div>
-                      <div className="col-6 mb-2">
-                        <button
-                          className="btn btn-outline-primary w-100"
-                          onClick={() => pasteValue(i)}
-                        >
-                          Paste
-                        </button>
-                      </div>
-                      <div className="col-12 mb-2">
-                        <button
-                          className="btn btn-outline-primary w-100"
-                          onClick={() => sameProperty(i)}
-                        >
-                          Same for all property
-                        </button>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>

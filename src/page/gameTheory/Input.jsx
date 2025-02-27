@@ -35,7 +35,7 @@ export default function InputPage() {
   const [fitnessFunction, setFitnessFunction] = useState("DEFAULT");
   const [playerPayoffFunction, setPlayerPayoffFunction] = useState("DEFAULT");
   const [isMaximizing, setIsMaximizing] = useState(false);
-
+  const [defaultStrategy, setDefaultStrategy] = useState("");
   const [problemType, setProblemType] = useState("");
   const [problemNameError, setProblemNameError] = useState("");
   const [specialPlayerPropsNumError, setSpecialPlayerPropsNumError] =
@@ -406,49 +406,29 @@ export default function InputPage() {
     if (isMaximizing) {
       isMaximizingRow = ["Is maximzing problem", "True"];
     }
-    // add isMaximizingRow to the end of sheet1
     sheet1.addRow(isMaximizingRow);
-
-    // if user choose to add special player, add sheet2
     if (specialPlayerExists) {
       const sheet2 = workbook.addWorksheet(
         GAME_THEORY_WORKBOOK.SPECIAL_PLAYER_SHEET_NAME,
       );
       sheet2.addRow(["Properties", "Weights"]);
     }
-
-    // Write the sheet3 with sample data
     const sheet3 = workbook.addWorksheet(
       GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME,
     );
-    sheet3.addRow(["Player 1's Name", "2 (Number of strategies)"]);
-
-    // add some  example data for sheet3 (base on the number of normal players user input)
-    const row2 = ["Strategy 1's name"];
-    const row3 = ["Strategy 2's name"];
-    // input the property placeholder as the number of normal player properties
-    for (let i = 0; i < Number(normalPlayerPropsNum); i++) {
-      row2.push(`Property ${i + 1}`);
-      row3.push(`Property ${i + 1}`);
-    }
-
-    // add the row2 and row3 to the end of sheet3
-    sheet3.addRows([row2, row3]);
-    // if the number of normal players is greater than 1, add one more player sample data
-    if (Number(normalPlayerNum)) {
-      const row4 = ["Player 2's Name", "3 (Number of strategies)"];
-      const row5 = ["Strategy 1's name"];
-      const row6 = ["Strategy 2's name"];
-      const row7 = ["Strategy 3's name"];
-
-      // input the property placeholder as the number of normal player properties
-      for (let i = 0; i < Number(normalPlayerPropsNum); i++) {
-        row5.push(`Property ${i + 1}`);
-        row6.push(`Property ${i + 1}`);
-        row7.push(`Property ${i + 1}`);
+    const noS = Number(defaultStrategy) <= 0 ? 1 : Number(defaultStrategy);
+    let curRow = 1;
+    for (let p = 0; p < normalPlayerNum; p++) {
+      sheet3.getCell(curRow, 1).value = "Player " + (p + 1);
+      sheet3.getCell(curRow, 2).value = noS;
+      for (let s = 0; s < noS; s++) {
+        sheet3.getCell(curRow + s + 1, 1).value = "Strategy " + (s + 1);
+        for (let p = 0; p < normalPlayerPropsNum; p++) {
+          sheet3.getCell(curRow + s + 1, 1 + p + 1).value =
+            "Property " + (p + 1);
+        }
       }
-      // add the row4, row5, row6, row7 to the end of sheet3
-      sheet3.addRows([row4, row5, row6, row7]);
+      curRow += noS + 1;
     }
 
     // Write the sheet4(blank sheet) for user to input conflict matrix
@@ -468,7 +448,7 @@ export default function InputPage() {
     } catch (error) {
       console.error(error);
       displayPopup(
-        "Failed to load gtguidelines.xlsx. Please check the file and try again.",
+        "Failed to load guidelines sheet. Please check the file and try again.",
         true,
       );
     }
@@ -547,6 +527,22 @@ export default function InputPage() {
               description="A property is a characteristic or attribute that a player
               has that affects their actions or outcomes in the game"
               guideSectionIndex={5}
+            />
+          </div>
+
+          <div className="row">
+            <Input
+              message="Default number of strategies"
+              type="number"
+              error={playerPayoffFunctionError}
+              handleOnChange={(e) => setDefaultStrategy(e.target.value)}
+              value={defaultStrategy}
+              description={
+                "This value is only for generating your Excel template. You should use the number of strategies " +
+                "that most of the players have, then manually edit any further exception. Leave it blank in " +
+                "case you want an example dataset."
+              }
+              guideSectionIndex={7}
             />
           </div>
 
