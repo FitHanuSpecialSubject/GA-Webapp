@@ -21,6 +21,11 @@ export const SMT_ALGORITHMS = Object.freeze([
   // ALGORITHMS.OMOPSO,
   // ALGORITHMS.SMPSO,
 ]);
+
+export const SMT_PSO_ALGORITHMS = Object.freeze([
+  ALGORITHMS.OMOPSO,
+  ALGORITHMS.SMPSO,
+]);
 export const INVALID_MATH_SYMBOLS = [
   "π",
   "∞",
