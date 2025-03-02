@@ -9,12 +9,13 @@ import ParamSettingBox from "../../module/core/component/ParamSettingBox";
 import PopupContext from "../../module/core/context/PopupContext";
 import { SMT, SMT_VALIDATE } from "../../consts";
 import { axiosErrorHandler, getBackendAddress } from "../../utils/http_utils";
-import { SMT_ALGORITHMS } from "../../const/matching_const";
+import { SMT_ALGORITHMS, SMT_PSO_ALGORITHMS } from "../../const/matching_const";
 
 export default function InputProcessingPage() {
   const navigate = useNavigate();
   const { appData, setAppData, setFavicon } = useContext(DataContext);
   const [isLoading, setIsLoading] = useState(false);
+  const [algorithmList, setAlgorithmList] = useState(SMT_ALGORITHMS);
   const [algorithm, setAlgorithm] = useState(SMT.DEFAULT_ALGORITHM);
   const [distributedCoreParam, setDistributedCoreParam] = useState(
     SMT.DEFAULT_CORE_NUM,
@@ -45,10 +46,23 @@ export default function InputProcessingPage() {
   // Hàm thay đổi problemType
   const handleChangeProblemType = (event) => {
     const ordinal = Number(event.target.value);
+
+    const PSO_COMPAT_TYPE = 6;
+
     for (const key in SMT.PROBLEM_TYPES) {
       if (SMT.PROBLEM_TYPES[key].ordinal === ordinal) {
         setProblemTypeOrdinal(ordinal);
         setProblemType(SMT.PROBLEM_TYPES[key]);
+
+        // Handle PSO compatible problem type exclusively
+        if (ordinal == PSO_COMPAT_TYPE) {
+          setAlgorithmList(SMT_PSO_ALGORITHMS);
+          setAlgorithm(SMT_PSO_ALGORITHMS[0].value);
+        } else {
+          setAlgorithmList(SMT_ALGORITHMS);
+          setAlgorithm(SMT.DEFAULT_ALGORITHM);
+        }
+
         // Cập nhật appData để lưu lại thông tin problemType
         setAppData((prevData) => ({
           ...prevData,
@@ -225,7 +239,7 @@ export default function InputProcessingPage() {
           onChange={handleChange}
           className="algorithm-select"
         >
-          {SMT_ALGORITHMS.map(({ displayName, value }) => (
+          {algorithmList.map(({ displayName, value }) => (
             <option key={value} value={value}>
               {displayName}
             </option>

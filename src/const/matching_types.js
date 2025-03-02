@@ -55,4 +55,10 @@ export const MATCHING_PROBLEM_TYPES = Object.freeze({
     "/api/stable-matching-solver",
     "/api/matching-problem-result-insights",
   ),
+  PSO: new MatchingProblemType(
+    6,
+    "PSO Compatible MTM",
+    "/api/smt-pso-compat-solve",
+    "/api/smt-pso-compat-insight",
+  ),
 });
