@@ -1,18 +1,6 @@
-# Project Name
+# Special Subject Application FE
 
-Special Subject Application FE
-
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Running the Project](#running-the-project)
-- [Available Scripts](#available-scripts)
-- [Folder Structure](#folder-structure)
-- [Contributing](#contributing)
-- [License](#license)
-
----
+A frontend application for solving Stable Matching and Game Theory problems using MOEA Framework. This application connects to the [GA-Application-Java](https://github.com/FitHanuSpecialSubject/GA-Application-Java) backend.
 
 ## Prerequisites
 
@@ -37,7 +25,7 @@ git clone https://github.com/FitHanuSpecialSubject/GA-Webapp.git
 cd GA-Webapp
 ```
 
-Install dependencies using npm or Yarn:
+Install dependencies:
 
 ```bash
 npm install
@@ -48,45 +36,53 @@ npm install
 Start the development server:
 
 ```bash
+npm run dev
+# or
 npm start
 ```
 
-Open your browser and navigate to [http://localhost:3000](http://localhost:3000) to view the application.
+Open your browser and navigate to the displayed local URL (typically [http://localhost:5173](http://localhost:5173)).
+
+## Building for Production
+
+Build the application for production:
+
+```bash
+npm run build
+```
+
+The built files will be in the `dist` directory, ready to be deployed.
 
 ## Available Scripts
 
-In the project directory, you can run the following scripts:
+In the project directory, you can run:
 
-### `npm start`
+- `npm start` or `npm run dev`: Starts the development server using Vite
+- `npm run build`: Builds the app for production to the `dist` folder
+- `npm run lint`: Runs ESLint to check code quality
+- `npm run lint-fix`: Runs Prettier to format code
+- `npm run stop`: Shuts down development server (useful for Maven integration)
 
-Runs the app in development mode.
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Project Overview
 
-The page will reload when you make edits. You will also see any lint errors in the console.
+This application provides a user interface for:
 
-### `npm test`
+1. Data generation for Stable Matching and Game Theory problems
+2. Viewing and manipulating problem characteristics
+3. Importing and exporting Excel data
+4. Visualizing results using charts and graphs
 
-Launches the test runner in interactive watch mode. See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Backend Connection
 
-### `npm run build`
+This frontend connects to a Java-based backend implementing MOEA Framework for solving optimization problems. The backend repository is available at:
+[https://github.com/FitHanuSpecialSubject/GA-Application-Java](https://github.com/FitHanuSpecialSubject/GA-Application-Java)
 
-Builds the app for production to the `build` folder. It correctly bundles React in production mode and optimizes the build for the best performance.
+## Technologies
 
-The build is minified, and the filenames include the hashes. Your app is ready to be deployed!
-
-### `npm run eject`
-
-**Note: This is a one-way operation. Once you eject, you can't go back!**
-
-If you aren’t satisfied with the default setup, you can eject it. This command will remove the single build dependency from your project and copy all the configuration files and the transitive dependencies into your project so you have full control over them.
-
-## Folder Structure
-
-```
-my-app/
-  node_modules/
-  public/
-    404.html
-    index.html
-  src/
-```
+- React 18
+- Vite (build tool)
+- Bootstrap 5
+- ExcelJS for spreadsheet manipulation
+- Chart.js for data visualization
+- React Router for navigation
+- WebSockets for real-time communication
