@@ -39,7 +39,7 @@ export default function InsightPage() {
         onClick={handleExportToExcel}
       >
         <FaRegFileExcel className="me-0 fs-4" />
-        Get Excel Template
+        Export Result
       </div>
       <div className="fitness-table">
         <InsightsTable fitnessValues={appData.insights.data.fitnessValues} />
