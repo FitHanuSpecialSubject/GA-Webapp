@@ -53,7 +53,7 @@ export default function SMTGenerator({ data, workbook }) {
     );
     const buffer = await processedWorkbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: "application/octet-stream" });
-    saveAs(blob, data.problemName + ".xlsx");
+    saveAs(blob, data.problemName + "_stable_matching.generated.xlsx");
   };
   const copyValue = (set, index) => {
     try {

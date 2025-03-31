@@ -34,7 +34,7 @@ export default function GTGenerator({ data, workbook }) {
       const processedWorkbook = generatorGTWriter(workbook, range, type, data);
       const buffer = await processedWorkbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: "application/octet-stream" });
-      saveAs(blob, data.problemName + ".xlsx");
+      saveAs(blob, data.problemName + "_game_theory.generated.xlsx");
     } catch (e) {
       console.error(e);
       displayPopup("Cannot generate data", e.message, true);
