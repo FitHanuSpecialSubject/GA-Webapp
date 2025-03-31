@@ -337,39 +337,26 @@ export default function InputPage() {
     for (let i = 0; i < Number(setNum); i++) {
       const numberSetIndividuals = Number(setIndividuals[i]);
       if (i === 0) {
-        const row8 = ["Set_1"];
-        if (setMany[i] === true) {
-          row8.push("Set Many");
-        } else {
-          row8.push("Set One");
-        }
-        row8.push("Capacity");
-        row8.push(numberSetIndividuals);
+        const rowSet = ["Set_1"];
+        rowSet.push("Capacity");
+        rowSet.push(numberSetIndividuals);
         for (let j = 0; j < Number(characteristicsNum); j++) {
-          row8.push(`Characteristic_${j + 1}`);
+          rowSet.push(`Characteristic_${j + 1}`);
         }
 
-        datasetWorksheet.addRow(row8);
+        datasetWorksheet.addRow(rowSet);
         for (let k = 0; k < numberSetIndividuals; k++) {
           const rowIndividual = [`Individual_${k + 1}`];
           if (setMany[i] === true) {
-            rowIndividual.push(null);
             // Change
             rowIndividual.push(1);
           } else {
-            rowIndividual.push(null);
             // Change
             rowIndividual.push("Fill capacity > 0");
           }
           rowIndividual.push(`Requirements`);
-          const rowWeights = [null];
-          rowWeights.push(null);
-          rowWeights.push(null);
-          rowWeights.push("Weights");
-          const rowProperties = [null];
-          rowProperties.push(null);
-          rowProperties.push(null);
-          rowProperties.push("Properties");
+          const rowWeights = [null, null, "Weights"];
+          const rowProperties = [null, null, "Properties"];
 
           for (let h = 0; h < characteristicsNum; h++) {
             rowIndividual.push(String(`req_${h + 1}`));
@@ -383,32 +370,21 @@ export default function InputPage() {
         }
       } else {
         const rowSet = [`Set_${i + 1}`];
-        if (setMany[i] === true) {
-          rowSet.push("Set Many");
-        } else {
-          rowSet.push("Set One");
-        }
         rowSet.push(null);
         rowSet.push(numberSetIndividuals);
         datasetWorksheet.addRow(rowSet);
         for (let k = 0; k < numberSetIndividuals; k++) {
           const rowIndividual = [`Individual_${k + 1}`];
           if (setMany[i] === true) {
-            rowIndividual.push(null);
-            // Change
             rowIndividual.push(1);
           } else {
-            rowIndividual.push(null);
-            // Change
             rowIndividual.push("Fill capacity > 0");
           }
           rowIndividual.push(`Requirements`);
           const rowWeights = [null];
           rowWeights.push(null);
-          rowWeights.push(null);
           rowWeights.push("Weights");
           const rowProperties = [null];
-          rowProperties.push(null);
           rowProperties.push(null);
           rowProperties.push("Properties");
 
@@ -453,7 +429,7 @@ export default function InputPage() {
     // Save the workbook
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: "application/octet-stream" });
-    saveAs(blob, "Input_Matching_Theory.xlsx");
+    saveAs(blob, `${problemName}_stable_matching.xlsx`);
   };
 
   const handleDrop = (event) => {

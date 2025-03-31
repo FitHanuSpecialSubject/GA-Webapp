@@ -456,7 +456,7 @@ export default function InputPage() {
     // Save workbooks
     const wbout = await workbook.xlsx.writeBuffer();
     const blob = new Blob([wbout]);
-    saveAs(blob, "input.xlsx");
+    saveAs(blob, `${problemName}_game_theory.xlsx`);
   };
 
   const handleDrop = (event) => {
