@@ -47,10 +47,6 @@ export default function InputPage() {
   const [setIndividuals, setSetIndividuals] = useState(
     Array.from({ length: colNums }, () => ""),
   );
-
-  const [setMany, setSetMany] = useState(
-    Array.from({ length: colNums }, () => false),
-  );
   const navigate = useNavigate();
 
   // useEffect to validate and read file when it changes
@@ -125,7 +121,6 @@ export default function InputPage() {
             fitnessFunction: problemInfo.fitnessFunction,
             evaluateFunctions: problemInfo.setEvaluateFunction,
             setNames: dataset.setNames,
-            setTypes: dataset.setTypes,
             individualNames: dataset.individualNames,
             characteristics: dataset.characteristics,
             individualSetIndices: dataset.individualSetIndices,
@@ -133,7 +128,6 @@ export default function InputPage() {
             individualProperties: dataset.individualProperties,
             individualRequirements: dataset.individualRequirements,
             individualWeights: dataset.individualWeights,
-            // individuals: problemInfo.individuals,
             excludePairs,
           },
         });
@@ -174,9 +168,9 @@ export default function InputPage() {
   const validateForm = () => {
     let error = false;
     let msg = "";
-    const maxSets = SMT.MAX_SET; // Số lượng tập tối đa
-    const maxCharacteristics = 20; // Số lượng đặc điểm tối đa
-    const maxTotalIndividuals = 10000; // Số lượng cá nhân tối đa
+    const maxSets = SMT.MAX_SET;
+    const maxCharacteristics = 20;
+    const maxTotalIndividuals = 10000;
 
     const validFunctionPattern = /^[a-zA-Z0-9s+\-*/^()]+$/;
     // check if the problem name is empty
@@ -218,7 +212,6 @@ export default function InputPage() {
       setTotalIndividualsNumError("");
     }
 
-    // Kiểm tra số lượng cá nhân
     if (
       !totalIndividualsNum ||
       totalIndividualsNum > maxTotalIndividuals ||
@@ -241,7 +234,6 @@ export default function InputPage() {
       setSetNumError("");
     }
 
-    // Kiểm tra số lượng đặc điểm
     if (!characteristicsNum || characteristicsNum > maxCharacteristics) {
       setCharacteristicsNumError(
         `The number of characteristics must be from 1 to ${maxCharacteristics}`,
@@ -267,7 +259,6 @@ export default function InputPage() {
       }
     }
 
-    // Chưa tìm được phương pháp ghi đè lên giá trị sau khi popup lỗi rồi sửa lại bỏ trống thành default
     // check hàm fitness của từng set
     setEvaluateFunction.forEach((evaluateFunction, index) => {
       if (!evaluateFunction) {
@@ -347,13 +338,7 @@ export default function InputPage() {
         datasetWorksheet.addRow(rowSet);
         for (let k = 0; k < numberSetIndividuals; k++) {
           const rowIndividual = [`Individual_${k + 1}`];
-          if (setMany[i] === true) {
-            // Change
-            rowIndividual.push(1);
-          } else {
-            // Change
-            rowIndividual.push("Fill capacity > 0");
-          }
+          rowIndividual.push("Fill capacity > 0");
           rowIndividual.push(`Requirements`);
           const rowWeights = [null, null, "Weights"];
           const rowProperties = [null, null, "Properties"];
@@ -375,11 +360,7 @@ export default function InputPage() {
         datasetWorksheet.addRow(rowSet);
         for (let k = 0; k < numberSetIndividuals; k++) {
           const rowIndividual = [`Individual_${k + 1}`];
-          if (setMany[i] === true) {
-            rowIndividual.push(1);
-          } else {
-            rowIndividual.push("Fill capacity > 0");
-          }
+          rowIndividual.push("Fill capacity > 0");
           rowIndividual.push(`Requirements`);
           const rowWeights = [null];
           rowWeights.push(null);
@@ -467,37 +448,17 @@ export default function InputPage() {
     setColNums(value);
     setSetIndividuals(Array.from({ length: value }, () => ""));
     setSetEvaluateFunction(Array.from({ length: value }, () => "DEFAULT"));
-    setSetMany(Array.from({ length: value }, () => ""));
   };
 
   const generateTable = () => {
     const table = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 3; i++) {
       const row = [];
       if (i === 0) {
         for (let j = 0; j < colNums; j++) {
           row.push(<th className="th" key={j}>{` Set_${j + 1}`}</th>);
         }
       } else if (i === 1) {
-        for (let k = 0; k < colNums; k++) {
-          row.push(
-            <td className="td" key={k}>
-              <label>
-                <input
-                  type="checkbox"
-                  name={`setType_Set_${k + 1}`}
-                  onChange={() => {
-                    const updatedSetMany = [...setMany];
-                    updatedSetMany[k] = !updatedSetMany[k];
-                    setSetMany(updatedSetMany);
-                  }}
-                />
-                <h6>Tick if Set_{k + 1} is Many</h6>
-              </label>
-            </td>,
-          );
-        }
-      } else if (i === 2) {
         for (let k = 0; k < colNums; k++) {
           row.push(
             <td className="td" key={k}>
@@ -514,7 +475,7 @@ export default function InputPage() {
             </td>,
           );
         }
-      } else if (i === 3) {
+      } else if (i === 2) {
         for (let k = 0; k < colNums; k++) {
           row.push(
             <td className="td" key={k}>
@@ -544,29 +505,9 @@ export default function InputPage() {
     );
   };
 
-  // const [showGuideline, setShowGuideline] = useState(false);
-  // const [showGuidelineText, setShowGuidelineText] = useState(false);
-  // const handleShowGuideline = () => {
-  //   setShowGuideline(!showGuideline);
-  //   setShowGuidelineText(!showGuidelineText);
-  // };
-
-  // const [isExpanded, setIsExpanded] = useState(false);
-
-  // const handleToggle = () => {
-  //   setIsExpanded(!isExpanded);
-  // };
-
   return (
     <>
       <div className="input-page">
-        {/* <button className="show-guideline-btn" onClick={handleShowGuideline}>
-          {showGuideline ? "Hide Guideline" : "Show Guideline"}
-        </button>
-        {showGuidelineText && (
-          <GuidelineText isExpanded={isExpanded} handleToggle={handleToggle} />
-        )} */}
-
         <Loading isLoading={isLoading} />
         <p className="header-text">Enter information about your problem</p>
 

@@ -1,7 +1,5 @@
 import {
-  MATCHING,
   STABLE_MATCHING_REQ_REGEX,
-  REQUIREMENT_ROW_NAME,
   STABLE_MATCHING_WORKBOOK,
   GAME_THEORY_WORKBOOK,
 } from "../const/excel_const";
@@ -101,7 +99,6 @@ export const loadDataset = async (workbook, charNum, setNum) => {
   );
   const characteristics = [];
   const setNames = [];
-  const setTypes = [];
   const individualNames = [];
   const individualSetIndices = [];
   const individualCapacities = [];
@@ -117,20 +114,19 @@ export const loadDataset = async (workbook, charNum, setNum) => {
   let rowPointer = 1;
   for (let set = 0; set < setNum; set++) {
     setNames.push(dataSheet.getCell(`A${rowPointer}`).value);
-    setTypes.push(dataSheet.getCell(`B${rowPointer}`).value);
-    const individualNum = Number(dataSheet.getCell(`D${rowPointer}`));
+    const individualNum = Number(dataSheet.getCell(`C${rowPointer}`));
     rowPointer++;
     for (let i = 0; i < individualNum; i++) {
       individualNames.push(dataSheet.getCell(`A${rowPointer}`).value);
-      individualCapacities.push(dataSheet.getCell(`C${rowPointer}`).value);
+      individualCapacities.push(dataSheet.getCell(`B${rowPointer}`).value);
       individualSetIndices.push(set);
       const r = [];
       const w = [];
       const p = [];
       for (let c = 0; c < charNum; c++) {
-        r.push(getPropertyRequirement(dataSheet, rowPointer, c + 5));
-        w.push(getPropertyWeight(dataSheet, rowPointer + 1, c + 5));
-        p.push(getPropertyValue(dataSheet, rowPointer + 2, c + 5));
+        r.push(getPropertyRequirement(dataSheet, rowPointer, c + 4));
+        w.push(getPropertyWeight(dataSheet, rowPointer + 1, c + 4));
+        p.push(getPropertyValue(dataSheet, rowPointer + 2, c + 4));
       }
       individualRequirements.push(r);
       individualWeights.push(w);
@@ -141,154 +137,12 @@ export const loadDataset = async (workbook, charNum, setNum) => {
   return {
     characteristics,
     setNames,
-    setTypes,
     individualNames,
     individualCapacities,
     individualSetIndices,
     individualProperties,
     individualRequirements,
     individualWeights,
-  };
-};
-
-/**
- * Tải dữ liệu bài toán song song từ workbook
- * @deprecated
- * @param {ExcelJS.Workbook} workbook - Workbook Excel chứa dữ liệu bài toán
- * @param {number} sheetNumber - Số thứ tự sheet cần đọc
- * @returns {Object} - Dữ liệu bài toán
- */
-export const loadProblemDataParallel = async (workbook, sheetNumber) => {
-  const sheetName = workbook.worksheets[sheetNumber].name;
-  const sheet = workbook.getWorksheet(sheetName);
-  const problemName = getCellValueStr(sheet, "B1");
-  const setNum = getCellValueNum(sheet, "B2");
-  const totalNumberOfIndividuals = getCellValueNum(sheet, "B3");
-  const characteristicNum = getCellValueNum(sheet, "B4");
-  const fitnessFunction = getCellValueStr(sheet, "B5");
-
-  let currentRow = 6 + setNum;
-  const characteristics = [];
-
-  const currentColumnIndex = colCache.decode(
-    MATCHING.CHARACTERISTIC_START_COL,
-  ).col;
-
-  // Đọc các đặc tính từ bảng
-  for (let i = currentColumnIndex; ; i++) {
-    const cell = sheet.getCell(colCache.encode(currentRow, i));
-    // Break if cell is empty or undefined
-    if (!cell || !cell.value) {
-      break;
-    }
-    characteristics.push(cell.value);
-  }
-
-  // Đọc các bộ dữ liệu (sets)
-  const individuals = [];
-  const setEvaluateFunction = [];
-  const individualSetIndices = [];
-  const individualNames = [];
-  const individualProperties = [];
-  const individualRequirements = [];
-  const individualWeights = [];
-  const individualCapacities = [];
-
-  const setNames = [];
-  const setTypes = [];
-  let individualNum = null;
-  let setType = null;
-  let setName = null;
-
-  // Load evaluate functions for each set
-  for (let j = 0; j < setNum; j++) {
-    const evaluateFunction = getCellValueStr(sheet, `B${6 + j}`);
-    setEvaluateFunction.push(evaluateFunction);
-  }
-
-  for (let g = 0; g < setNum; g++) {
-    setName = sheet.getCell(`A${currentRow}`)?.value || "";
-    setType = sheet.getCell(`B${currentRow}`)?.value || "";
-    setNames.push(setName);
-    setTypes.push(setType);
-
-    individualNum = sheet.getCell(`D${currentRow}`)?.value || 0;
-
-    for (let i = 0; i < individualNum; i++) {
-      let name = sheet.getCell(`A${currentRow + 1}`)?.value;
-      if (
-        Object.is(name, undefined) ||
-        Object.is(name, null) ||
-        Object.is(name, "")
-      ) {
-        name = `no_name_${i + 1}`;
-      }
-
-      // Validate data in good shape
-      const requirementLabel = getCellValueStr(sheet, `D${currentRow + 1}`);
-      if (requirementLabel !== REQUIREMENT_ROW_NAME) {
-        throw new Error(`Error when loading indiviudal ${name},
-          row = ${currentRow}.
-          Expected label at D${currentRow} to be ${REQUIREMENT_ROW_NAME}`);
-      }
-
-      const properties = [];
-      const requirements = [];
-      const weights = [];
-
-      let r;
-      let p;
-      let w;
-
-      let col;
-      for (let k = 0; k < characteristicNum; k++) {
-        col = k + 5;
-        r = getPropertyRequirement(sheet, currentRow + 1, col);
-        w = getPropertyWeight(sheet, currentRow + 2, col);
-        p = getPropertyValue(sheet, currentRow + 3, col);
-        requirements.push(r);
-        weights.push(w);
-        properties.push(p);
-      }
-
-      individualNames.push(name);
-      individualSetIndices.push(g);
-      individualProperties.push(properties);
-      individualRequirements.push(requirements);
-      individualWeights.push(weights);
-
-      // Load capacity
-      let capacityValue = sheet.getCell(`C${currentRow + 1}`)?.value;
-      if (capacityValue !== undefined && capacityValue !== null) {
-        if (typeof capacityValue === "object" && "result" in capacityValue) {
-          capacityValue = capacityValue.result;
-        }
-        individualCapacities.push(capacityValue);
-      }
-
-      currentRow += 3;
-    }
-
-    currentRow += 1;
-  }
-
-  return {
-    problemName,
-    characteristicNum,
-    setNum,
-    setNames,
-    setTypes,
-    totalNumberOfIndividuals,
-    individualNames,
-    characteristics,
-    individualSetIndices,
-    individualCapacities,
-    individualRequirements,
-    individualProperties,
-    individualWeights,
-    individuals,
-    fitnessFunction,
-    setEvaluateFunction,
   };
 };
 
@@ -731,7 +585,7 @@ export const generatorSMTReader = (workbook) => {
   const dataSheet = workbook.getWorksheet(
     STABLE_MATCHING_WORKBOOK.DATASET_SHEET_NAME,
   );
-  for (let i = 5; i < 5 + numberOfCharacteristic; i++) {
+  for (let i = 4; i < 4 + numberOfCharacteristic; i++) {
     const cname = dataSheet.getCell(1, i).value;
     if (!cname) {
       throw new Error(
@@ -762,10 +616,10 @@ export const generatorSMTWriter = (workbook, ranges, types, data) => {
   const fields = ["r", "w", "p"];
   let currentRow = 1;
   for (let set = 0; set < data.numberOfSet; set++) {
-    const numberOfIndividual = Number(dataSheet.getCell(currentRow, 4));
+    const numberOfIndividual = Number(dataSheet.getCell(currentRow, 3));
     for (let individual = 0; individual < numberOfIndividual; individual++) {
       for (let k = 0; k < data.characteristic.length; k++) {
-        const col = 5 + k;
+        const col = 4 + k;
         for (let f = 1; f <= fields.length; f++) {
           dataSheet.getCell(currentRow + f, col).value = genRandom(
             ranges[set][fields[f - 1]][k],
