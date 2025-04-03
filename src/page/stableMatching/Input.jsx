@@ -65,6 +65,7 @@ export default function InputPage() {
         }
       } catch (error) {
         console.error(error);
+        setExcelFile(null);
         displayPopup("Error", error.message, true);
       }
     }
@@ -399,6 +400,7 @@ export default function InputPage() {
       ).model;
     } catch (error) {
       console.error("Error loading guidelines.xlsx:", error);
+      setExcelFile(null);
       displayPopup(
         "Error",
         "Failed to load guidelines.xlsx. Please check the file and try again.",

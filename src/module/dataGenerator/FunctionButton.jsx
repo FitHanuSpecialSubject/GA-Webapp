@@ -34,6 +34,6 @@ FunctionButton.propTypes = {
   callback: PropTypes.func,
   callbackParams: PropTypes.array,
   disableCondition: PropTypes.bool,
-  icon: React.ReactNode,
+  icon: PropTypes.node,
   desc: PropTypes.string,
 };

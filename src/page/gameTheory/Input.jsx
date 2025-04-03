@@ -73,6 +73,7 @@ export default function InputPage() {
         }
       } catch (error) {
         console.error(error);
+        setExcelFile(null);
         displayPopup("Error", error.message, true);
       }
     }
@@ -111,6 +112,7 @@ export default function InputPage() {
         } catch (e) {
           console.error(e);
           setIsLoading(false);
+          setExcelFile(null);
           displayPopup(
             "Something went wrong!",
             `Have problems with '${GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME}' .`,
@@ -148,6 +150,7 @@ export default function InputPage() {
             );
           } catch (e) {
             console.error(e);
+            setExcelFile(null);
             setIsLoading(false);
             displayPopup(
               "Something went wrong!",
@@ -180,6 +183,7 @@ export default function InputPage() {
         } catch (error) {
           console.error(error);
           setIsLoading(false);
+          setExcelFile(null);
           displayPopup(
             "Something went wrong!",
             `Error loading data from '${GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME}' sheet.`,
@@ -207,6 +211,7 @@ export default function InputPage() {
           conflictSet = await loadConflictSet(workbook);
         } catch (error) {
           console.error(error);
+          setExcelFile(null);
           setIsLoading(false);
           displayPopup(
             "Something went wrong!",
@@ -239,6 +244,7 @@ export default function InputPage() {
     } catch (error) {
       console.error(error);
       setIsLoading(false);
+      setExcelFile(null);
       displayPopup(
         "Something went wrong!",
         "Check the input file again or contact the admin!",
@@ -447,6 +453,7 @@ export default function InputPage() {
       ).model;
     } catch (error) {
       console.error(error);
+      setExcelFile(null);
       displayPopup(
         "Failed to load guidelines sheet. Please check the file and try again.",
         true,

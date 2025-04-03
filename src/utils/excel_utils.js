@@ -604,12 +604,19 @@ export const generatorSMTReader = (workbook) => {
 /**
  * Write data to Excel file | Data Generator
  * @param {ExcelJS.Workbook} workbook
- * @param {Object} ranges
+ * @param {Object} dataRanges
+ * @param {Object} capacity
  * @param {Object} types
  * @param {Object} data
  * @returns {ExcelJS.Workbook}
  */
-export const generatorSMTWriter = (workbook, ranges, types, data) => {
+export const generatorSMTWriter = (
+  workbook,
+  dataRanges,
+  types,
+  data,
+  capacity,
+) => {
   const dataSheet = workbook.getWorksheet(
     STABLE_MATCHING_WORKBOOK.DATASET_SHEET_NAME,
   );
@@ -618,11 +625,15 @@ export const generatorSMTWriter = (workbook, ranges, types, data) => {
   for (let set = 0; set < data.numberOfSet; set++) {
     const numberOfIndividual = Number(dataSheet.getCell(currentRow, 3));
     for (let individual = 0; individual < numberOfIndividual; individual++) {
+      dataSheet.getCell(currentRow + 1, 2).value = genRandom(
+        capacity[set],
+        false,
+      );
       for (let k = 0; k < data.characteristic.length; k++) {
         const col = 4 + k;
         for (let f = 1; f <= fields.length; f++) {
           dataSheet.getCell(currentRow + f, col).value = genRandom(
-            ranges[set][fields[f - 1]][k],
+            dataRanges[set][fields[f - 1]][k],
             types[set][fields[f - 1]][k],
           );
           dataSheet.getCell(currentRow + f, col).style.numFmt = "0.00";
