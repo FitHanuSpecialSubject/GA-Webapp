@@ -68,9 +68,9 @@ export const loadProblemInfoSMT = async (workbook) => {
     STABLE_MATCHING_WORKBOOK.PROBLEM_INFO_SHEET_NAME,
   );
   const problemName = getCellValueStr(problemSheet, "B1");
-  const setNum = getCellValueNum(problemSheet, "B2");
-  const totalNumberOfIndividuals = getCellValueNum(problemSheet, "B3");
-  const characteristicNum = getCellValueNum(problemSheet, "B4");
+  const setNum = getCellValueNum(problemSheet, 2, 2);
+  const totalNumberOfIndividuals = getCellValueNum(problemSheet, 3, 2);
+  const characteristicNum = getCellValueNum(problemSheet, 4, 2);
   const fitnessFunction = getCellValueStr(problemSheet, "B5");
   const setEvaluateFunction = [];
   for (let i = 0; i < setNum; i++) {
@@ -151,15 +151,15 @@ export const loadProblemInfoGT = async (workbook) => {
     GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME,
   );
 
-  const problemName = problemInfoWorksheet.getCell("B1").value;
-  const specialPlayerExists = problemInfoWorksheet.getCell("B2").value;
-  const specialPlayerPropsNum = problemInfoWorksheet.getCell("B3").value;
-  const normalPlayerNum = problemInfoWorksheet.getCell("B4").value;
-  const normalPlayerPropsNum = problemInfoWorksheet.getCell("B5").value;
-  const fitnessFunction = problemInfoWorksheet.getCell("B6").value;
-  const playerPayoffFunction = problemInfoWorksheet.getCell("B7").value;
+  const problemName = getCellValueStr(problemInfoWorksheet, "B1");
+  const specialPlayerExists = getCellValueNum(problemInfoWorksheet, 2, 2);
+  const specialPlayerPropsNum = getCellValueNum(problemInfoWorksheet, 3, 2);
+  const normalPlayerNum = getCellValueNum(problemInfoWorksheet, 4, 2);
+  const normalPlayerPropsNum = getCellValueNum(problemInfoWorksheet, 5, 2);
+  const fitnessFunction = getCellValueStr(problemInfoWorksheet, "B6");
+  const playerPayoffFunction = getCellValueStr(problemInfoWorksheet, "B7");
   const isMaximizing =
-    (await problemInfoWorksheet.getCell("B8")?.value) &&
+    problemInfoWorksheet.getCell("B8")?.value &&
     problemInfoWorksheet.getCell("B8")?.value.toString().toLowerCase() ===
       "true";
 
@@ -197,7 +197,6 @@ export const loadNormalPlayers = async (
     const strategyNumber = normalPlayerWorkSheet.getCell(
       `B${currentRow}`,
     ).value;
-    // console.log(`name address: A${currentRow}, name value: ${playerName} , strat number: B${currentRow}`);
 
     if (!strategyNumber || typeof strategyNumber !== "number") {
       errorMessage =
@@ -209,7 +208,7 @@ export const loadNormalPlayers = async (
       throw new Error(errorMessage);
     }
     const payoffFunction = normalPlayerWorkSheet.getCell(`C${currentRow}`)
-      ? normalPlayerWorkSheet.getCell(`C${currentRow}`).value
+      ? getCellValueStr(normalPlayerWorkSheet, `C${currentRow}`)
       : null;
 
     const strategies = [];
@@ -229,12 +228,13 @@ export const loadNormalPlayers = async (
       for (let j = 0; j < normalPlayerPropsNum; j++) {
         // c (1-based)
         // r (1-based)
-        const propertyCell = normalPlayerWorkSheet.getCell(
+        const prop = getCellValueNum(
+          normalPlayerWorkSheet,
           currentRow + i + 1,
           j + 2,
         );
-        if (propertyCell.value !== null) {
-          properties.push(propertyCell.value);
+        if (prop !== null) {
+          properties.push(prop);
         }
       }
 
@@ -466,10 +466,11 @@ const getCellValueStr = (sheet, address) => {
  */
 export const getCellValueNum = (sheet, row, col) => {
   validateAddress(row, col);
-  const val = Number(sheet.getCell(row, col)?.value);
-  if (Number.isNaN(val)) {
+  const val = Number(sheet.getCell(row, col).value);
+  if (Number.isNaN(val) || sheet.getCell(row, col).value == null) {
+    console.error(row, col, sheet.name);
     throw new TypeError(
-      `Invalid number format, cell address: ${colCache.encode(row, col)}`,
+      `Invalid number format, Cell(${colCache.encode(row, col)}) Sheet(${sheet.name})`,
     );
   }
   return val;
@@ -481,7 +482,7 @@ export const getPropertyValue = (sheet, row, col) => {
   try {
     if (Number.isNaN(value)) {
       throw new TypeError(`Invalid type for property value: ${value},
-        field address: R=${row} C=${col},
+        Cell(${colCache.encode(row, col)}) Sheet(${sheet.name}), 
         expected type: number`);
     } else {
       return value;
@@ -489,7 +490,7 @@ export const getPropertyValue = (sheet, row, col) => {
   } catch (e) {
     console.error(e);
     throw new Error(
-      `Error when reading Property Value at: ${colCache.encode(row, col)}`,
+      `Error when reading Property Value at: ${colCache.encode(row, col)} - ${sheet.name}`,
     );
   }
 };

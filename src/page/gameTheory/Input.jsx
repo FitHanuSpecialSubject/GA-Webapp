@@ -113,11 +113,7 @@ export default function InputPage() {
           console.error(e);
           setIsLoading(false);
           setExcelFile(null);
-          displayPopup(
-            "Something went wrong!",
-            `Have problems with '${GAME_THEORY_WORKBOOK.PROBLEM_INFO_SHEET_NAME}' .`,
-            true,
-          );
+          displayPopup("Something went wrong!", e.message, true);
           return;
         }
 
@@ -184,11 +180,7 @@ export default function InputPage() {
           console.error(error);
           setIsLoading(false);
           setExcelFile(null);
-          displayPopup(
-            "Something went wrong!",
-            `Error loading data from '${GAME_THEORY_WORKBOOK.NORMAL_PLAYER_SHEET_NAME}' sheet.`,
-            true,
-          );
+          displayPopup("Something went wrong!", error.message, true);
           return;
         }
         if (!players) return;
@@ -483,7 +475,9 @@ export default function InputPage() {
   };
 
   const handleFileInput = (event) => {
+    if (event.target.value == null) return;
     setExcelFile(event.target.files[0]);
+    event.target.value = null;
   };
 
   return (
