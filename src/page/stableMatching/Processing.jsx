@@ -87,7 +87,6 @@ export default function InputProcessingPage() {
         return;
       }
       setFavicon("running");
-
       const evaluateFunctions = appData.problem.evaluateFunctions || [];
       for (const func of evaluateFunctions) {
         for (const keyword of SMT_VALIDATE.INVALID_MATH_SYMBOLS) {

@@ -22,6 +22,7 @@ export default function SMTGenerator({ data, workbook }) {
   const [rwpRange, setRwpRange] = useState([]);
   const [valueType, setValueType] = useState([]);
   const [clipboard, setClipboard] = useState(null);
+  const [setCapacity, setSetCapacity] = useState([]);
   const setType = (field, index, set, value) => {
     const clone = [...valueType];
     clone[set][field][index] = value;
@@ -30,6 +31,13 @@ export default function SMTGenerator({ data, workbook }) {
   const generateFile = async () => {
     // Validation
     for (let j = 0; j < data.numberOfSet; j++) {
+      if (setCapacity[j][0] > setCapacity[j][1]) {
+        return displayPopup(
+          "Oops! Did you miss something?",
+          "Please make sure all the input have valid value. For instance: 0 <= min <= max",
+          true,
+        );
+      }
       for (let i = 0; i < data.characteristic.length; i++) {
         for (const field of ["r", "w", "p"]) {
           if (
@@ -50,6 +58,7 @@ export default function SMTGenerator({ data, workbook }) {
       rwpRange,
       valueType,
       data,
+      setCapacity,
     );
     const buffer = await processedWorkbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: "application/octet-stream" });
@@ -124,6 +133,11 @@ export default function SMTGenerator({ data, workbook }) {
     }
     setRwpRange(rangeInit);
     setValueType(valueTypeInit);
+    const setCapacityArr = [];
+    for (let i = 0; i < data.numberOfSet; i++) {
+      setCapacityArr.push([1, 1]);
+    }
+    setSetCapacity(setCapacityArr);
   }, [data]);
   const functionButtons = [
     {
@@ -169,72 +183,102 @@ export default function SMTGenerator({ data, workbook }) {
         </a>
         <SMTProblemInfo data={data} infoVisible={infoVisible} />
         <div className="w-100 mb-4">
-          {new Array(data.numberOfSet)
-            .fill(0)
-            .map((e, i) => i)
-            .map((s) => (
-              <div key={s} className={"d-block"}>
-                <div className="fs-4 fw-bold mb-3">
-                  Configuration |{" "}
-                  <span className="text-secondary">{"Set " + (s + 1)}</span>
-                </div>
-                <div className="row">
-                  {data.characteristic.map((c, i) => {
-                    return (
-                      <div className="col-4" key={String(s) + " " + c}>
-                        <div className="card mb-4 bg-light-subtle border-2 rounded-4">
-                          <div className="card-body text-center p-4">
-                            <div className="btn-group w-100 mb-4">
-                              {functionButtons.map((e) => {
-                                return (
-                                  <FunctionButton
-                                    key={e.desc}
-                                    callback={e.callback}
-                                    callbackParams={[s, i]}
-                                    className="btn btn-outline-dark"
-                                    icon={e.icon}
-                                    disableCondition={e.disableCondition}
-                                    desc={e.desc}
-                                  />
-                                );
-                              })}
-                            </div>
-                            <p className="fs-5 fw-bold">{c}</p>
-                            <div className="mb-2">
-                              <div className="mb-1">Requirements</div>
-                              <SMTMinMaxInput
-                                field="r"
-                                set={s}
-                                index={i}
-                                setType={setType}
-                              />
-                            </div>
-                            <div className="mb-2">
-                              <div className="mb-1">Weights</div>
-                              <SMTMinMaxInput
-                                field="w"
-                                set={s}
-                                index={i}
-                                setType={setType}
-                              />
-                            </div>
-                            <div className="mb-4">
-                              <div className="mb-1">Properties</div>
-                              <SMTMinMaxInput
-                                field="p"
-                                set={s}
-                                index={i}
-                                setType={setType}
-                              />
+          {setCapacity.length > 0 &&
+            new Array(data.numberOfSet)
+              .fill(0)
+              .map((e, i) => i)
+              .map((s) => (
+                <div key={s} className="d-block">
+                  <div className="fs-4 fw-bold mb-3">
+                    Configuration |{" "}
+                    <span className="text-secondary">{"Set " + (s + 1)}</span>
+                  </div>
+                  <div className="py-3">
+                    <div className="mb-2 fw-bold text-secondary">
+                      Capacity RNG range [x, y]
+                    </div>
+                    <div className="input-group w-25">
+                      <input
+                        type="number"
+                        className="form-control border-3"
+                        placeholder="Lower bound"
+                        value={setCapacity[s][0]}
+                        onChange={(e) => {
+                          const clone = [...setCapacity];
+                          clone[s][0] = Number(e.target.value);
+                          setSetCapacity(clone);
+                        }}
+                      />
+                      <input
+                        type="number"
+                        className="form-control border-3 border-start-0"
+                        placeholder="Upper bound"
+                        value={setCapacity[s][1]}
+                        onChange={(e) => {
+                          const clone = [...setCapacity];
+                          clone[s][1] = Number(e.target.value);
+                          setSetCapacity(clone);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="row">
+                    {data.characteristic.map((c, i) => {
+                      return (
+                        <div className="col-4" key={String(s) + " " + c}>
+                          <div className="card mb-4 bg-light-subtle border-2 rounded-4">
+                            <div className="card-body text-center p-4">
+                              <div className="btn-group w-100 mb-4">
+                                {functionButtons.map((e) => {
+                                  return (
+                                    <FunctionButton
+                                      key={e.desc}
+                                      callback={e.callback}
+                                      callbackParams={[s, i]}
+                                      className="btn btn-outline-dark"
+                                      icon={e.icon}
+                                      disableCondition={e.disableCondition}
+                                      desc={e.desc}
+                                    />
+                                  );
+                                })}
+                              </div>
+                              <p className="fs-5 fw-bold">{c}</p>
+                              <div className="mb-2">
+                                <div className="mb-1">Requirements</div>
+                                <SMTMinMaxInput
+                                  field="r"
+                                  set={s}
+                                  index={i}
+                                  setType={setType}
+                                />
+                              </div>
+                              <div className="mb-2">
+                                <div className="mb-1">Weights</div>
+                                <SMTMinMaxInput
+                                  field="w"
+                                  set={s}
+                                  index={i}
+                                  setType={setType}
+                                />
+                              </div>
+                              <div className="mb-4">
+                                <div className="mb-1">Properties</div>
+                                <SMTMinMaxInput
+                                  field="p"
+                                  set={s}
+                                  index={i}
+                                  setType={setType}
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
         </div>
         <button className="w-100 btn btn-primary" onClick={generateFile}>
           Generate
