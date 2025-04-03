@@ -156,14 +156,6 @@ export default function InputPage() {
     if (validateForm()) {
       downloadExcel().then();
     }
-    // else {
-    //   displayPopup(
-    //     "Invalid Form!",
-    //     "Make sure you have filled all the required fields.",
-    //     problemType,
-    //     true,
-    //   );
-    // }
   };
 
   const validateForm = () => {
@@ -432,7 +424,9 @@ export default function InputPage() {
   };
 
   const handleFileInput = (event) => {
+    if (event.target.value == null) return;
     setExcelFile(event.target.files[0]);
+    event.target.value = null;
   };
 
   // Initialize table of individual per set
