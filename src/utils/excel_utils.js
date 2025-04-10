@@ -499,22 +499,19 @@ export const getPropertyWeight = (sheet, row, col) => {
   validateAddress(row, col);
   try {
     const value = Number(sheet.getCell(row, col).value);
-    if (!Number.isNaN(value)) {
+    if (!Number.isNaN(value) && Number.isSafeInteger(value)) {
       if (value < 0 || value > 10) {
-        throw new RangeError(`Invalid value for property Weight: ${value},
-          field address: R=${row} C=${col},
-          expected value in range [0, 10] for Weight`);
+        throw Error(value);
       }
       return value;
     } else {
-      throw new TypeError(`Invalid type for property Weight: ${value},
-        field address: R=${row} C=${col},
-        expected type: number`);
+      throw Error(value);
     }
   } catch (e) {
     console.error(e);
     throw new Error(
-      `Error when reading Property Weight at: ${colCache.encode(row, col)}`,
+      `Error when reading Property Weight at: ${colCache.encode(row, col)},
+      Expected value: integer in range [0, 10] for Weight. Actual value: ${e.message}`,
     );
   }
 };
@@ -526,8 +523,8 @@ export const getPropertyRequirement = (sheet, row, col) => {
     if (!Number.isNaN(value)) {
       return value;
     } else if (typeof value === "string") {
-      if (STABLE_MATCHING_REQ_REGEX.test(value)) {
-        return value;
+      if (STABLE_MATCHING_REQ_REGEX.test(value.replaceAll(" ", ""))) {
+        return value.replaceAll(" ", "");
       } else {
         throw new TypeError(`Invalid string format for property Requirement: ${value},
           field address: ${colCache.encode(row, col)},
@@ -562,8 +559,11 @@ const validateAddress = (row, column) => {
  * @returns {Object} - Problem data
  */
 export const generatorSMTReader = (workbook) => {
-  const { GUIDELINE_SHEET_NAME: _, ...essentialSheet } =
-    STABLE_MATCHING_WORKBOOK;
+  const {
+    GUIDELINE_SHEET_NAME: _,
+    EXCLUDE_PAIRS_SHEET_NAME: __,
+    ...essentialSheet
+  } = STABLE_MATCHING_WORKBOOK;
   for (const sheetName of Object.values(essentialSheet)) {
     if (!workbook.worksheets.find((ws) => ws.name === sheetName)) {
       throw new Error(`Sheet missing: ${sheetName}`);
