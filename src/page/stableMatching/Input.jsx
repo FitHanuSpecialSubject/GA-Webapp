@@ -82,8 +82,11 @@ export default function InputPage() {
       reader.onload = async () => {
         const data = reader.result;
         const workbook = await new ExcelJS.Workbook().xlsx.load(data);
-
-        for (const sheetName of Object.values(STABLE_MATCHING_WORKBOOK)) {
+        const importantSheet = [
+          STABLE_MATCHING_WORKBOOK.PROBLEM_INFO_SHEET_NAME,
+          STABLE_MATCHING_WORKBOOK.DATASET_SHEET_NAME,
+        ];
+        for (const sheetName of importantSheet) {
           if (!workbook.getWorksheet(sheetName)) {
             displayPopup(
               "Excel Error",
