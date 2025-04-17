@@ -17,10 +17,11 @@ export function axiosErrorHandler(err) {
   if (err instanceof AxiosError) {
     let title;
     let message;
-
     if (err.response) {
       title = `Error ${err.response.status}`;
-      if (err.response.status in ERROR) {
+      if (err.response.data.message) {
+        message = err.response.data.message;
+      } else if (err.response.status in ERROR) {
         message = ERROR[err.response.status].message;
       } else {
         message = "Please contact admin.";

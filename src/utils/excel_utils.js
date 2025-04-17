@@ -499,8 +499,8 @@ export const getPropertyWeight = (sheet, row, col) => {
   validateAddress(row, col);
   try {
     const value = Number(sheet.getCell(row, col).value);
-    if (!Number.isNaN(value) && Number.isSafeInteger(value)) {
-      if (value < 0 || value > 10) {
+    if (!Number.isNaN(value)) {
+      if (value < 0) {
         throw Error(value);
       }
       return value;
@@ -511,7 +511,7 @@ export const getPropertyWeight = (sheet, row, col) => {
     console.error(e);
     throw new Error(
       `Error when reading Property Weight at: ${colCache.encode(row, col)},
-      Expected value: integer in range [0, 10] for Weight. Actual value: ${e.message}`,
+      Expected value: real number in range [0, ∞) for Weight. Actual value: ${e.message}`,
     );
   }
 };
