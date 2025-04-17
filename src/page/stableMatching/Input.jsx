@@ -28,7 +28,7 @@ export default function InputPage() {
   const [setNum, setSetNum] = useState(undefined);
   const [characteristicsNum, setCharacteristicsNum] = useState(undefined);
   const [totalIndividualsNum, setTotalIndividualsNum] = useState(undefined);
-  const [fitnessFunction, setFitnessFunction] = useState("DEFAULT");
+  const [fitnessFunction, setFitnessFunction] = useState("default");
   const [isLoading, setIsLoading] = useState(false);
   const [excelFileError, setExcelFileError] = useState("");
   const [problemType, setProblemType] = useState("");
@@ -42,7 +42,7 @@ export default function InputPage() {
   const { displayPopup } = useContext(PopupContext);
   const [colNums, setColNums] = useState(0);
   const [setEvaluateFunction, setSetEvaluateFunction] = useState(
-    Array.from({ length: colNums }, () => "DEFAULT"),
+    Array.from({ length: colNums }, () => "default"),
   );
   const [setIndividuals, setSetIndividuals] = useState(
     Array.from({ length: colNums }, () => ""),
@@ -241,7 +241,7 @@ export default function InputPage() {
     }
 
     if (fitnessFunction.length === 0) {
-      setFitnessFunction("DEFAULT");
+      setFitnessFunction("default");
     } else {
       if (!validFunctionPattern.test(fitnessFunction)) {
         setFitnessFunctionError(
@@ -260,7 +260,7 @@ export default function InputPage() {
       if (!evaluateFunction) {
         setSetEvaluateFunction((prevState) => {
           const newState = [...prevState];
-          newState[index] = "DEFAULT";
+          newState[index] = "default";
           return newState;
         });
       } else {
@@ -436,7 +436,7 @@ export default function InputPage() {
   const handleFitnessFunctionChange = (e) => {
     const value = e.target.value;
     if (value.length === 0) {
-      setFitnessFunction("DEFAULT");
+      setFitnessFunction("default");
     } else {
       setFitnessFunction(value);
     }
@@ -446,7 +446,7 @@ export default function InputPage() {
     setSetNum(value);
     setColNums(value);
     setSetIndividuals(Array.from({ length: value }, () => ""));
-    setSetEvaluateFunction(Array.from({ length: value }, () => "DEFAULT"));
+    setSetEvaluateFunction(Array.from({ length: value }, () => "default"));
   };
 
   const generateTable = () => {
