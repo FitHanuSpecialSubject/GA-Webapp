@@ -1,6 +1,7 @@
 import { isStringNullOrEmpty } from "./string_utils";
 import { AxiosError } from "axios";
 import { ERROR } from "../const/error_const";
+import React from "react";
 
 export function getBackendAddress() {
   const protocol = import.meta.env.VITE_BACKEND_PROTOCOL;
@@ -19,8 +20,33 @@ export function axiosErrorHandler(err) {
     let message;
     if (err.response) {
       title = `Error ${err.response.status}`;
-      if (err.response.data.message) {
-        message = err.response.data.message;
+      message = err.response.data.message;
+      if (err.response.status === 400) {
+        title = err.response.data.message;
+        message = (
+          <>
+            <div className="fw-bold fs-6 mb-1">Error details:</div>
+            <div>
+              {err.response.data.details.map((detail, index) => {
+                return (
+                  <div className="mb-1" key={"errDetail_" + index}>
+                    <span className="fw-bold">{"- " + detail.field}</span>
+                    {": "}
+                    <span className="text-danger">{detail.message}</span>.
+                    <div>
+                      Current value:{" "}
+                      <span style={{ color: "#a9bc07" }}>
+                        {typeof detail.value === "object"
+                          ? detail.value.join(", ")
+                          : detail.value}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        );
       } else if (err.response.status in ERROR) {
         message = ERROR[err.response.status].message;
       } else {
