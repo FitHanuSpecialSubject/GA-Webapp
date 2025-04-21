@@ -74,7 +74,7 @@ export const loadProblemInfoSMT = async (workbook) => {
   const fitnessFunction = getCellValueStr(problemSheet, "B5");
   const setEvaluateFunction = [];
   for (let i = 0; i < setNum; i++) {
-    setEvaluateFunction.push(problemSheet.getCell(`B${i + 5}`).value);
+    setEvaluateFunction.push(problemSheet.getCell(`B${i + 6}`).value);
   }
   return {
     problemName,
