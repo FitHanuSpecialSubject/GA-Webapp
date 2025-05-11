@@ -38,7 +38,7 @@ export default function InsightsGraph({ runtimes }) {
     width: 600,
     height: 600,
   };
-  return <Line class="graph" data={graphData} option={graphOptions} />;
+  return <Line className="graph" data={graphData} option={graphOptions} />;
 }
 
 InsightsGraph.propTypes = {
