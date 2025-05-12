@@ -1650,7 +1650,7 @@ export default function InsightPage() {
         </p>
       </div>
       <div className="runtime-graph">
-        <RuntimeGraphSelector runtimes={appData.insights.data.runtimes} />
+        <RuntimeGraphSelector data={appData.insights.data} />
       </div>
     </div>
   );
