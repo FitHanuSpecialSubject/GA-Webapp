@@ -1,5 +1,6 @@
 import React, { useState, Suspense, lazy } from "react";
 const InsightsGraph = lazy(() => import("./Graphs/InsightsGraph"));
+const HorizontalBarChart = lazy(() => import("./Graphs/HorizontalBarChart"));
 const FallBackGraph = lazy(() => import("./Graphs/FallBackGraph"));
 
 const GRAPH_TYPES = {
@@ -8,8 +9,8 @@ const GRAPH_TYPES = {
     component: InsightsGraph,
   },
   1: {
-    name: "Dot plots",
-    component: FallBackGraph,
+    name: "Horizontal bar chart",
+    component: HorizontalBarChart,
   },
   2: {
     name: "Histogram",
@@ -60,7 +61,14 @@ const RuntimeGraphSelector = ({ data }) => {
       <div style={{ marginTop: "1rem" }}>
         {SelectedGraphComponent && (
           <Suspense fallback={<div>Loading graph...</div>}>
-            <SelectedGraphComponent data={data} />
+            {selectedGraphType === 1 ? (
+              <SelectedGraphComponent 
+                data={data.runtimes} 
+                title="Runtime Comparison" 
+              />
+            ) : (
+              <SelectedGraphComponent data={data} />
+            )}
           </Suspense>
         )}
       </div>
