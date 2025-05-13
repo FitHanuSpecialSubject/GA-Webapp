@@ -25,18 +25,17 @@ ChartJS.register(
   Legend
 );
 
-// Define reusable colors (with transparency for background)
 const colors = [
-  { border: "#262A56", background: "rgba(38, 42, 86, 0.4)" },
-  { border: "#45CFDD", background: "rgba(69, 207, 221, 0.4)" },
-  { border: "#6527BE", background: "rgba(101, 39, 190, 0.4)" },
-  { border: "#E11299", background: "rgba(225, 18, 153, 0.4)" },
-  { border: "#EBB02D", background: "rgba(235, 176, 45, 0.4)" },
-  { border: "hotpink", background: "rgba(255, 105, 180, 0.4)" },
-  { border: "crimson", background: "rgba(220, 20, 60, 0.4)" },
-  { border: "steelblue", background: "rgba(70, 130, 180, 0.4)" },
-  { border: "lime", background: "rgba(0, 255, 0, 0.4)" },
-];
+  { border: '#262A56', background: 'rgba(38, 42, 86, 0.4)' },
+  { border: '#45CFDD', background: 'rgba(69, 207, 221, 0.4)' },
+  { border: '#6527BE', background: 'rgba(101, 39, 190, 0.4)' },
+  { border: '#E11299', background: 'rgba(225, 18, 153, 0.4)' },
+  { border: '#EBB02D', background: 'rgba(235, 176, 45, 0.4)' },
+  // { border: '#FF69B4', background: 'rgba(255, 105, 180, 0.4)' },
+  // { border: '#DC143C', background: 'rgba(220, 20, 60, 0.4)' },
+  { border: '#4682B4', background: 'rgba(70, 130, 180, 0.4)' }, // steelblue
+  { border: '#00FF00', background: 'rgba(0, 255, 0, 0.4)' }
+]
 
 export default function AreaChart({ data }) {
   const runtimes = data.runtimes;

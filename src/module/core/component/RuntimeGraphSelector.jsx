@@ -1,5 +1,5 @@
 import React, { useState, Suspense, lazy } from "react";
-import AreaChart from "./Graphs/AreaChart";
+const AreaChart = lazy(() => import("./Graphs/AreaChart"));
 const InsightsGraph = lazy(() => import("./Graphs/InsightsGraph"));
 const FallBackGraph = lazy(() => import("./Graphs/FallBackGraph"));
 
