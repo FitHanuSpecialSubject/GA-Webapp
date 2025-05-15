@@ -32,7 +32,7 @@ export default function HorizontalBarChart({ data }) {
         stack: "Stack 0",
       },
       {
-        label: "Mean-Min",
+        label: "Mean",
         data: meanMinValues,
         backgroundColor: "rgba(241, 196, 15, 0.8)",
         borderColor: "rgba(243, 156, 18, 1)",
@@ -40,7 +40,7 @@ export default function HorizontalBarChart({ data }) {
         stack: "Stack 0",
       },
       {
-        label: "Max-Mean",
+        label: "Max",
         data: maxMeanValues,
         backgroundColor: "rgba(231, 76, 60, 0.8)",
         borderColor: "rgba(192, 57, 43, 1)",
