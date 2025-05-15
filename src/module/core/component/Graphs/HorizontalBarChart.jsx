@@ -2,7 +2,7 @@ import React from "react";
 import { Bar } from "react-chartjs-2";
 import PropTypes from "prop-types";
 
-export default function HorizontalBarChart({ data, title }) {
+export default function HorizontalBarChart({ data }) {
   // Prepare data for the chart
   const algorithms = Object.keys(data);
   
@@ -57,8 +57,8 @@ export default function HorizontalBarChart({ data, title }) {
     maintainAspectRatio: false,
     plugins: {
       title: {
-        display: !!title,
-        text: title || "Runtime Comparison",
+        display: true,
+        text: "Runtime Comparison",
         font: { size: 16 },
       },
       tooltip: {
@@ -112,5 +112,4 @@ export default function HorizontalBarChart({ data, title }) {
 
 HorizontalBarChart.propTypes = {
   data: PropTypes.object.isRequired,
-  title: PropTypes.string,
 }; 

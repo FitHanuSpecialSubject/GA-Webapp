@@ -1,8 +1,9 @@
 import React, { useState, Suspense, lazy } from "react";
+const AreaChart = lazy(() => import("./Graphs/AreaChart"));
 const InsightsGraph = lazy(() => import("./Graphs/InsightsGraph"));
 const HorizontalBarChart = lazy(() => import("./Graphs/HorizontalBarChart"));
 const FallBackGraph = lazy(() => import("./Graphs/FallBackGraph"));
-
+const Histogram = lazy(() => import("./Graphs/Histogram"));
 const GRAPH_TYPES = {
   0: {
     name: "Line plot",
@@ -14,7 +15,7 @@ const GRAPH_TYPES = {
   },
   2: {
     name: "Histogram",
-    component: FallBackGraph,
+    component: Histogram,
   },
   3: {
     name: "Scatter plots",
@@ -22,7 +23,7 @@ const GRAPH_TYPES = {
   },
   4: {
     name: "Area chart",
-    component: FallBackGraph,
+    component: AreaChart,
   },
 };
 
@@ -61,14 +62,7 @@ const RuntimeGraphSelector = ({ data }) => {
       <div style={{ marginTop: "1rem" }}>
         {SelectedGraphComponent && (
           <Suspense fallback={<div>Loading graph...</div>}>
-            {selectedGraphType === 1 ? (
-              <SelectedGraphComponent 
-                data={data.runtimes} 
-                title="Runtime Comparison" 
-              />
-            ) : (
-              <SelectedGraphComponent data={data} />
-            )}
+            <SelectedGraphComponent data={data} />
           </Suspense>
         )}
       </div>
