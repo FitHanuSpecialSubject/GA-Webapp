@@ -1,7 +1,7 @@
 import React, { useState, Suspense, lazy } from "react";
 const InsightsGraph = lazy(() => import("./Graphs/InsightsGraph"));
 const FallBackGraph = lazy(() => import("./Graphs/FallBackGraph"));
-
+const Histogram = lazy(() => import("./Graphs/Histogram"));
 const GRAPH_TYPES = {
   0: {
     name: "Line plot",
@@ -13,7 +13,7 @@ const GRAPH_TYPES = {
   },
   2: {
     name: "Histogram",
-    component: FallBackGraph,
+    component: Histogram,
   },
   3: {
     name: "Scatter plots",
