@@ -110,7 +110,7 @@ const ScatterChart = ({ data }) => {
   return (
     <div style={{ width: "800px", margin: "0 auto" }}>
       <Scatter data={dataSet} options={options} />
-      <h2>Comparing the performance of algorithms</h2>
+      <h3>Algorithms’s performance</h3>
 
     </div>
   );
