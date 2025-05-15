@@ -1,4 +1,5 @@
 import React, { useState, Suspense, lazy } from "react";
+const AreaChart = lazy(() => import("./Graphs/AreaChart"));
 const InsightsGraph = lazy(() => import("./Graphs/InsightsGraph"));
 const FallBackGraph = lazy(() => import("./Graphs/FallBackGraph"));
 
@@ -21,7 +22,7 @@ const GRAPH_TYPES = {
   },
   4: {
     name: "Area chart",
-    component: FallBackGraph,
+    component: AreaChart,
   },
 };
 
