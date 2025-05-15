@@ -1,6 +1,7 @@
 import React, { useState, Suspense, lazy } from "react";
 const AreaChart = lazy(() => import("./Graphs/AreaChart"));
 const InsightsGraph = lazy(() => import("./Graphs/InsightsGraph"));
+const HorizontalBarChart = lazy(() => import("./Graphs/HorizontalBarChart"));
 const FallBackGraph = lazy(() => import("./Graphs/FallBackGraph"));
 const Histogram = lazy(() => import("./Graphs/Histogram"));
 const GRAPH_TYPES = {
@@ -9,8 +10,8 @@ const GRAPH_TYPES = {
     component: InsightsGraph,
   },
   1: {
-    name: "Dot plots",
-    component: FallBackGraph,
+    name: "Horizontal bar chart",
+    component: HorizontalBarChart,
   },
   2: {
     name: "Histogram",
