@@ -4,14 +4,15 @@ import PropTypes from "prop-types";
 
 export default function HorizontalBarChart({ data }) {
   // Prepare data for the chart
-  const algorithms = Object.keys(data);
+  const algorithmFitnessValues = data.fitnessValues;
+  const algorithms = Object.keys(algorithmFitnessValues);
   
-  const minValues = algorithms.map((algo) => Math.min(...data[algo]));
+  const minValues = algorithms.map((algo) => Math.min(...algorithmFitnessValues[algo]));
   const meanValues = algorithms.map((algo) => {
-    const values = data[algo];
+    const values = algorithmFitnessValues[algo];
     return values.reduce((sum, value) => sum + value, 0) / values.length;
   });
-  const maxValues = algorithms.map((algo) => Math.max(...data[algo]));
+  const maxValues = algorithms.map((algo) => Math.max(...algorithmFitnessValues[algo]));
   
   const meanMinValues = meanValues.map(
     (mean, index) => mean - minValues[index],
