@@ -1,4 +1,0 @@
-1. tạo các graph types để render
-2. Số lượng 4 người
-3. sử dụng thư viện d3 - react-chart-js-2 (trong package.json)
-4. css dùng theo bootstrap (trong package.json)

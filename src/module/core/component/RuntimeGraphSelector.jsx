@@ -1,11 +1,11 @@
 import React, { useState, Suspense, lazy } from "react";
 
-const ScatterChart = lazy(() => import("./Graphs/ScatterGraph"));
-const AreaChart = lazy(() => import("./Graphs/AreaChart"));
-const InsightsGraph = lazy(() => import("./Graphs/InsightsGraph"));
-const HorizontalBarChart = lazy(() => import("./Graphs/HorizontalBarChart"));
-const FallBackGraph = lazy(() => import("./Graphs/FallBackGraph"));
-const Histogram = lazy(() => import("./Graphs/Histogram"));
+const ScatterChart        = lazy(() => import("./Graphs/ScatterGraph"));
+const AreaChart           = lazy(() => import("./Graphs/AreaChart"));
+const InsightsGraph       = lazy(() => import("./Graphs/InsightsGraph"));
+const HorizontalBarChart  = lazy(() => import("./Graphs/HorizontalBarChart"));
+const Histogram           = lazy(() => import("./Graphs/Histogram"));
+
 const GRAPH_TYPES = {
   0: {
     name: "Line plot",
