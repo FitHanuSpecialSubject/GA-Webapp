@@ -14,7 +14,9 @@ const colors = [
   "lime",
 ];
 
-export default function InsightsGraph({ runtimes }) {
+export default function InsightsGraph({ data }) {
+  const runtimes = data.runtimes;
+  const fitnessValues = data.fitnessValues;
   const algorithms = Object.keys(runtimes);
   const labels = runtimes[algorithms[0]].map((_, index) => index + 1);
   const datasets = algorithms.map((name, index) => {
@@ -38,9 +40,10 @@ export default function InsightsGraph({ runtimes }) {
     width: 600,
     height: 600,
   };
-  return <Line class="graph" data={graphData} option={graphOptions} />;
+  return<>
+          <Line className="graph" data={graphData} option={graphOptions} />
+          <p className="mt-4 small">
+            Comparison of runtime (in seconds) across various algorithms
+          </p>
+        </>;
 }
-
-InsightsGraph.propTypes = {
-  runtimes: PropTypes.object.isRequired,
-};

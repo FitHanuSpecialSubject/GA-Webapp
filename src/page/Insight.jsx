@@ -5,9 +5,9 @@ import { Chart, registerables } from "chart.js";
 import DataContext from "../module/core/context/DataContext";
 import { saveAs } from "file-saver";
 import { exportInsights } from "../utils/excel_utils";
-import InsightsGraph from "../module/core/component/InsightsGraph";
 import InsightsTable from "../module/core/component/InsightsTable";
 import { FaRegFileExcel } from "react-icons/fa6";
+import RuntimeGraphSelector from "../module/core/component/RuntimeGraphSelector";
 
 export default function InsightPage() {
   const { appData } = useContext(DataContext);
@@ -48,10 +48,7 @@ export default function InsightPage() {
         </p>
       </div>
       <div className="runtime-graph">
-        <InsightsGraph runtimes={appData.insights.data.runtimes} />
-        <p className="figure-description">
-          Comparison of runtime (in seconds) across various algorithms
-        </p>
+        <RuntimeGraphSelector data={appData.insights.data} />
       </div>
     </div>
   );
