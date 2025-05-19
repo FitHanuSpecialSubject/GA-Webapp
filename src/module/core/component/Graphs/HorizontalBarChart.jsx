@@ -3,16 +3,19 @@ import { Bar } from "react-chartjs-2";
 import PropTypes from "prop-types";
 
 export default function HorizontalBarChart({ data }) {
-  // Prepare data for the chart
-  const algorithmFitnessValues = data.fitnessValues;
-  const algorithms = Object.keys(algorithmFitnessValues);
+  const algorithmRuntimes = data.runtimes;
+  const algorithms = Object.keys(algorithmRuntimes);
   
-  const minValues = algorithms.map((algo) => Math.min(...algorithmFitnessValues[algo]));
+  const minValues = algorithms.map((algo) => 
+    Math.min(...algorithmRuntimes[algo]),
+  );
   const meanValues = algorithms.map((algo) => {
-    const values = algorithmFitnessValues[algo];
+    const values = algorithmRuntimes[algo];
     return values.reduce((sum, value) => sum + value, 0) / values.length;
   });
-  const maxValues = algorithms.map((algo) => Math.max(...algorithmFitnessValues[algo]));
+  const maxValues = algorithms.map((algo) => 
+    Math.max(...algorithmRuntimes[algo]),
+  );
   
   const meanMinValues = meanValues.map(
     (mean, index) => mean - minValues[index],
@@ -53,7 +56,7 @@ export default function HorizontalBarChart({ data }) {
   
   // Chart configuration
   const options = {
-    indexAxis: "y", // Horizontal bar chart
+    indexAxis: "y",
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -64,7 +67,7 @@ export default function HorizontalBarChart({ data }) {
       },
       tooltip: {
         callbacks: {
-          label: function (context) {
+          label(context) {
             const index = context.dataIndex;
             const datasetIndex = context.datasetIndex;
             
