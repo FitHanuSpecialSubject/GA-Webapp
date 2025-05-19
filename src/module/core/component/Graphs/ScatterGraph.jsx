@@ -12,48 +12,53 @@ ChartJS.register(LinearScale, PointElement, Tooltip, Legend);
 
 const ScatterChart = ({ data }) => {
   const algorithms = data.runtimes;
-  const characters = [
+  const iconStyled = [
     {
-      label: "eMOEA",
       pointStyle: "circle",
       color: "#0002FF",
     },
     {
-      label: "VEGA",
       pointStyle: "rect",
       color: "#22CE83",
     },
     {
-      label: "NSGAII",
       pointStyle: "rectRot",
       color: "#E2F516",
     },
     {
-      label: "NSGAIII",
       pointStyle: "triangle",
       color: "#FFA500",
     },
     {
-      label: "IBEA",
       pointStyle: "star",
       color: "#FD1C03",
     },
     {
-      label: "PESA2",
       pointStyle: "rectRounded",
       color: "#FF00FF",
     },
     {
-      label: "SMPSO",
       pointStyle: "rectRot",
       color: "#FF6347",
     },
     {
-      label: "OMOPSO",
       pointStyle: "circle",
       color: "#9370DB",
     },
+    {
+      pointStyle: "triangle",
+      color: "#4B0082",
+    },
+    {
+      pointStyle: "star",
+      color: "#800000",
+    },
   ];
+
+  const characters = Object.keys(algorithms).map((algorithmName, index) => ({
+    label: algorithmName,
+    ...iconStyled[index % iconStyled.length]
+  }));
 
   const dataSet = {
     datasets: Object.keys(algorithms).map((algorithm) => {
