@@ -61,7 +61,7 @@ const ScatterChart = ({ data }) => {
   }));
 
   const dataSet = {
-    datasets: Object.keys(algorithms).map((algorithm) => {
+    datasets: Object.keys(algorithms).map((algorithm, i) => {
       const char = characters.find((c) => c.label === algorithm) || {
         pointStyle: "circle",
         color: "#ccc"
@@ -110,16 +110,20 @@ const ScatterChart = ({ data }) => {
         },
       },
       legend: {
+        display: true,
         position: "top",
         labels: {
+          display: true,
           usePointStyle: true,
           generateLabels: (chart) => {
-            return chart.data.datasets.map((dataset) => {
+            return chart.data.datasets.map((dataset, i) => {
               const algo = characters.find(char => char.label === dataset.label) || {
                 color: "#ccc"
               };
               return {
                 text: dataset.label,
+                datasetIndex: i,
+                hidden: !chart.isDatasetVisible(i),
                 pointStyle: algo.pointStyle,
                 fillStyle: algo.color,
                 strokeStyle: algo.color,
