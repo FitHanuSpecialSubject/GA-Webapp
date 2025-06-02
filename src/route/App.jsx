@@ -8,9 +8,10 @@ import DataContext from "../module/core/context/DataContext";
 import InsightPage from "../page/Insight";
 import PopupContext from "../module/core/context/PopupContext";
 import Popup from "../module/core/component/Popup";
-import stableMatchingRouter from "./stableMatching";
-import gameTheoryRouter from "./gameTheory";
+import stableMatchingRouter from "./StableMatchingRoutes";
+import gameTheoryRouter from "./GameTheoryRoutes";
 import dataGeneratorRouter from "./DataGenerator";
+import AppRoutes from "./route.constants";
 
 function App() {
   const [appData, setAppData] = useState(null);
@@ -55,8 +56,14 @@ function App() {
             {StableMatchingRouter}
             {GameTheoryRouter}
             {DataGeneratorRouter}
-            <Route path="/insights" element={<InsightPage />} />
-            <Route path="*" element={<InputPage />} />
+            <Route
+              path    = {AppRoutes.Insights}
+              element = {<InsightPage />}
+            />
+            <Route
+              path    = {AppRoutes.Fallback}
+              element = {<InputPage />}
+            />
           </Routes>
         </div>
 
