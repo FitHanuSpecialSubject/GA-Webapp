@@ -24,13 +24,13 @@ function Param({ inputText, paramVal, setParamVal, hintTitle, hintContent }) {
         description={hintContent}
         guideSectionIndex={8}
       />
-      <div className="text">
+      <div className="info-label">
         <i
           className="info fa-solid fa-info"
           onMouseOver={handleMouseOver}
           onMouseLeave={handleMouseLeave}
         ></i>
-        <p className="bold">{inputText}</p>
+        <p className="info-label-bold">{inputText}</p>
       </div>
 
       <input

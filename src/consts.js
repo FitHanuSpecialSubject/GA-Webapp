@@ -25,6 +25,7 @@ export const SMT = Object.freeze({
   EXCLUDE_PAIRS_SHEET: 1,
   MIN_SET: 2,
   MAX_SET: 10,
+  DEFAULT_RUN_COUNT_PARAM: 10,
 });
 
 export const SMT_VALIDATE = Object.freeze({

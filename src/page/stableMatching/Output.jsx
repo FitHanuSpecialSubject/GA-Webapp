@@ -23,6 +23,7 @@ import {
 import ExcelJS from "exceljs";
 import { RESULT_WORKBOOK } from "../../const/excel_const";
 import { FaChartLine } from "react-icons/fa6";
+import { SMT } from "../../consts.js";
 
 let stompClient = null;
 export default function MatchingOutputPage() {
@@ -42,12 +43,14 @@ export default function MatchingOutputPage() {
   const [generationParam, setGenerationParam] = useState(100);
   const [maxTimeParam, setMaxTimeParam] = useState(5000);
   const [selectedSet, setSelectedSet] = useState("all");
-  const problemType = appData.problemType;
+  const [runCountParam, setRunCountParam] = useState(SMT.DEFAULT_RUN_COUNT_PARAM);
+
   useEffect(() => {
     if (appData == null) {
       return <NothingToShow />;
     }
   }, []);
+  const problemType = appData.problemType ?? SMT.DEFAULT_PROBLEM_TYPE;
   const matchesArray = appData.result.data.matches.matches;
   const leftOversArray = appData.result.data.matches.leftOvers;
   const problemData = appData.problem;
@@ -136,6 +139,7 @@ export default function MatchingOutputPage() {
         populationSize: populationSizeParam,
         generation: generationParam,
         maxTime: maxTimeParam,
+        runCountPerAlgorithm: runCountParam
       };
 
       const problemType = appData.problemType;
@@ -327,6 +331,8 @@ export default function MatchingOutputPage() {
             setPopulationSizeParam={setPopulationSizeParam}
             maxTimeParam={maxTimeParam}
             setMaxTimeParam={setMaxTimeParam}
+            runCountParam={runCountParam}
+            setRunCountParam={setRunCountParam}
           />
           <div
             className="align-self-center btn btn-outline-primary d-flex justify-content-center border-1 p-3"

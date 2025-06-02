@@ -41,6 +41,7 @@ export default function OutputPage() {
   const [populationSizeParam, setPopulationSizeParam] = useState(1000);
   const [generationParam, setGenerationParam] = useState(100);
   const [maxTimeParam, setMaxTimeParam] = useState(5000);
+  const [runCountParam, setRunCountParam] = useState(10);
 
   if (appData == null) {
     return <NothingToShow />;
@@ -94,6 +95,7 @@ export default function OutputPage() {
         populationSize: populationSizeParam,
         generation: generationParam,
         maxTime: maxTimeParam,
+        runCountPerAlgorithm: runCountParam,
       };
 
       setIsLoading(true);
@@ -195,6 +197,8 @@ export default function OutputPage() {
             setPopulationSizeParam={setPopulationSizeParam}
             maxTimeParam={maxTimeParam}
             setMaxTimeParam={setMaxTimeParam}
+            runCountParam={runCountParam}
+            setRunCountParam={setRunCountParam}
           />
           <div
             className="align-self-center btn btn-outline-primary d-flex justify-content-center border-1 p-3"

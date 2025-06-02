@@ -31,6 +31,8 @@ export default function InputProcessingPage() {
     SMT.DEFAULT_GENERATION_NUM,
   );
   const [maxTimeParam, setMaxTimeParam] = useState(SMT.DEFAULT_MAXTIME);
+  const [runCountParam, setRunCountParam] = useState(SMT.DEFAULT_RUN_COUNT_PARAM);
+
   const { displayPopup } = useContext(PopupContext);
 
   useEffect(() => {
@@ -205,6 +207,8 @@ export default function InputProcessingPage() {
         setPopulationSizeParam={setPopulationSizeParam}
         maxTimeParam={maxTimeParam}
         setMaxTimeParam={setMaxTimeParam}
+        runCountParam={runCountParam}
+        setRunCountParam={setRunCountParam}
       />
       {algorithm === "PAES" && (
         <p style={{ color: "red", textAlign: "center" }}>

@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 import InputHint from "../InputHint";
 import { useState } from "react";
 import Param from "../Param";
+import { useLocation } from "react-router-dom";
+import AppRoutes from "../../../../route/route.constants";
 
 export default function Input({
   distributedCoreParam,
@@ -14,7 +16,10 @@ export default function Input({
   setGenerationParam,
   maxTimeParam,
   setMaxTimeParam,
+  runCountParam,
+  setRunCountParam,
 }) {
+  const location = useLocation();
   // const playerHolder = error ? message: message
   const [showHint, setShowHint] = useState(false);
 
@@ -94,6 +99,29 @@ export default function Input({
           paramVal={maxTimeParam}
           setParamVal={setMaxTimeParam}
         />
+        {
+        
+        [
+          AppRoutes.GameTheoryResult,
+          AppRoutes.MatchingResult
+        ].includes(location.pathname)
+        
+        &&
+        
+        <Param
+          inputText="Run count per algorithm (Insights):"
+          hintTitle={"Run count per algorithm when insights run (from 5 to 25)"}
+          hintContent={
+            "Each of available algorithms will run (x) times when perform insights run, " +
+            "The greater the value, longer run time it will take, " +
+            "If run single time take 5000 miliseconds (5 seconds), `x` is 10, it would take aprox. " +
+            "5 * 10 * 6 = 300 seconds (5 minutes) to complete the insights run (6 is the number " +
+            "of algorithms). "
+          }
+          paramVal={runCountParam}
+          setParamVal={setRunCountParam}
+        />
+        }
       </div>
     </>
   );
