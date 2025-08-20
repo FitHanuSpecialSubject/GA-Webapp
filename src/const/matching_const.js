@@ -17,7 +17,7 @@ export const SMT_ALGORITHMS = Object.freeze([
   ALGORITHMS.PAES,
   ALGORITHMS.MOEAD,
   ALGORITHMS.IBEA,
-  ALGORITHMS.SPEA2,
+  ALGORITHMS.SPEA2 ,
   // PSO algorithms for SMT currently unavailable
   // ALGORITHMS.OMOPSO,
   // ALGORITHMS.SMPSO,

@@ -24,5 +24,5 @@ export const ALGORITHMS = Object.freeze({
   IBEA: new RequestAlgorithm("IBEA", "IBEA"),
   OMOPSO: new RequestAlgorithm("OMOPSO", "OMOPSO"),
   SMPSO: new RequestAlgorithm("SMPSO", "SMPSO"),
-  SPEA2: new RequestAlgorithm("SPEA2", "SPEA2"),
+  SPEA2: new RequestAlgorithm("SPEA2","SPEA2"),
 });
