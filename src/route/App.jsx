@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import Navbar from "../module/core/component/Navbar";
-import InputPage from "../page/gameTheory/Input";
+import HomePage from "../page/home";
 import "../module/core/asset/css/index.scss";
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
@@ -62,7 +62,7 @@ function App() {
             />
             <Route
               path    = {AppRoutes.Fallback}
-              element = {<InputPage />}
+              element = {<HomePage />}
             />
           </Routes>
         </div>

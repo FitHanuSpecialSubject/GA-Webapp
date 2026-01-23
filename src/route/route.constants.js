@@ -13,7 +13,7 @@ const AppRoutes = {
   GameTheoryResult:     '/result',
 
   // Data Generator
-  GeneratorHome:        '/generator/',
+  GeneratorHome:        '/generator',
 
   // Insights
   Insights:            '/insights',

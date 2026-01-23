@@ -3,6 +3,28 @@ import "./style.scss";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 
+/** MOEA: subtle converging-arrows SVG (no broken images). */
+function MoeaIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="moea-svg"
+      aria-hidden
+    >
+      <path d="M7 17L2 12l5-5" />
+      <path d="M17 7l5 5-5 5" />
+      <path d="M2 12h20" />
+    </svg>
+  );
+}
+
 export default function Header() {
   const location = useLocation();
   const [path, setPath] = useState("");
@@ -22,13 +44,26 @@ export default function Header() {
             className="app-name fw-semibold d-flex align-items-center"
             onClick={backToHome}
           >
-            <img src="/logo.svg" className="logo" alt="Logo" />
-            Game Theory & Matching Theory Solver
+            {/* Logo: use the same MOEA icon as the strip below */}
+            <span className="logo-moea-icon" aria-hidden>
+              <MoeaIcon />
+            </span>
+            <span className="app-title">Game Theory & Matching Theory Solver</span>
           </div>
           <div className="nav-item-container">
             <Link
               to="/"
               className={path === "/" ? "nav-item highlight" : "nav-item"}
+            >
+              Home
+            </Link>
+            <Link
+              to="/input"
+              className={
+                ["/input", "/input-processing", "/result"].includes(path)
+                  ? "nav-item highlight"
+                  : "nav-item"
+              }
             >
               Game Theory
             </Link>
@@ -65,12 +100,9 @@ export default function Header() {
         target="_blank"
         rel="noreferrer"
       >
-        <img
-          className="moea-framework-logo"
-          src="https://th.bing.com/th/id/R.813fc73036588da433a26877f9738f63?rik=QW%2fZfuTteoFJug&riu=http%3a%2f%2fmoeaframework.org%2fimages%2flogo2_small.png&ehk=Yj9EPtTmS%2brN1WGUO7EUHyKgEVdiu9Drs0y9NoLKJXM%3d&risl=&pid=ImgRaw&r=0"
-          alt=""
-        />
-        <p>Powered by MOEA Framework</p>
+        <span className="moea-brand-text">
+          <MoeaIcon /> Powered by MOEA Framework
+        </span>
       </a>
     </>
   );
