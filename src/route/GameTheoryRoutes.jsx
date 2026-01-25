@@ -1,6 +1,5 @@
 import React from "react";
 import { Route } from "react-router-dom";
-import HomePage from "../page/home";
 import InputPage from "../page/gameTheory/Input";
 import GuidePage from "../page/Guide";
 import InputProcessingPage from "../page/gameTheory/Processing";
@@ -12,7 +11,7 @@ export default function gameTheoryRouter() {
     <>
       <Route
         path    = {AppRoutes.GameTheoryHome}
-        element = {<HomePage />}
+        element = {<InputPage />}
       />
       <Route
         path    = {AppRoutes.GameTheoryInput}
