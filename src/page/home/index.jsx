@@ -11,7 +11,6 @@ import {
   FaBookOpen,
   FaChalkboardTeacher,
   FaCodeBranch,
-  FaEnvelope,
   FaExternalLinkAlt,
   FaFlask,
   FaGithub,
@@ -23,9 +22,6 @@ import {
 // Intro image (lab/office). You can swap this URL anytime.
 const HERO_IMAGE_URL =
   "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=2340";
-
-// Admin email for feedback/contact.
-const ADMIN_EMAIL = "ngoctb@hanu.vn";
 
 /**
  * MOEA Framework Icon: Subtle converging arrows (evolutionary / Pareto front theme)
@@ -106,6 +102,8 @@ export default function Home() {
 
   return (
     <>
+      <div className="flex flex-col min-h-screen bg-white">
+        <main className="flex-1">
       {/* ============================= */}
       {/* 1) Introduction Section */}
       {/* ============================= */}
@@ -387,221 +385,135 @@ export default function Home() {
       </div>
     </div>
   </div>
-</section>
+    </section>
+      </main>
 
-      {/* ============================= */}
-      {/* 3) Footer Section */}
-      {/* ============================= */}
-      <footer className="bg-gray-900 text-white/90">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 py-14">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {/* Contact */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-white">Contact</h4>
-              <a
-                href={`mailto:${ADMIN_EMAIL}`}
-                className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+    </div>
+
+    {/* Feedback Modal (Custom Tailwind Modal) */}
+    {showFeedback && (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        {/* Backdrop */}
+        <div 
+          className="fixed inset-0 bg-black/50 transition-opacity"
+          onClick={closeFeedback}
+          aria-hidden="true"
+        />
+        
+        {/* Modal Container */}
+        <div className="flex min-h-full items-center justify-center p-4">
+          <div className="relative bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 transform transition-all">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-gray-900">Send feedback</h3>
+              <button
+                onClick={closeFeedback}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                aria-label="Close"
               >
-                <FaEnvelope className="text-white/70" />
-                {ADMIN_EMAIL}
-              </a>
-              <p className="text-sm text-white/60 leading-relaxed">
-                Send bug reports, feature requests, or ask for templates/experiment details via the email above.
-              </p>
+                <FaTimes size={22} />
+              </button>
             </div>
 
-            {/* Feedback */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-white">Feedback</h4>
-              <div className="flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={openFeedback}
-                  className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white font-semibold hover:bg-indigo-700 transition-colors"
-                >
-                  <FaRegCommentDots />
-                  Quick feedback
-                </button>
-                <a
-                  href={`mailto:${ADMIN_EMAIL}?subject=${encodeURIComponent(
-                    "[GA Solver] Feedback"
-                  )}`}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-white/90 font-semibold hover:bg-white/10 transition-colors"
-                >
-                  <FaEnvelope />
-                  Email admin
-                </a>
-              </div>
-              <p className="text-sm text-white/60 leading-relaxed">
-                Tip: for bug reports, include the page URL and input data (if possible) to help reproduce the issue.
-              </p>
-            </div>
-
-            {/* Contribute */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-white">Contribute</h4>
-              <div className="flex flex-col gap-2">
-                <a
-                  href="https://github.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors"
-                >
-                  <FaGithub />
-                  GitHub (repository)
-                </a>
-                <a
-                  href="http://moeaframework.org/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 text-white/70 hover:text-white/90 transition-colors italic"
-                >
-                  <MoeaIcon />
-                  MOEA Framework
-                </a>
-                <span className="inline-flex items-center gap-2 text-white/60">
-                  <FaCodeBranch />
-                  Roadmap: solvers, templates, UI/UX, exportable results
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-sm text-white/60">
-            <span>
-              &copy; {new Date().getFullYear()} Game Theory &amp; Matching Theory Solver
-            </span>
-            <span>
-              Academic portal · optimized for research &amp; teaching
-            </span>
-          </div>
-        </div>
-      </footer>
-
-      {/* Feedback Modal (Custom Tailwind Modal) */}
-      {showFeedback && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black/50 transition-opacity"
-            onClick={closeFeedback}
-            aria-hidden="true"
-          />
-          
-          {/* Modal Container */}
-          <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 transform transition-all">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-gray-900">Send feedback</h3>
-                <button
-                  onClick={closeFeedback}
-                  className="text-gray-400 hover:text-gray-600 transition-colors p-1"
-                  aria-label="Close"
-                >
-                  <FaTimes size={22} />
-                </button>
-              </div>
-
-              {/* Body */}
-              <div>
-                {formSuccess ? (
-                  <div className="text-center py-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
-                      <FaRegCommentDots size={28} className="text-green-600" />
-                    </div>
-                    <p className="text-green-600 font-semibold text-lg">
-                      Thank you. Your feedback has been recorded.
-                    </p>
+            {/* Body */}
+            <div>
+              {formSuccess ? (
+                <div className="text-center py-8">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+                    <FaRegCommentDots size={28} className="text-green-600" />
                   </div>
-                ) : (
-                  <form onSubmit={handleFeedbackSubmit} className="space-y-4">
-                    {/* Feedback Textarea */}
-                    <div>
-                      <label htmlFor="feedback" className="block text-sm font-medium text-gray-700 mb-2">
-                        Feedback / Suggestion / Bug <span className="text-red-500">*</span>
-                      </label>
-                      <textarea
-                        id="feedback"
-                        rows={4}
-                        value={feedback}
-                        onChange={(e) => setFeedback(e.target.value)}
-                        placeholder="Describe your feedback, suggestion, or bug report..."
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
-                        required
-                      />
-                      {formError && (
-                        <p className="mt-1 text-sm text-red-600">{formError}</p>
-                      )}
-                    </div>
+                  <p className="text-green-600 font-semibold text-lg">
+                    Thank you. Your feedback has been recorded.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+                  {/* Feedback Textarea */}
+                  <div>
+                    <label htmlFor="feedback" className="block text-sm font-medium text-gray-700 mb-2">
+                      Feedback / Suggestion / Bug <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      id="feedback"
+                      rows={4}
+                      value={feedback}
+                      onChange={(e) => setFeedback(e.target.value)}
+                      placeholder="Describe your feedback, suggestion, or bug report..."
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                      required
+                    />
+                    {formError && (
+                      <p className="mt-1 text-sm text-red-600">{formError}</p>
+                    )}
+                  </div>
 
-                    {/* Name */}
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                        Name (optional)
-                      </label>
-                      <input
-                        id="name"
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Your name"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
-                      />
-                    </div>
+                  {/* Name */}
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                      Name (optional)
+                    </label>
+                    <input
+                      id="name"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your name"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                    />
+                  </div>
 
-                    {/* Email */}
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                        Email (optional)
-                      </label>
-                      <input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="email@domain.com"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
-                      />
-                    </div>
+                  {/* Email */}
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                      Email (optional)
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="email@domain.com"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                    />
+                  </div>
 
-                    {/* Anonymous Checkbox */}
-                    <div className="flex items-center">
-                      <input
-                        id="anonymous"
-                        type="checkbox"
-                        checked={anonymous}
-                        onChange={(e) => setAnonymous(e.target.checked)}
-                        className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                      />
-                      <label htmlFor="anonymous" className="ml-2 text-sm text-gray-700">
-                        Submit anonymously
-                      </label>
-                    </div>
+                  {/* Anonymous Checkbox */}
+                  <div className="flex items-center">
+                    <input
+                      id="anonymous"
+                      type="checkbox"
+                      checked={anonymous}
+                      onChange={(e) => setAnonymous(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                    />
+                    <label htmlFor="anonymous" className="ml-2 text-sm text-gray-700">
+                      Submit anonymously
+                    </label>
+                  </div>
 
-                    {/* Actions */}
-                    <div className="flex justify-end gap-3 pt-4">
-                      <button
-                        type="button"
-                        onClick={closeFeedback}
-                        className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200"
-                      >
-                        Submit
-                      </button>
-                    </div>
-                  </form>
-                )}
-              </div>
+                  {/* Actions */}
+                  <div className="flex justify-end gap-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={closeFeedback}
+                      className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </div>
-      )}
+      </div>
+    )}
     </>
   );
 }
