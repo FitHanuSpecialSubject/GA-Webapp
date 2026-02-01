@@ -11,7 +11,6 @@ import {
   FaBookOpen,
   FaChalkboardTeacher,
   FaCodeBranch,
-  FaEnvelope,
   FaExternalLinkAlt,
   FaFlask,
   FaGithub,
@@ -23,9 +22,6 @@ import {
 // Intro image (lab/office). You can swap this URL anytime.
 const HERO_IMAGE_URL =
   "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=2340";
-
-// Admin email for feedback/contact.
-const ADMIN_EMAIL = "ngoctb@hanu.vn";
 
 /**
  * MOEA Framework Icon: Subtle converging arrows (evolutionary / Pareto front theme)
@@ -392,30 +388,6 @@ export default function Home() {
     </section>
       </main>
 
-      {/* ============================= */}
-      {/* 3) Footer Section (compact) */}
-      {/* ============================= */}
-      <footer className="bg-gray-900 text-white/90">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 py-3">
-          <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-10 text-sm sm:text-base text-white/75">
-            <span className="text-white/85">
-              &copy; {new Date().getFullYear()} MOEAs Platform
-            </span>
-            <span className="hidden sm:inline text-white/40">•</span>
-            <span className="text-center">
-              Địa chỉ: Đại học Hà Nội, Km9 Nguyễn Trãi, Thanh Xuân, Hà Nội
-            </span>
-            <span className="hidden sm:inline text-white/40">•</span>
-            <a
-              href={`mailto:${ADMIN_EMAIL}`}
-              className="inline-flex items-center gap-2 text-white hover:text-white"
-            >
-              <FaEnvelope className="text-white/70" aria-hidden />
-              Liên hệ: {ADMIN_EMAIL}
-            </a>
-          </div>
-        </div>
-      </footer>
     </div>
 
     {/* Feedback Modal (Custom Tailwind Modal) */}
