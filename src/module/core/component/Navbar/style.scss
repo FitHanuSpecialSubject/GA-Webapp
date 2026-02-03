@@ -1,90 +1,107 @@
+/* Slim, compact dark navbar with neon DNA logo */
+
 .Navbar {
   position: sticky;
   top: 0;
   z-index: 1030;
-  padding: 0;
+  height: 54px;
   margin: 0;
-  background: #20262e;
-  color: white;
+  padding: 0;
+  background: #000;
+  color: #e5e7eb;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Inter", sans-serif;
 
-  .container {
+  .Navbar__inner {
+    width: 100%;
     max-width: 1200px;
     display: flex;
     justify-content: space-between;
-    padding: 15px 30px;
     align-items: center;
-    margin: 0 auto;
-
-    .logo-moea-icon {
-      width: 36px;
-      height: 36px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 10px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 10px 18px rgba(0, 0, 0, 0.22);
-      flex-shrink: 0;
-    }
-
-    .app-title {
-      line-height: 1.1;
-    }
-
-    .app-name {
-      font-size: 1.3rem;
-      cursor: pointer;
-      // font-weight: bold;
-    }
-
-    .nav-item-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-radius: 5px;
-
-      // width: 200px;
-      // background: red;
-
-      .nav-item {
-        margin: 0 10px;
-        cursor: pointer;
-        padding: 3px 10px;
-        font-size: 12px;
-        text-decoration: none;
-        color: white;
-      }
-
-      .highlight {
-        color: white;
-        background-color: #20262e;
-      }
-    }
+    padding-inline: 18px; // tight horizontal padding
+    position: relative;
   }
-}
 
-.app-info {
-  background: white;
-  color: #20262e;
-  max-width: 1200px;
-  display: flex;
-  padding: 15px 30px;
-  align-items: center;
-  margin: 0 auto;
-  gap: 15px;
-
-  .moea-brand-text {
+  .Navbar__brand {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    font-style: italic;
-    font-size: 13px;
-    color: #4b5563;
+    text-decoration: none;
   }
 
-  .moea-svg {
-    flex-shrink: 0;
+  .Navbar__brand-logo {
+    width: 30px;
+    height: 30px;
+    display: block;
+  }
+
+  .Navbar__brand-text {
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #f9fafb;
+    white-space: nowrap;
+  }
+
+  .Navbar__nav {
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px; // subtle gaps between items and dots
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .Navbar__link {
+    color: #9ca3af;
+    text-decoration: none;
+    padding: 0 3px; // minimal padding: no wasted space
+    position: relative;
+    transition:
+      color 140ms ease-out,
+      text-shadow 140ms ease-out;
+
+    &:hover {
+      color: #e5f9ff;
+      text-shadow:
+        0 0 8px rgba(56, 189, 248, 0.7),
+        0 0 14px rgba(34, 211, 238, 0.6);
+    }
+
+    &:focus-visible {
+      outline: none;
+      color: #f9fafb;
+      text-shadow: 0 0 0 1px rgba(56, 189, 248, 0.9);
+    }
+  }
+
+  .Navbar__link--active {
+    color: #e5f9ff;
+    text-shadow:
+      0 0 8px rgba(56, 189, 248, 0.7),
+      0 0 18px rgba(34, 211, 238, 0.75);
+  }
+
+  .Navbar__dot {
+    color: #111827;
+    font-size: 10px;
+    user-select: none;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline: 20%;
+    bottom: 0;
+    height: 1px;
+    background: radial-gradient(circle, #22d3ee 0, transparent 60%);
+    opacity: 0.45;
+    pointer-events: none;
   }
 }

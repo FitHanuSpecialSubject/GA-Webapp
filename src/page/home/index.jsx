@@ -8,14 +8,10 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  FaBookOpen,
-  FaChalkboardTeacher,
   FaCodeBranch,
   FaExternalLinkAlt,
-  FaFlask,
   FaGithub,
   FaRegCommentDots,
-  FaRegFileAlt,
   FaTimes,
 } from "react-icons/fa";
 
@@ -59,9 +55,6 @@ export default function Home() {
   const [formSuccess, setFormSuccess] = useState(false);
 
   const pagePath = useMemo(() => window.location.pathname, []);
-
-  const scrollToUsage = () =>
-    document.getElementById("usage")?.scrollIntoView({ behavior: "smooth" });
 
   const openFeedback = () => {
     setFormError("");
@@ -161,124 +154,30 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* CTA */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-center">
-                <button
-                  onClick={scrollToUsage}
-                  className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 text-white font-semibold shadow-md hover:bg-indigo-700 hover:shadow-lg hover:scale-[1.02] transition-all"
-                >
-                  See how to use
-                </button>
-                <Link
-                  to="/guide"
-                  className="inline-flex items-center justify-center rounded-xl border-2 border-indigo-600 bg-white px-6 py-3 text-indigo-600 font-semibold hover:bg-indigo-50 transition-all"
-                >
-                  Open guide
-                </Link>
-              </div>
-
-              {/* Key highlights (clean, balanced cards) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-3 items-stretch text-left">
-                {/* Research-ready */}
-                <div className="h-full rounded-2xl border border-gray-200/70 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-3">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
-                      <FaFlask className="text-[18px]" />
-                    </span>
-                    <p className="text-base font-semibold text-gray-900">Research-ready</p>
-                  </div>
-
-                  <ol className="mt-4 space-y-2 text-gray-600 text-sm leading-relaxed">
-                    <li className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-[11px] font-bold">
-                        1
-                      </span>
-                      <span>Run experiments</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-[11px] font-bold">
-                        2
-                      </span>
-                      <span>Compare configurations</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-[11px] font-bold">
-                        3
-                      </span>
-                      <span>Record results for papers, reports, or theses</span>
-                    </li>
-                  </ol>
-                </div>
-
-                {/* Teaching-friendly */}
-                <div className="h-full rounded-2xl border border-gray-200/70 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-3">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
-                      <FaChalkboardTeacher className="text-[18px]" />
-                    </span>
-                    <p className="text-base font-semibold text-gray-900">Teaching-friendly</p>
-                  </div>
-
-                  <ol className="mt-4 space-y-2 text-gray-600 text-sm leading-relaxed">
-                    <li className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-[11px] font-bold">
-                        1
-                      </span>
-                      <span>Clear step-by-step flow</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-[11px] font-bold">
-                        2
-                      </span>
-                      <span>From input → solver → results</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-[11px] font-bold">
-                        3
-                      </span>
-                      <span>Suitable for classroom demonstrations</span>
-                    </li>
-                  </ol>
-                </div>
-              </div>
-
-              {/* Installation / setup mini guide */}
-              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
-                <div className="flex items-center gap-2">
-                  <FaRegFileAlt className="text-indigo-600" />
-                  <h2 className="text-xl font-bold text-gray-900">Quick start</h2>
-                </div>
-                <ol className="list-decimal pl-6 space-y-2 text-gray-600 leading-relaxed">
-                  <li>Open <span className="font-semibold text-gray-800">Guide</span> to download templates (Excel) and read the input conventions.</li>
-                  <li>Fill in your data and upload it to the corresponding solver page.</li>
-                  <li>Select algorithms/parameters, run the solver, and inspect results (optionally compare in Insights).</li>
-                </ol>
-              </div>
-
               {/* Reference links */}
               <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h3 className="text-lg font-bold text-gray-900 mb-3">References</h3>
-                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <a
                     href="http://moeaframework.org/"
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="inline-flex items-center justify-center sm:justify-start gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     <FaExternalLinkAlt className="text-gray-500" />
                     MOEA Framework
                   </a>
                   <Link
                     to="/insights"
-                    className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="inline-flex items-center justify-center sm:justify-start gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                   >
-                    Insights / Experiments
+                    Input Format
                   </Link>
                   <Link
                     to="/guide"
-                    className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="inline-flex items-center justify-center sm:justify-start gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                   >
-                    Guide / Input format
+                    Guide
                   </Link>
                 </div>
               </div>
@@ -286,106 +185,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* ============================= */}
-      {/* 2) Usage & Reference Section */}
-      {/* ============================= */}
-      <section id="usage" className="bg-gray-50 py-16 px-6 md:px-12 lg:px-20">
-  <div className="max-w-7xl mx-auto">
-    <div className="max-w-3xl mx-auto text-center">
-      <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
-        How to use the platform (study & research)
-      </h2>
-      <p className="mt-4 text-lg text-gray-600 leading-relaxed">
-        A simple workflow: prepare input → run the solver → inspect results → record and compare experiments.
-      </p>
-    </div>
-
-    <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* For learning */}
-      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex items-center gap-3">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-700">
-            <FaBookOpen />
-          </span>
-          <h3 className="text-xl font-bold text-gray-900">For study</h3>
-        </div>
-        <ol className="mt-6 space-y-4">
-          <li className="flex gap-3">
-            <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-bold">1</span>
-            <p className="text-gray-600 leading-relaxed">
-              Start in <span className="font-semibold text-gray-800">Guide</span> to learn the input format and download templates.
-            </p>
-          </li>
-          <li className="flex gap-3">
-            <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-bold">2</span>
-            <p className="text-gray-600 leading-relaxed">
-              Try a small case first (few players/agents) to understand the algorithm's behavior.
-            </p>
-          </li>
-          <li className="flex gap-3">
-            <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-bold">3</span>
-            <p className="text-gray-600 leading-relaxed">
-              Interpret the results using theory (Nash / stability / optimality) and compare scenarios.
-            </p>
-          </li>
-        </ol>
-        <div className="mt-6 flex flex-wrap gap-3 justify-center">
-          <Link
-            to="/input"
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white font-semibold hover:bg-indigo-700 transition-colors"
-          >
-            Start with Game Theory
-          </Link>
-          <Link
-            to="/matching-theory/input"
-            className="inline-flex items-center gap-2 rounded-xl border-2 border-indigo-600 bg-white px-4 py-2 text-indigo-600 font-semibold hover:bg-indigo-50 transition-colors"
-          >
-            Matching Problem
-          </Link>
-        </div>
-      </div>
-
-      {/* For research */}
-      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex items-center gap-3">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-700">
-            <FaFlask />
-          </span>
-          <h3 className="text-xl font-bold text-gray-900">For research</h3>
-        </div>
-        <ol className="mt-6 space-y-4">
-          <li className="flex gap-3">
-            <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-bold">1</span>
-            <p className="text-gray-600 leading-relaxed">
-              Use <span className="font-semibold text-gray-800">Data Generator</span> to create reproducible benchmark datasets.
-            </p>
-          </li>
-          <li className="flex gap-3">
-            <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-bold">2</span>
-            <p className="text-gray-600 leading-relaxed">
-              Run multiple configurations and record metrics (runtime, stability, optimality—depending on the problem).
-            </p>
-          </li>
-          <li className="flex gap-3">
-            <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-bold">3</span>
-            <p className="text-gray-600 leading-relaxed">
-              Consolidate results in <span className="font-semibold text-gray-800">Insights</span> for comparisons and reporting.
-            </p>
-          </li>
-        </ol>
-        <div className="mt-6 flex justify-center">
-          <Link
-            to="/generator"
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white font-semibold hover:bg-indigo-700 transition-colors"
-          >
-            Open Data Generator
-          </Link>
-        </div>
-      </div>
-    </div>
-  </div>
-    </section>
       </main>
 
     </div>

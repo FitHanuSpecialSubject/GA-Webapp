@@ -59,6 +59,10 @@ function App() {
               {GameTheoryRouter}
               {DataGeneratorRouter}
               <Route
+                path    = {AppRoutes.Home}
+                element = {<HomePage />}
+              />
+              <Route
                 path    = {AppRoutes.Insights}
                 element = {<InsightPage />}
               />
