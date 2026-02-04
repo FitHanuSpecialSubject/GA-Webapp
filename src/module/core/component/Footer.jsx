@@ -14,18 +14,20 @@ export default function Footer() {
                 MOEAs Platform
               </span>
             </div>
-            <div className="text-sm text-white/75 sm:text-right leading-tight">
-              <p className="text-white/90 font-semibold">Contact</p>
-              <a
-                href={`mailto:${ADMIN_EMAIL}`}
-                className="block text-white hover:text-white/90"
-              >
-                {ADMIN_EMAIL}
-              </a>
+            <div className="text-sm text-white/75 leading-tight">
+              <div className="flex flex-wrap items-center gap-x-1 gap-y-1">
+                <span className="text-white/90 font-semibold">Contact:</span>
+                <a
+                  href={`mailto:${ADMIN_EMAIL}`}
+                  className="text-white hover:text-white/90"
+                >
+                  {ADMIN_EMAIL}
+                </a>
+              </div>
               <p>Hanoi University, Km9 Nguyen Trai, Thanh Xuan, Hanoi, Vietnam</p>
             </div>
           </div>
-          <div className="h-px bg-white/10" />
+          <div className="h-px bg-white/20" />
           <div className="text-center text-xs sm:text-sm text-white/70 leading-tight">
             &copy; {new Date().getFullYear()} MOEAs Platform. All rights reserved.
           </div>
