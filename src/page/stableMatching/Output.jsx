@@ -319,7 +319,7 @@ export default function MatchingOutputPage() {
         message={loadingMessage}
       />
       <br />
-      <p className="below-headertext">Optimal solution</p>
+      <p className="below-headertext">Solution</p>
       <div className="output-container">
         <div className="param-box">
           <ParamSettingBox
@@ -335,11 +335,16 @@ export default function MatchingOutputPage() {
             setRunCountParam={setRunCountParam}
           />
           <div
-            className="align-self-center btn btn-outline-primary d-flex justify-content-center border-1 p-3"
+            className="align-self-center btn btn-outline-primary d-flex flex-column align-items-center justify-content-center border-1 p-3"
             onClick={handleGetMoreInsights}
           >
-            <FaChartLine className="me-0 fs-4" />
-            Get more insights
+            <div className="d-flex align-items-center justify-content-center gap-2">
+              <FaChartLine className="me-0 fs-4" />
+              <span>Insights & Analysis</span>
+            </div>
+            <div className="small text-muted mt-1 text-center">
+              Generate comparison charts, convergence plots, stability metrics
+            </div>
           </div>
         </div>
 

@@ -8,6 +8,7 @@ import { exportInsights } from "../utils/excel_utils";
 import InsightsTable from "../module/core/component/InsightsTable";
 import { FaRegFileExcel } from "react-icons/fa6";
 import RuntimeGraphSelector from "../module/core/component/RuntimeGraphSelector";
+import ResultSummaryTable from "../module/core/component/ResultSummaryTable";
 
 export default function InsightPage() {
   const { appData } = useContext(DataContext);
@@ -28,6 +29,13 @@ export default function InsightPage() {
     return <NothingToShow />;
   }
 
+  const gameTheoryResults =
+    appData?.insights?.data?.gameTheoryResults ?? appData?.gameTheoryResults;
+  const stabilityReference =
+    appData?.insights?.data?.stabilityReference ?? appData?.stabilityReference;
+
+  const isStableMatching = !!appData.problemType;
+
   return (
     <div className="insight-page">
       <div className="text-center small px-5">
@@ -40,6 +48,20 @@ export default function InsightPage() {
       >
         <FaRegFileExcel className="me-0 fs-4" />
         Export Result
+      </div>
+
+      <div className="result-summary-table">
+        {isStableMatching ? (
+          <ResultSummaryTable
+            mode="stableMatching"
+            stabilityReference={stabilityReference}
+          />
+        ) : (
+          <ResultSummaryTable
+            mode="gameTheory"
+            gameTheoryResults={gameTheoryResults}
+          />
+        )}
       </div>
       <div className="fitness-table">
         <InsightsTable fitnessValues={appData.insights.data.fitnessValues} />
