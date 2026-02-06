@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import "../../module/stableMatching/css/output.scss";
+import "../../module/core/asset/css/solve-charts.scss";
 import { useContext, useState } from "react";
 import DataContext from "../../module/core/context/DataContext";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +25,7 @@ import ExcelJS from "exceljs";
 import { RESULT_WORKBOOK } from "../../const/excel_const";
 import { FaChartLine } from "react-icons/fa6";
 import { SMT } from "../../consts.js";
+import StableMatchingCharts from "../../module/core/component/SolveCharts/StableMatchingCharts";
 
 let stompClient = null;
 export default function MatchingOutputPage() {
@@ -45,11 +47,13 @@ export default function MatchingOutputPage() {
   const [selectedSet, setSelectedSet] = useState("all");
   const [runCountParam, setRunCountParam] = useState(SMT.DEFAULT_RUN_COUNT_PARAM);
 
+  if (appData == null) {
+    return <NothingToShow />;
+  }
+
   useEffect(() => {
-    if (appData == null) {
-      return <NothingToShow />;
-    }
-  }, []);
+    setFavicon("success");
+  }, [setFavicon]);
   const problemType = appData.problemType ?? SMT.DEFAULT_PROBLEM_TYPE;
   const matchesArray = appData.result.data.matches.matches;
   const leftOversArray = appData.result.data.matches.leftOvers;
@@ -351,6 +355,11 @@ export default function MatchingOutputPage() {
           <p>Runtime: {runtime} ms</p>
         </div>
       </div>
+
+      <StableMatchingCharts
+        result={appData.result?.data}
+        problemName={appData.problem?.nameOfProblem || appData.problem?.name}
+      />
       <div className="view-1" style={{ display: "block" }}>
         <div className="d-flex">
           <Button
