@@ -1,0 +1,526 @@
+// MOEA Platform — Minimalist academic-tech, full width
+// Colors: purple #6b46c1, blue #4299e1
+$purple: #6b46c1;
+$purple-light: #9f7aea;
+$blue: #4299e1;
+$blue-light: #63b3ed;
+$white: #ffffff;
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-600: #4b5563;
+$gray-800: #1f2937;
+
+.homepage-moea {
+  width: 100%;
+  min-height: 100vh;
+  background: $white;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.section-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $gray-800;
+  text-align: center;
+  margin: 0 0 3rem 0;
+  letter-spacing: -0.02em;
+}
+
+// —— 1. Hero ——
+.hero {
+  position: relative;
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-color: $gray-100;
+  background-image: var(--hero-bg-image);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba($white, 0.97) 0%,
+    rgba($purple, 0.04) 50%,
+    rgba($blue, 0.06) 100%
+  );
+  pointer-events: none;
+}
+
+.hero-floats {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hero-float {
+  position: absolute;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $purple;
+  opacity: 0.2;
+  white-space: nowrap;
+
+  &--1 { top: 18%; left: 12%; animation: float 14s ease-in-out infinite; }
+  &--2 { top: 22%; right: 15%; animation: float 16s ease-in-out infinite 1s; color: $blue; }
+  &--3 { top: 55%; left: 8%; animation: float 12s ease-in-out infinite 2s; }
+  &--4 { top: 60%; right: 10%; animation: float 15s ease-in-out infinite 0.5s; color: $blue; }
+  &--5 { top: 78%; left: 20%; animation: float 13s ease-in-out infinite 2.5s; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(8px, -10px) scale(1.02); }
+  66% { transform: translate(-6px, 6px) scale(0.98); }
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  text-align: center;
+}
+
+.hero-title {
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 800;
+  color: $gray-800;
+  line-height: 1.15;
+  margin: 0 0 1.25rem 0;
+  letter-spacing: -0.03em;
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  line-height: 1.65;
+  color: $gray-600;
+  max-width: 700px;
+  margin: 0 auto 2.5rem auto;
+}
+
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-hero {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &--primary {
+    background: linear-gradient(135deg, $purple 0%, darken($purple, 6%) 100%);
+    color: $white;
+    box-shadow: 0 4px 14px rgba($purple, 0.4);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba($purple, 0.45);
+    }
+  }
+
+  &--secondary {
+    background: $white;
+    color: $purple;
+    border: 2px solid rgba($purple, 0.4);
+
+    &:hover {
+      background: rgba($purple, 0.06);
+      border-color: $purple;
+    }
+  }
+}
+
+.hero-cta-icon {
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+// —— 2. About — 4 cards (glassmorphism / soft neumorphism) ——
+.about-section {
+  padding: 5rem 0;
+  background: linear-gradient(180deg, $gray-50 0%, $white 100%);
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.75rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card-glass {
+  background: rgba($white, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid rgba($white, 0.9);
+  box-shadow:
+    0 4px 24px rgba($purple, 0.06),
+    inset 0 1px 0 rgba($white, 0.9);
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba($purple, 0.1);
+  }
+
+  .card-glass-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba($purple, 0.12) 0%, rgba($blue, 0.12) 100%);
+    color: $purple;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    margin-bottom: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: $gray-800;
+    margin: 0 0 0.6rem 0;
+  }
+
+  p {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: $gray-600;
+    margin: 0;
+
+    a {
+      color: $purple;
+      font-weight: 600;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// —— 3. Optimization Tools — 3 large cards ——
+.tools-section {
+  padding: 5rem 0;
+  background: $white;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card-tool {
+  background: $white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  border: 1px solid $gray-200;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 10px 20px -5px rgba($purple, 0.06);
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+
+  &:hover {
+    transform: translateY(-6px);
+    border-color: rgba($purple, 0.3);
+    box-shadow: 0 20px 40px -10px rgba($purple, 0.15);
+  }
+
+  .card-tool-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, $purple 0%, $blue 100%);
+    color: $white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: $gray-800;
+    margin: 0 0 0.75rem 0;
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: $gray-600;
+    margin: 0 0 1.25rem 0;
+  }
+}
+
+.card-tool-link {
+  font-size: 1rem;
+  font-weight: 600;
+  color: $purple;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+
+  &:hover {
+    color: $blue;
+    text-decoration: underline;
+  }
+}
+
+// —— 4. How to Use — horizontal timeline ——
+.howto-section {
+  padding: 5rem 0;
+  background: linear-gradient(180deg, $gray-50 0%, $white 100%);
+}
+
+.howto-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 40px;
+    left: 12.5%;
+    right: 12.5%;
+    height: 2px;
+    background: linear-gradient(90deg, rgba($purple, 0.3), rgba($blue, 0.3));
+    border-radius: 1px;
+    z-index: 0;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr 1fr;
+
+    &::before {
+      display: none;
+    }
+  }
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.howto-step {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 1rem 0;
+
+  .howto-step-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.25rem auto;
+    border-radius: 50%;
+    background: $white;
+    border: 2px solid rgba($purple, 0.2);
+    color: $purple;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    box-shadow: 0 4px 20px rgba($purple, 0.08);
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $gray-800;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: $gray-600;
+    margin: 0;
+  }
+}
+
+// —— 5. Designed For — 3 icons ——
+.designed-section {
+  padding: 5rem 0;
+  background: $white;
+}
+
+.designed-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card-designed {
+  text-align: center;
+  padding: 2rem 1.5rem;
+
+  .card-designed-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 1.25rem auto;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba($blue, 0.1) 0%, rgba($purple, 0.1) 100%);
+    color: $blue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.9rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: $gray-800;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: $gray-600;
+    margin: 0;
+  }
+}
+
+// —— 6. Footer — university feel ——
+.homepage-footer-moea {
+  background: linear-gradient(180deg, $gray-100 0%, darken($gray-100, 2%) 100%);
+  padding: 3rem 2rem 2rem;
+  border-top: 1px solid $gray-200;
+}
+
+.footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.footer-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.footer-brand-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $gray-800;
+  letter-spacing: -0.02em;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3rem;
+  margin-bottom: 2rem;
+}
+
+.footer-block {
+  max-width: 320px;
+  text-align: center;
+
+  h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $gray-800;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: $gray-600;
+    margin: 0;
+  }
+}
+
+.footer-email {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: $purple;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.footer-bottom {
+  padding-top: 1.5rem;
+  border-top: 1px solid $gray-200;
+}
+
+.footer-moea-link {
+  font-size: 0.85rem;
+  color: $gray-600;
+  text-decoration: none;
+
+  &:hover {
+    color: $purple;
+    text-decoration: underline;
+  }
+}

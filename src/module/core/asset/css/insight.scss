@@ -5,6 +5,89 @@
   justify-content: center;
   align-items: center;
 
+  .result-summary-table {
+    min-width: 800px;
+    width: fit-content;
+    max-width: 1000px;
+    overflow-x: auto;
+  }
+
+  .result-summary-card {
+    background: #f0f0f0;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: left;
+  }
+
+  .result-summary-header {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .result-summary-subtitle {
+    font-size: 12px;
+    color: #444;
+    margin-bottom: 12px;
+  }
+
+  .result-summary-table-wrap {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .result-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e6e6e6;
+      vertical-align: middle;
+    }
+
+    thead th {
+      font-size: 12px;
+      text-transform: none;
+      letter-spacing: 0.2px;
+      background: #fafafa;
+      border-bottom: 1px solid #e6e6e6;
+    }
+
+    .metric-cell {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .value-cell {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .explanation-cell {
+      color: #333;
+    }
+
+    .section-row td {
+      background: #f7f7f7;
+      border-bottom: 1px solid #e6e6e6;
+      padding: 10px 12px;
+    }
+
+    .section-title {
+      font-weight: 700;
+    }
+
+    .section-note {
+      display: inline-block;
+      margin-left: 10px;
+      font-size: 12px;
+      color: #555;
+    }
+  }
+
   .problem-name {
     font-size: 20px;
     color: #000;
@@ -43,21 +126,198 @@
     min-width: 800px;
     width: fit-content;
     max-width: 90%;
-    overflow-x: scroll;
-    background: #f0f0f0;
-    padding: 20px;
-    border-radius: 10px;
+    overflow-x: auto;
+    background: #f5f5f5;
+    padding: 24px;
+    border-radius: 12px;
     text-align: center;
 
-    table {
-      background: white;
+    .insights-table-wrapper {
+      width: 100%;
+    }
 
-      td,
-      th {
-        padding: 10px;
-        border: 1px solid black;
+    /* Ranking Legend */
+    .ranking-legend {
+      text-align: left;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+
+      .ranking-legend-title {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+        color: #333;
+      }
+
+      .ranking-legend-items {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .ranking-legend-color {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        vertical-align: middle;
+      }
+
+      .ranking-legend-label {
+        font-size: 13px;
+        color: #555;
+      }
+
+      .ranking-legend-arrow {
+        color: #999;
+        font-size: 13px;
+        margin: 0 2px;
+      }
+
+      .ranking-legend-note {
+        font-size: 12px;
+        color: #888;
+        margin-top: 8px;
+        font-style: italic;
+      }
+    }
+
+    /* Table */
+    .insights-ranked-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #ddd;
+
+      th,
+      td {
+        padding: 10px 14px;
+        border: 1px solid #ddd;
         text-align: center;
-        width: fit-content;
+        font-size: 14px;
+      }
+
+      .iter-col {
+        background: white;
+        font-weight: 600;
+        width: 80px;
+        color: #333;
+      }
+
+      .algo-header {
+        vertical-align: top;
+        min-width: 140px;
+        transition: box-shadow 0.2s;
+
+        &:hover {
+          box-shadow: inset 0 0 0 2px #333;
+        }
+
+        &.selected {
+          box-shadow: inset 0 0 0 2px #28a745;
+        }
+
+        .algo-name {
+          font-weight: 700;
+          font-size: 15px;
+          margin-bottom: 6px;
+          color: #222;
+        }
+
+        .algo-badges {
+          display: flex;
+          gap: 4px;
+          flex-wrap: wrap;
+          justify-content: center;
+          margin-bottom: 6px;
+        }
+
+        .badge {
+          display: inline-block;
+          padding: 2px 8px;
+          border-radius: 10px;
+          font-size: 11px;
+          font-weight: 600;
+          color: white;
+        }
+
+        .rank-badge {
+          color: white;
+        }
+
+        .best-badge {
+          background: #28a745;
+          color: white;
+        }
+
+        .worst-badge {
+          background: #dc3545;
+          color: white;
+        }
+
+        .selected-badge {
+          background: #007bff;
+          color: white;
+        }
+
+        .algo-avg {
+          font-size: 13px;
+          font-weight: 600;
+          color: #444;
+        }
+      }
+
+      .max-value {
+        color: #dc3545;
+        font-weight: 700;
+      }
+    }
+
+    /* Summary */
+    .insights-summary {
+      text-align: left;
+      margin-top: 16px;
+      padding: 16px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+
+      .insights-summary-title {
+        font-weight: 700;
+        font-size: 16px;
+        margin-bottom: 8px;
+        color: #333;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 8px 0;
+
+        li {
+          font-size: 14px;
+          color: #444;
+          margin-bottom: 4px;
+
+          &::before {
+            content: "• ";
+            color: #333;
+            font-weight: 700;
+          }
+        }
+      }
+
+      .insights-summary-note {
+        font-size: 12px;
+        color: #888;
+        font-style: italic;
       }
     }
   }
@@ -75,6 +335,21 @@
 
     .graph {
       background: white;
+    }
+  }
+
+  @media only screen and (max-width: 900px) {
+    .row,
+    .fitness-table,
+    .runtime-graph,
+    .result-summary-table {
+      min-width: unset;
+      width: 100%;
+      max-width: 95%;
+    }
+
+    .result-summary-table {
+      overflow-x: auto;
     }
   }
 }
