@@ -10,6 +10,7 @@ export default function SpecialPlayerInput({
   specialPlayerPropsNum,
   setSpecialPlayerPropsNum,
   error,
+  onBlur,
 }) {
   const [style, setStyle] = useState("hidden");
 
@@ -36,7 +37,7 @@ export default function SpecialPlayerInput({
           placeholder="You problem name"
           id="special-player-checkbox"
           onChange={(e) => setSpecialPlayerExists(e.target.checked)}
-          value={specialPlayerExists == null ? undefined : specialPlayerExists}
+          checked={Boolean(specialPlayerExists)}
         />
         <p id="text">Special player exists</p>
       </label>
@@ -49,6 +50,7 @@ export default function SpecialPlayerInput({
           handleOnChange={(e) => {
             setSpecialPlayerPropsNum(e.target.value);
           }}
+          onBlur={onBlur}
           value={
             specialPlayerPropsNum == null ? undefined : specialPlayerPropsNum
           }
@@ -60,9 +62,13 @@ export default function SpecialPlayerInput({
   );
 }
 SpecialPlayerInput.propTypes = {
-  specialPlayerExists: PropTypes.string,
+  specialPlayerExists: PropTypes.bool,
   setSpecialPlayerExists: PropTypes.func,
-  specialPlayerPropsNum: PropTypes.number,
+  specialPlayerPropsNum: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
   setSpecialPlayerPropsNum: PropTypes.func,
   error: PropTypes.string,
+  onBlur: PropTypes.func,
 };

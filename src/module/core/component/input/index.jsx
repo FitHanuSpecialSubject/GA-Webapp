@@ -9,6 +9,7 @@ export default function Input({
   message,
   error,
   handleOnChange,
+  onBlur,
   value,
   description,
   guideSectionIndex,
@@ -28,21 +29,16 @@ export default function Input({
     setShowHint(false);
   };
 
-  const internalOnchangeEvent = (e) => {
-    if (Number.isSafeInteger(max) && e.target.value > max) e.target.value = max;
-    if (Number.isSafeInteger(min) && e.target.value < min) e.target.value = min;
-    handleOnChange(e);
-  };
-
   return (
-    <>
+    <div className="input-field">
       <div className={`input ${style}`}>
         <input
           min={min}
           max={max}
           type={inputType}
           placeholder={message}
-          onChange={internalOnchangeEvent}
+          onChange={handleOnChange}
+          onBlur={onBlur}
           value={value == null ? undefined : value}
           className="pe-2"
         />
@@ -59,7 +55,8 @@ export default function Input({
           description={description}
         />
       </div>
-    </>
+      {error ? <p className="input-error-text">{error}</p> : null}
+    </div>
   );
 }
 
@@ -68,6 +65,7 @@ Input.propTypes = {
   message: PropTypes.string,
   error: PropTypes.string,
   handleOnChange: PropTypes.func,
+  onBlur: PropTypes.func,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   description: PropTypes.string,
   guideSectionIndex: PropTypes.number,

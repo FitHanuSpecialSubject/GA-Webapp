@@ -258,7 +258,7 @@ export const loadNormalPlayers = async (
     // CHECK IF ALL STRATEGIES HAVE THE SAME NUMBER OF PROPERTIES
     const allStrategiesHaveSameNumOfProps = strategies.every((strategy) => {
       const firstStrategy = strategies[0];
-      return (strategy.properties.length = firstStrategy.properties.length);
+      return strategy.properties.length === firstStrategy.properties.length;
     });
 
     if (!allStrategiesHaveSameNumOfProps) {
