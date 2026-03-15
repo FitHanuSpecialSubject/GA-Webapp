@@ -122,6 +122,7 @@ export default function InputPage() {
       label: "Number of properties of special player",
       value,
       min: 1,
+      max: 20,
     });
   };
 
@@ -146,6 +147,7 @@ export default function InputPage() {
       label: "Default number of strategies",
       value,
       min: 1,
+      max: 100,
     });
 
   const validateFitnessFunctionValue = (value) =>
@@ -560,7 +562,10 @@ export default function InputPage() {
             message="Name of the problem"
             type="text"
             error={problemNameError}
-            handleOnChange={(event) => setProblemName(event.target.value)}
+            handleOnChange={(event) => {
+              setProblemName(event.target.value);
+              setProblemNameError(validateProblemNameValue(event.target.value));
+            }}
             onBlur={() => setProblemNameError(validateProblemNameValue(problemName))}
             value={problemName}
             description="The name should be concise and meaningful, reflecting the nature of the game being analyzed"
@@ -574,6 +579,14 @@ export default function InputPage() {
             specialPlayerPropsNum={specialPlayerPropsNum}
             setSpecialPlayerPropsNum={setSpecialPlayerPropsNum}
             error={specialPlayerPropsNumError}
+            onChange={(event) =>
+              setSpecialPlayerPropsNumError(
+                validateSpecialPlayerPropsNumValue(
+                  event.target.value,
+                  specialPlayerExists,
+                ),
+              )
+            }
             onBlur={() =>
               setSpecialPlayerPropsNumError(
                 validateSpecialPlayerPropsNumValue(
@@ -590,7 +603,10 @@ export default function InputPage() {
             type="number"
             message="Number of normal players"
             error={normalPlayerNumError}
-            handleOnChange={(event) => setNormalPlayerNum(event.target.value)}
+            handleOnChange={(event) => {
+              setNormalPlayerNum(event.target.value);
+              setNormalPlayerNumError(validateNormalPlayerNumValue(event.target.value));
+            }}
             onBlur={() =>
               setNormalPlayerNumError(
                 validateNormalPlayerNumValue(normalPlayerNum),
@@ -604,9 +620,10 @@ export default function InputPage() {
             message="Number of properties each strategy of normal player"
             type="number"
             error={normalPlayerPropsNumError}
-            handleOnChange={(event) =>
-              setNormalPlayerPropsNum(event.target.value)
-            }
+            handleOnChange={(event) => {
+              setNormalPlayerPropsNum(event.target.value);
+              setNormalPlayerPropsNumError(validateNormalPlayerPropsNumValue(event.target.value));
+            }}
             onBlur={() =>
               setNormalPlayerPropsNumError(
                 validateNormalPlayerPropsNumValue(normalPlayerPropsNum),
@@ -623,7 +640,10 @@ export default function InputPage() {
             message="Default number of strategies"
             type="number"
             error={defaultStrategyError}
-            handleOnChange={(event) => setDefaultStrategy(event.target.value)}
+            handleOnChange={(event) => {
+              setDefaultStrategy(event.target.value);
+              setDefaultStrategyError(validateDefaultStrategyValue(event.target.value));
+            }}
             onBlur={() =>
               setDefaultStrategyError(
                 validateDefaultStrategyValue(defaultStrategy),
@@ -644,7 +664,10 @@ export default function InputPage() {
             message="Fitness function"
             type="text"
             error={fitnessFunctionError}
-            handleOnChange={(event) => setFitnessFunction(event.target.value)}
+            handleOnChange={(event) => {
+              setFitnessFunction(event.target.value);
+              setFitnessFunctionError(validateFitnessFunctionValue(event.target.value));
+            }}
             onBlur={() =>
               setFitnessFunctionError(
                 validateFitnessFunctionValue(fitnessFunction),
@@ -661,9 +684,10 @@ export default function InputPage() {
             message="Player payoff function"
             type="text"
             error={playerPayoffFunctionError}
-            handleOnChange={(event) =>
-              setPlayerPayoffFunction(event.target.value)
-            }
+            handleOnChange={(event) => {
+              setPlayerPayoffFunction(event.target.value);
+              setPlayerPayoffFunctionError(validatePlayerPayoffFunctionValue(event.target.value));
+            }}
             onBlur={() =>
               setPlayerPayoffFunctionError(
                 validatePlayerPayoffFunctionValue(playerPayoffFunction),

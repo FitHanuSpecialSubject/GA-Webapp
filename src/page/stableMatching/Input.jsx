@@ -600,6 +600,9 @@ export default function InputPage() {
   const handleSetNumChange = (event) => {
     const nextValue = event.target.value;
     setSetNum(nextValue);
+    
+    // Add real-time validation
+    setSetNumError(validateSetNumValue(nextValue));
 
     const parsedSetCount = parseIntegerInput(nextValue);
 
@@ -625,6 +628,14 @@ export default function InputPage() {
       nextState[index] = value;
       return nextState;
     });
+    
+    // Add real-time validation
+    const nextError = validateSetIndividualsValue(value, index, totalIndividualsNum);
+    setSetIndividualsErrors((prevState) => {
+      const nextState = [...prevState];
+      nextState[index] = nextError;
+      return nextState;
+    });
   };
 
   const handleSetIndividualsBlur = (index) => {
@@ -645,6 +656,14 @@ export default function InputPage() {
     setSetEvaluateFunctions((prevState) => {
       const nextState = [...prevState];
       nextState[index] = value;
+      return nextState;
+    });
+    
+    // Add real-time validation
+    const nextError = validateSetEvaluateFunctionValue(value, index);
+    setSetEvaluateFunctionsErrors((prevState) => {
+      const nextState = [...prevState];
+      nextState[index] = nextError;
       return nextState;
     });
   };
@@ -779,7 +798,10 @@ export default function InputPage() {
             message="Name of the problem"
             type="text"
             error={problemNameError}
-            handleOnChange={(event) => setProblemName(event.target.value)}
+            handleOnChange={(event) => {
+              setProblemName(event.target.value);
+              setProblemNameError(validateProblemNameValue(event.target.value));
+            }}
             onBlur={handleProblemNameBlur}
             value={problemName}
             description="The name should be concise and meaningful, reflecting the nature of the game being analyzed"
@@ -816,9 +838,10 @@ export default function InputPage() {
             message="Number of characteristics"
             type="number"
             error={characteristicsNumError}
-            handleOnChange={(event) =>
-              setCharacteristicsNum(event.target.value)
-            }
+            handleOnChange={(event) => {
+              setCharacteristicsNum(event.target.value);
+              setCharacteristicsNumError(validateCharacteristicsNumValue(event.target.value));
+            }}
             onBlur={handleCharacteristicsNumBlur}
             value={characteristicsNum}
             description="A characteristic is the requirements and the properties that an individual has that affect their weight during matching"
@@ -829,9 +852,10 @@ export default function InputPage() {
             message="Number of total individuals"
             type="number"
             error={totalIndividualsNumError}
-            handleOnChange={(event) =>
-              setTotalIndividualsNum(event.target.value)
-            }
+            handleOnChange={(event) => {
+              setTotalIndividualsNum(event.target.value);
+              setTotalIndividualsNumError(validateTotalIndividualsValue(event.target.value));
+            }}
             onBlur={handleTotalIndividualsBlur}
             value={totalIndividualsNum}
             description="A positive integer that represents the total number of individuals across all sets"
@@ -845,7 +869,10 @@ export default function InputPage() {
             message="Fitness function"
             type="text"
             error={fitnessFunctionError}
-            handleOnChange={(event) => setFitnessFunction(event.target.value)}
+            handleOnChange={(event) => {
+              setFitnessFunction(event.target.value);
+              setFitnessFunctionError(validateFitnessFunctionValue(event.target.value));
+            }}
             onBlur={handleFitnessFunctionBlur}
             value={fitnessFunction}
             description="The fitness function is a mathematical function that represents the payoff that a player receives for a specific combination of strategies played by all the players in the game"

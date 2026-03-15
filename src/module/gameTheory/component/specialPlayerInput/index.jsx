@@ -11,6 +11,7 @@ export default function SpecialPlayerInput({
   setSpecialPlayerPropsNum,
   error,
   onBlur,
+  onChange,
 }) {
   const [style, setStyle] = useState("hidden");
 
@@ -49,6 +50,7 @@ export default function SpecialPlayerInput({
           error={error}
           handleOnChange={(e) => {
             setSpecialPlayerPropsNum(e.target.value);
+            if (onChange) onChange(e);
           }}
           onBlur={onBlur}
           value={
@@ -71,4 +73,5 @@ SpecialPlayerInput.propTypes = {
   setSpecialPlayerPropsNum: PropTypes.func,
   error: PropTypes.string,
   onBlur: PropTypes.func,
+  onChange: PropTypes.func,
 };
