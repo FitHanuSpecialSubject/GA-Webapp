@@ -66,9 +66,6 @@ export default function InsightPage() {
       </div>
       <div className="fitness-table">
         <InsightsTable fitnessValues={appData.insights.data.fitnessValues} />
-        <p className="figure-description">
-          Comparison of Fitness Values across different algorithms
-        </p>
       </div>
       <div className="runtime-graph">
         <RuntimeGraphSelector data={appData.insights.data} />
