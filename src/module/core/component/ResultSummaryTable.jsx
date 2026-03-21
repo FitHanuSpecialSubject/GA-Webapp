@@ -3,49 +3,24 @@ import PropTypes from "prop-types";
 
 function formatValue(value, fallback = "—") {
   if (value === null || value === undefined || value === "") return fallback;
-  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return parseFloat(value.toFixed(3));
+  }
   return String(value);
 }
 
-export default function ResultSummaryTable({
-  mode = "gameTheory",
-  gameTheoryResults,
-  stabilityReference,
-}) {
+export default function ResultSummaryTable({ mode = "gameTheory", gameTheoryResults, smtResults }) {
   if (mode === "stableMatching") {
-    const smt = stabilityReference ?? {};
-
-    const stabilityRows = [
-      {
-        key: "matchingRate",
-        metric: "Matching Rate (%)",
-        value: formatValue(smt.matchingRate),
-        explanation: "Percentage of users successfully matched.",
-      },
-      {
-        key: "blockingPairs",
-        metric: "Blocking Pairs",
-        value: formatValue(smt.blockingPairs),
-        explanation: "Number of unstable pairs remaining.",
-      },
-      {
-        key: "stabilityScore",
-        metric: "Stability Score",
-        value: formatValue(smt.stabilityScore),
-        explanation: "Overall stability level of the matching.",
-      },
+    const smt = smtResults ?? {};
+    const rows = [
+      { key: "socialWelfare", metric: "Social Welfare", value: formatValue(smt.socialWelfare), explanation: "Total satisfaction achieved by all participants." },
+      { key: "averageRank", metric: "Average Rank", value: formatValue(smt.averageRank), explanation: "Average satisfaction level across all individuals." },
+      { key: "worstCaseRank", metric: "Worst-case Rank", value: formatValue(smt.worstCaseRank), explanation: "Lowest satisfaction among all individuals." },
+      { key: "fairnessIndex", metric: "Fairness Index", value: formatValue(smt.fairnessIndex), explanation: "How evenly satisfaction is distributed (Jain's Index, 0–1, higher = more fair)." },
     ];
-
     return (
       <div className="result-summary-card">
-        <div className="result-summary-header">
-          Result Summary - Stable Matching (Stability Reference)
-        </div>
-        <div className="result-summary-subtitle">
-          (Reference only – detailed stability analysis is shown on the SMT
-          page)
-        </div>
-
+        <div className="result-summary-header">Result Summary – Stable Matching Outcome Quality</div>
         <div className="result-summary-table-wrap">
           <table className="result-summary-table">
             <thead>
@@ -56,7 +31,10 @@ export default function ResultSummaryTable({
               </tr>
             </thead>
             <tbody>
-              {stabilityRows.map((row) => (
+              <tr className="section-row">
+                <td colSpan={3}><span className="section-title">Stable Matching – Outcome Quality</span></td>
+              </tr>
+              {rows.map((row) => (
                 <tr key={row.key}>
                   <td className="metric-cell">{row.metric}</td>
                   <td className="value-cell">{row.value}</td>
@@ -71,40 +49,15 @@ export default function ResultSummaryTable({
   }
 
   const gt = gameTheoryResults ?? {};
-
   const rows = [
-    {
-      key: "averageRank",
-      metric: "Average Rank",
-      value: formatValue(gt.averageRank),
-      explanation: "Average preference level achieved by users.",
-    },
-    {
-      key: "worstCaseRank",
-      metric: "Worst-case Rank",
-      value: formatValue(gt.worstCaseRank),
-      explanation: "Lowest satisfaction among all users.",
-    },
-    {
-      key: "fairnessIndex",
-      metric: "Fairness Index",
-      value: formatValue(gt.fairnessIndex),
-      explanation: "How evenly satisfaction is distributed across users.",
-    },
-    {
-      key: "socialWelfare",
-      metric: "Social Welfare",
-      value: formatValue(gt.socialWelfare),
-      explanation: "Total benefit achieved by all participants.",
-    },
+    { key: "socialWelfare", metric: "Social Welfare", value: formatValue(gt.socialWelfare), explanation: "Total benefit achieved by all participants." },
+    { key: "averageRank", metric: "Average Rank", value: formatValue(gt.averageRank), explanation: "Average preference level achieved by users." },
+    { key: "worstCaseRank", metric: "Worst-case Rank", value: formatValue(gt.worstCaseRank), explanation: "Lowest satisfaction among all users." },
+    { key: "fairnessIndex", metric: "Fairness Index", value: formatValue(gt.fairnessIndex), explanation: "How evenly satisfaction is distributed (Jain's Index, 0–1, higher = more fair)." },
   ];
-
   return (
     <div className="result-summary-card">
-      <div className="result-summary-header">
-        Result Summary - Game Theory outcome quality
-      </div>
-
+      <div className="result-summary-header">Result Summary – Game Theory Outcome Quality</div>
       <div className="result-summary-table-wrap">
         <table className="result-summary-table">
           <thead>
@@ -116,11 +69,7 @@ export default function ResultSummaryTable({
           </thead>
           <tbody>
             <tr className="section-row">
-              <td colSpan={3}>
-                <span className="section-title">
-                  Game Theory – Outcome Quality
-                </span>
-              </td>
+              <td colSpan={3}><span className="section-title">Game Theory – Outcome Quality</span></td>
             </tr>
             {rows.map((row) => (
               <tr key={row.key}>
@@ -139,5 +88,5 @@ export default function ResultSummaryTable({
 ResultSummaryTable.propTypes = {
   mode: PropTypes.oneOf(["gameTheory", "stableMatching"]),
   gameTheoryResults: PropTypes.object,
-  stabilityReference: PropTypes.object,
+  smtResults: PropTypes.object,
 };

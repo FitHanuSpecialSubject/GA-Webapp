@@ -9,6 +9,7 @@ import InsightsTable from "../module/core/component/InsightsTable";
 import { FaRegFileExcel } from "react-icons/fa6";
 import RuntimeGraphSelector from "../module/core/component/RuntimeGraphSelector";
 import ResultSummaryTable from "../module/core/component/ResultSummaryTable";
+import { computeInsightMetricsFromFitnessMap } from "../utils/computeMetrics";
 
 export default function InsightPage() {
   const { appData } = useContext(DataContext);
@@ -29,12 +30,12 @@ export default function InsightPage() {
     return <NothingToShow />;
   }
 
-  const gameTheoryResults =
-    appData?.insights?.data?.gameTheoryResults ?? appData?.gameTheoryResults;
-  const stabilityReference =
-    appData?.insights?.data?.stabilityReference ?? appData?.stabilityReference;
-
   const isStableMatching = !!appData.problemType;
+
+  // Metrics for insights page are computed from the
+  // benchmarking fitness values returned by the backend
+  const fitnessValuesMap = appData.insights?.data?.fitnessValues ?? {};
+  const insightMetrics = computeInsightMetricsFromFitnessMap(fitnessValuesMap);
 
   return (
     <div className="insight-page">
@@ -54,12 +55,12 @@ export default function InsightPage() {
         {isStableMatching ? (
           <ResultSummaryTable
             mode="stableMatching"
-            stabilityReference={stabilityReference}
+            smtResults={insightMetrics}
           />
         ) : (
           <ResultSummaryTable
             mode="gameTheory"
-            gameTheoryResults={gameTheoryResults}
+            gameTheoryResults={insightMetrics}
           />
         )}
       </div>

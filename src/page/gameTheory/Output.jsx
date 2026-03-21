@@ -15,7 +15,6 @@ import {
   createSystemInfoSheet,
   createParameterConfigSheet,
 } from "../../utils/excel_utils.js";
-
 import SockJS from "sockjs-client";
 import { v4 } from "uuid";
 import { over } from "stompjs";
@@ -25,6 +24,7 @@ import { getBackendAddress } from "../../utils/http_utils";
 import { FaChartLine, FaRegFileExcel } from "react-icons/fa6";
 
 let stompClient = null;
+
 export default function OutputPage() {
   const navigate = useNavigate();
   const { appData, setAppData, setFavicon } = useContext(DataContext);
@@ -46,13 +46,13 @@ export default function OutputPage() {
   if (appData == null) {
     return <NothingToShow />;
   }
+
   useEffect(() => {
     setFavicon("success");
   }, []);
 
   const handleExportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
-    // write result data to sheet 1
     const sheet1 = workbook.addWorksheet(RESULT_WORKBOOK.SOLUTION_SHEET_NAME);
     sheet1.addRows([
       ["Fitness value", appData.result.data.fitnessValue],
@@ -60,26 +60,17 @@ export default function OutputPage() {
       ["Runtime (in seconds)", appData.result.data.runtime],
       ["Player name", "Choosen strategy name", "Payoff value"],
     ]);
-
-    // append players data to sheet 1
     appData.result.data.players.forEach((player) => {
-      const row = [player.playerName, player.strategyName, player.payoff];
-      sheet1.addRow(row);
+      sheet1.addRow([player.playerName, player.strategyName, player.payoff]);
     });
-
-    // write parameter configurations to sheet 2
     createParameterConfigSheet(workbook, appData);
-    // write computer specs to sheet 3
     createSystemInfoSheet(workbook, appData);
-    // write workbook to file
     const wbout = await workbook.xlsx.writeBuffer();
     const blob = new Blob([wbout], { type: "application/octet-stream" });
     saveAs(blob, appData.problem.name + "_Result.xlsx");
   };
 
-  const handleGetMoreInsights = () => {
-    setIsShowPopup(true);
-  };
+  const handleGetMoreInsights = () => setIsShowPopup(true);
 
   const handlePopupOk = async () => {
     try {
@@ -97,28 +88,26 @@ export default function OutputPage() {
         maxTime: maxTimeParam,
         runCountPerAlgorithm: runCountParam,
       };
-
       setIsLoading(true);
-      await connectWebSocket(); // connect to websocket to get the progress percentage
+      await connectWebSocket();
       const res = await axios.post(
         `${getBackendAddress()}/api/problem-result-insights/${sessionCode}`,
         body,
       );
       setIsLoading(false);
-
       const insights = {
         data: res.data.data,
         params: {
-          distributedCoreParam: distributedCoreParam,
-          populationSizeParam: populationSizeParam,
-          generationParam: generationParam,
-          maxTimeParam: maxTimeParam,
+          distributedCoreParam,
+          populationSizeParam,
+          generationParam,
+          maxTimeParam,
         },
       };
       setAppData({ ...appData, insights });
       closeWebSocketConnection();
       setFavicon("success");
-      navigate("/insights"); // navigate to insights page
+      navigate("/insights");
     } catch (err) {
       setFavicon("error");
       console.error(err);
@@ -136,6 +125,7 @@ export default function OutputPage() {
     stompClient = over(Sock);
     await stompClient.connect({}, onConnected, onError);
   };
+
   const onConnected = () => {
     stompClient.subscribe(
       "/session/" + sessionCode + "/progress",
@@ -143,27 +133,18 @@ export default function OutputPage() {
     );
   };
 
-  const onError = (err) => {
-    console.error(err);
-    // displayPopup("Something went wrong!", "Connect to server failed!, please contact the admin!", true)
-  };
+  const onError = (err) => console.error(err);
 
   const closeWebSocketConnection = () => {
-    if (stompClient) {
-      stompClient.disconnect();
-    }
+    if (stompClient) stompClient.disconnect();
   };
 
   const onPrivateMessage = (payload) => {
     const payloadData = JSON.parse(payload.body);
-
-    // some return data are to show the progress, some are not
-    // if the data is to show the progress, then it will have the estimated time and percentage
     if (payloadData.inProgress) {
       setLoadingEstimatedTime(payloadData.minuteLeft);
       setLoadingPercentage(payloadData.percentage);
     }
-
     setLoadingMessage(payloadData.message);
   };
 
@@ -176,7 +157,6 @@ export default function OutputPage() {
         message={`This process can take a while do you to continue?`}
         okCallback={handlePopupOk}
       />
-
       <Loading
         isLoading={isLoading}
         percentage={loadingPercentage}
@@ -222,11 +202,9 @@ export default function OutputPage() {
         Get Excel Template
       </div>
       <p className="below-headertext">
-        {" "}
         Fitness value: {appData.result.data.fitnessValue}
       </p>
       <br />
-
       <div className="table-container">
         <div className="grid-container">
           <div className="column head-column">No</div>
@@ -234,7 +212,6 @@ export default function OutputPage() {
           <div className="column head-column">Choosen strategy name</div>
           <div className="column head-column">Payoff value</div>
         </div>
-
         {appData.result.data.players?.map((player, index) => (
           <PlayerResult key={index} player={player} index={index + 1} />
         ))}
