@@ -37,7 +37,7 @@
     .row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       gap: 20px;
       width: 100%;
     }
@@ -111,6 +111,10 @@
 
   .dragging {
     background: var(--grey);
+  }
+
+  .drag-area.file-error {
+    border-color: rgb(186, 7, 7);
   }
 
   .file-error {

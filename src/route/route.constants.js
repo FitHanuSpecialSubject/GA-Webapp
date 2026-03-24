@@ -1,4 +1,7 @@
 const AppRoutes = {
+  // Home
+  Home:                 '/',
+
   // Matching Theory
   MatchingHome:         '/matching-theory/',
   MatchingInput:        '/matching-theory/input',
@@ -6,14 +9,14 @@ const AppRoutes = {
   MatchingResult:       '/matching-theory/result',
 
   // Game Theory
-  GameTheoryHome:       '/',
+  GameTheoryHome:       '/input',
   GameTheoryInput:      '/input',
   GameTheoryGuide:      '/guide',
   GameTheoryProcessing: '/input-processing',
   GameTheoryResult:     '/result',
 
   // Data Generator
-  GeneratorHome:        '/generator/',
+  GeneratorHome:        '/generator',
 
   // Insights
   Insights:            '/insights',

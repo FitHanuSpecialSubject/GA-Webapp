@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 500 500" width="500" height="500">
+    <!-- Nền trong suốt -->
+    
+    
+    <!-- Vòng tròn ngoài bao quanh ADN, chia đôi màu -->
+    <path d="M100,250 A150,150 0 1,1 400,250" stroke="blue" stroke-width="10" fill="none" />
+    <path d="M400,250 A150,150 0 1,1 100,250" stroke="green" stroke-width="10" fill="none" />
+    
+    <!-- Cấu trúc DNA, các vòng bé đan xen chính xác -->
+    <g stroke-width="8" fill="none">
+        <!-- Đường xoắn DNA -->
+        <path d="M220,80 C310,160 310,340 220,420" stroke="blue" />
+        <path d="M280,80 C190,160 190,340 280,420" stroke="green" />
+        
+        <!-- Thanh ngang DNA đan xen -->
+        <line x1="230" y1="100" x2="270" y2="100" stroke="blue" />
+        <line x1="235" y1="150" x2="270" y2="150" stroke="green" />
+        <line x1="220" y1="200" x2="280" y2="200" stroke="blue" />
+        <line x1="220" y1="250" x2="280" y2="250" stroke="green" />
+        <line x1="220" y1="300" x2="280" y2="300" stroke="blue" />
+        <line x1="235" y1="350" x2="270" y2="350" stroke="green" />
+        <line x1="230" y1="400" x2="270" y2="400" stroke="blue" />
+        
+        <!-- Chấm tròn DNA đan xen -->
+        <circle cx="230" cy="100" r="8" fill="blue" />
+        <circle cx="270" cy="100" r="8" fill="green" />
+        <circle cx="230" cy="150" r="8" fill="green" />
+        <circle cx="270" cy="150" r="8" fill="blue" />
+        <circle cx="220" cy="200" r="8" fill="blue" />
+        <circle cx="280" cy="200" r="8" fill="green" />
+        <circle cx="220" cy="250" r="8" fill="green" />
+        <circle cx="280" cy="250" r="8" fill="blue" />
+        <circle cx="220" cy="300" r="8" fill="blue" />
+        <circle cx="280" cy="300" r="8" fill="green" />
+        <circle cx="230" cy="350" r="8" fill="green" />
+        <circle cx="270" cy="350" r="8" fill="blue" />
+        <circle cx="230" cy="400" r="8" fill="blue" />
+        <circle cx="270" cy="400" r="8" fill="green" />
+    </g>
+</svg>
