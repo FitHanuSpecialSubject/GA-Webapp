@@ -1,5 +1,6 @@
 import { MATCHING_PROBLEM_TYPES } from "./matching_types";
 import { ALGORITHMS } from "./algorithm_const";
+import { STABLE_MATCHING_PARAMS_CONFIG, getStableMatchingParamConfig, validateStableMatchingParam, computeStableMatchingDerivedParams } from "./stableMatchingParamsConfig";
 
 export const DEFAULT_ALGORITHM = "NSGAII";
 export const DEFAULT_PROBLEM_TYPE = MATCHING_PROBLEM_TYPES.OTO;
@@ -8,6 +9,9 @@ export const DEFAULT_GENERATION_NUM = 100;
 export const DEFAULT_MAXTIME = 5000;
 export const DEFAULT_SAMPLE_DISPLAY_NUM = 10;
 export const DEFAULT_CORE_NUM = "all";
+
+// Stable Matching Parameters Configuration and utilities
+export { STABLE_MATCHING_PARAMS_CONFIG, getStableMatchingParamConfig, validateStableMatchingParam, computeStableMatchingDerivedParams };
 export const SMT_ALGORITHMS = Object.freeze([
   ALGORITHMS.NSGA2,
   ALGORITHMS.NSGA3,

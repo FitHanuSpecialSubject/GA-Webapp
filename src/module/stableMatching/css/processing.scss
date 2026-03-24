@@ -130,3 +130,37 @@ option {
 .problem-type-text {
   margin-bottom: 10px; /* Khoảng cách giữa văn bản và ô chọn */
 }
+
+.extra-params {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .extra-param-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .extra-param-label {
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .extra-param-input {
+    height: 36px;
+    padding: 5px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 13px;
+    width: 220px;
+
+    &::placeholder {
+      color: #999;
+      font-size: 12px;
+    }
+  }
+}

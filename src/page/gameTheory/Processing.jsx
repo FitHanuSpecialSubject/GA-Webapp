@@ -7,7 +7,7 @@ import axios from "axios";
 import DataContext from "../../module/core/context/DataContext";
 import NothingToShow from "../../module/core/component/NothingToShow";
 import Loading from "../../module/core/component/Loading";
-import ParamSettingBox from "../../module/core/component/ParamSettingBox";
+import AlgorithmConfigurationPanel from "../../module/core/component/AlgorithmConfigurationPanel";
 import PopupContext from "../../module/core/context/PopupContext";
 import { GT_ALGORITHMS } from "../../const/game_theory_const";
 import { axiosErrorHandler, getBackendAddress } from "../../utils/http_utils";
@@ -16,10 +16,7 @@ export default function InputProcessingPage() {
   const { appData, setAppData, setFavicon } = useContext(DataContext);
   const [isLoading, setIsLoading] = useState(false);
   const [algorithm, setAlgorithm] = useState("NSGAII");
-  const [distributedCoreParam, setDistributedCoreParam] = useState("all");
-  const [populationSizeParam, setPopulationSizeParam] = useState(1000);
-  const [generationParam, setGenerationParam] = useState(100);
-  const [maxTimeParam, setMaxTimeParam] = useState(5000);
+  const [algorithmParams, setAlgorithmParams] = useState({});
 
   const { displayPopup } = useContext(PopupContext);
 
@@ -45,10 +42,7 @@ export default function InputProcessingPage() {
         defaultPayoffFunction: appData.problem.playerPayoffFunction,
         conflictSet: appData.problem.conflictSet,
         algorithm: algorithm,
-        distributedCores: distributedCoreParam,
-        populationSize: populationSizeParam,
-        generation: generationParam,
-        maxTime: maxTimeParam,
+        ...algorithmParams,
       };
       setFavicon("running");
       setIsLoading(true);
@@ -62,10 +56,7 @@ export default function InputProcessingPage() {
         data: res.data.data,
         params: {
           usedAlgorithm: usedAlgorithm,
-          distributedCoreParam: distributedCoreParam,
-          populationSizeParam: populationSizeParam,
-          generationParam: generationParam,
-          maxTimeParam: maxTimeParam,
+          ...algorithmParams,
         },
       };
       setAppData({ ...appData, result });
@@ -87,21 +78,13 @@ export default function InputProcessingPage() {
       />
       <h1 className="problem-name">{appData.problem.name}</h1>
 
-      <ParamSettingBox
-        distributedCoreParam={distributedCoreParam}
-        setDistributedCoreParam={setDistributedCoreParam}
-        generationParam={generationParam}
-        setGenerationParam={setGenerationParam}
-        populationSizeParam={populationSizeParam}
-        setPopulationSizeParam={setPopulationSizeParam}
-        maxTimeParam={maxTimeParam}
-        setMaxTimeParam={setMaxTimeParam}
-      />
+
       {algorithm === "PAES" && (
         <p style={{ color: "red", textAlign: "center" }}>
           Population size takes no effect for PAES algorithm
         </p>
       )}
+
       <div className="algo-chooser">
         <p className="algorithm-text bold">Choose an algorithm: </p>
 
@@ -119,6 +102,11 @@ export default function InputProcessingPage() {
           ))}
         </select>
       </div>
+
+      <AlgorithmConfigurationPanel
+        algorithm={algorithm}
+        onParamsChange={setAlgorithmParams}
+      />
 
       <p className="solve-now-btn" onClick={handleSolveNow}>
         Solve now

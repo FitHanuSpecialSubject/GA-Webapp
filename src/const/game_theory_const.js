@@ -1,4 +1,5 @@
 import { ALGORITHMS } from "./algorithm_const";
+import { GAME_THEORY_PARAMS_CONFIG, getGameTheoryParamConfig, validateGameTheoryParam, computeGameTheoryDerivedParams } from "./gameTheoryParamsConfig";
 
 export const GT_ALGORITHMS = Object.freeze([
   ALGORITHMS.NSGA2,
@@ -11,3 +12,6 @@ export const GT_ALGORITHMS = Object.freeze([
   ALGORITHMS.OMOPSO,
   ALGORITHMS.SMPSO,
 ]);
+
+// Game Theory Parameters Configuration and utilities
+export { GAME_THEORY_PARAMS_CONFIG, getGameTheoryParamConfig, validateGameTheoryParam, computeGameTheoryDerivedParams };

@@ -5,7 +5,7 @@ import axios from "axios";
 import DataContext from "../../module/core/context/DataContext";
 import NothingToShow from "../../module/core/component/NothingToShow";
 import Loading from "../../module/core/component/Loading";
-import ParamSettingBox from "../../module/core/component/ParamSettingBox";
+import AlgorithmConfigurationPanel from "../../module/core/component/AlgorithmConfigurationPanel";
 import PopupContext from "../../module/core/context/PopupContext";
 import { SMT, SMT_VALIDATE } from "../../consts";
 import { axiosErrorHandler, getBackendAddress } from "../../utils/http_utils";
@@ -17,21 +17,11 @@ export default function InputProcessingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [algorithmList, setAlgorithmList] = useState(SMT_ALGORITHMS);
   const [algorithm, setAlgorithm] = useState(SMT.DEFAULT_ALGORITHM);
-  const [distributedCoreParam, setDistributedCoreParam] = useState(
-    SMT.DEFAULT_CORE_NUM,
-  );
+  const [algorithmParams, setAlgorithmParams] = useState({});
   const [problemType, setProblemType] = useState(SMT.PROBLEM_TYPES.MTM);
   const [problemTypeOrdinal, setProblemTypeOrdinal] = useState(
     SMT.PROBLEM_TYPES.MTM.ordinal,
   );
-  const [populationSizeParam, setPopulationSizeParam] = useState(
-    SMT.DEFAULT_POPULATION_SIZE,
-  );
-  const [generationParam, setGenerationParam] = useState(
-    SMT.DEFAULT_GENERATION_NUM,
-  );
-  const [maxTimeParam, setMaxTimeParam] = useState(SMT.DEFAULT_MAXTIME);
-  const [runCountParam, setRunCountParam] = useState(SMT.DEFAULT_RUN_COUNT_PARAM);
 
   const { displayPopup } = useContext(PopupContext);
 
@@ -127,10 +117,7 @@ export default function InputProcessingPage() {
         excludePairs: appData.problem.excludePairs,
         evaluateFunctions: evaluateFunctions,
         algorithm: algorithm,
-        distributedCores: distributedCoreParam,
-        populationSize: populationSizeParam,
-        generation: generationParam,
-        maxTime: maxTimeParam,
+        ...algorithmParams,
       };
       const serviceEndpoint = problemType.endpoint;
       const endpoint = `${getBackendAddress()}${serviceEndpoint}`;
@@ -144,10 +131,7 @@ export default function InputProcessingPage() {
         params: {
           runtime: runtime,
           usedAlgorithm: usedAlgorithm,
-          distributedCoreParam: distributedCoreParam,
-          populationSizeParam: populationSizeParam,
-          generationParam: generationParam,
-          maxTimeParam: maxTimeParam,
+          ...algorithmParams,
         },
       };
 
@@ -198,18 +182,8 @@ export default function InputProcessingPage() {
       />
       <h1 className="problem-name">{appData.problem.name}</h1>
 
-      <ParamSettingBox
-        distributedCoreParam={distributedCoreParam}
-        setDistributedCoreParam={setDistributedCoreParam}
-        generationParam={generationParam}
-        setGenerationParam={setGenerationParam}
-        populationSizeParam={populationSizeParam}
-        setPopulationSizeParam={setPopulationSizeParam}
-        maxTimeParam={maxTimeParam}
-        setMaxTimeParam={setMaxTimeParam}
-        runCountParam={runCountParam}
-        setRunCountParam={setRunCountParam}
-      />
+
+
       {algorithm === "PAES" && (
         <p style={{ color: "red", textAlign: "center" }}>
           Population size takes no effect for PAES algorithm
@@ -249,6 +223,11 @@ export default function InputProcessingPage() {
           ))}
         </select>
       </div>
+
+      <AlgorithmConfigurationPanel
+        algorithm={algorithm}
+        onParamsChange={setAlgorithmParams}
+      />
 
       <div>
         <p className="solve-now-btn" onClick={handleSolveNow}>
