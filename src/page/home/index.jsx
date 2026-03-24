@@ -156,26 +156,28 @@ export default function Home() {
 
               {/* Reference links */}
               <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-gray-900 mb-3">References</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  References
+                </h3>
+                <div className="flex flex-col sm:flex-row gap-3">
                   <a
                     href="http://moeaframework.org/"
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center justify-center sm:justify-start gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="flex-1 inline-flex items-center justify-center min-h-[52px] px-4 rounded-xl border border-gray-200 bg-white text-sm sm:text-base font-medium text-gray-800 shadow-sm hover:bg-gray-50 hover:shadow transition-all duration-150"
                   >
-                    <FaExternalLinkAlt className="text-gray-500" />
+                    <FaExternalLinkAlt className="mr-2 text-gray-500" />
                     MOEA Framework
                   </a>
                   <Link
                     to="/insights"
-                    className="inline-flex items-center justify-center sm:justify-start gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="flex-1 inline-flex items-center justify-center min-h-[52px] px-4 rounded-xl border border-gray-200 bg-white text-sm sm:text-base font-medium text-gray-800 shadow-sm hover:bg-gray-50 hover:shadow transition-all duration-150"
                   >
                     Input Format
                   </Link>
                   <Link
                     to="/guide"
-                    className="inline-flex items-center justify-center sm:justify-start gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="flex-1 inline-flex items-center justify-center min-h-[52px] px-4 rounded-xl border border-gray-200 bg-white text-sm sm:text-base font-medium text-gray-800 shadow-sm hover:bg-gray-50 hover:shadow transition-all duration-150"
                   >
                     Guide
                   </Link>
