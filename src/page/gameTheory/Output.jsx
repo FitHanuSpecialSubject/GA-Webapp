@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import "../../module/gameTheory/css/output.scss";
+import "../../module/core/asset/css/solve-charts.scss";
 import PlayerResult from "../../module/gameTheory/component/PlayerResult";
 import { useContext, useState } from "react";
 import DataContext from "../../module/core/context/DataContext";
@@ -22,6 +23,7 @@ import ExcelJS from "exceljs";
 import { RESULT_WORKBOOK } from "../../const/excel_const";
 import { getBackendAddress } from "../../utils/http_utils";
 import { FaChartLine, FaRegFileExcel } from "react-icons/fa6";
+import GameTheoryCharts from "../../module/core/component/SolveCharts/GameTheoryCharts";
 
 let stompClient = null;
 
@@ -205,6 +207,12 @@ export default function OutputPage() {
         Fitness value: {appData.result.data.fitnessValue}
       </p>
       <br />
+
+      <GameTheoryCharts
+        result={appData.result?.data}
+        problemName={appData.problem?.name}
+      />
+
       <div className="table-container">
         <div className="grid-container">
           <div className="column head-column">No</div>
