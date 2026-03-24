@@ -53,7 +53,7 @@
     .row {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 10px;
       width: 100%;
     }
@@ -77,35 +77,9 @@
       text-align: center; // Center-align content in cells
 
       .input-table-data {
-        width: 100%;
         border: none;
         text-align: center;
-        background: transparent;
       }
-
-      .input-table-data-error {
-        outline: 1px solid rgb(186, 7, 7);
-        border-radius: 4px;
-        color: rgb(186, 7, 7);
-      }
-    }
-
-    .table-input-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .table-input-error,
-    .table-summary-error {
-      color: rgb(186, 7, 7);
-      font-size: 12px;
-      margin: 0;
-      text-align: left;
-    }
-
-    .table-summary-error {
-      padding: 10px;
     }
   }
 
@@ -177,10 +151,6 @@
 
   .dragging {
     background: var(--grey);
-  }
-
-  .drag-area.file-error {
-    border-color: rgb(186, 7, 7);
   }
 
   .file-error {

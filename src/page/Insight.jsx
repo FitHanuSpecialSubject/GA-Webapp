@@ -8,8 +8,6 @@ import { exportInsights } from "../utils/excel_utils";
 import InsightsTable from "../module/core/component/InsightsTable";
 import { FaRegFileExcel } from "react-icons/fa6";
 import RuntimeGraphSelector from "../module/core/component/RuntimeGraphSelector";
-import ResultSummaryTable from "../module/core/component/ResultSummaryTable";
-import { computeInsightMetricsFromFitnessMap } from "../utils/computeMetrics";
 
 export default function InsightPage() {
   const { appData } = useContext(DataContext);
@@ -30,13 +28,6 @@ export default function InsightPage() {
     return <NothingToShow />;
   }
 
-  const isStableMatching = !!appData.problemType;
-
-  // Metrics for insights page are computed from the
-  // benchmarking fitness values returned by the backend
-  const fitnessValuesMap = appData.insights?.data?.fitnessValues ?? {};
-  const insightMetrics = computeInsightMetricsFromFitnessMap(fitnessValuesMap);
-
   return (
     <div className="insight-page">
       <div className="text-center small px-5">
@@ -50,22 +41,11 @@ export default function InsightPage() {
         <FaRegFileExcel className="me-0 fs-4" />
         Export Result
       </div>
-
-      <div className="result-summary-table">
-        {isStableMatching ? (
-          <ResultSummaryTable
-            mode="stableMatching"
-            smtResults={insightMetrics}
-          />
-        ) : (
-          <ResultSummaryTable
-            mode="gameTheory"
-            gameTheoryResults={insightMetrics}
-          />
-        )}
-      </div>
       <div className="fitness-table">
         <InsightsTable fitnessValues={appData.insights.data.fitnessValues} />
+        <p className="figure-description">
+          Comparison of Fitness Values across different algorithms
+        </p>
       </div>
       <div className="runtime-graph">
         <RuntimeGraphSelector data={appData.insights.data} />

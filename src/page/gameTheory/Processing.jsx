@@ -11,7 +11,6 @@ import ParamSettingBox from "../../module/core/component/ParamSettingBox";
 import PopupContext from "../../module/core/context/PopupContext";
 import { GT_ALGORITHMS } from "../../const/game_theory_const";
 import { axiosErrorHandler, getBackendAddress } from "../../utils/http_utils";
-import { INVALID_MATH_SYMBOLS } from "../../const/matching_const";
 export default function InputProcessingPage() {
   const navigate = useNavigate();
   const { appData, setAppData, setFavicon } = useContext(DataContext);
@@ -39,30 +38,6 @@ export default function InputProcessingPage() {
 
   const handleSolveNow = async () => {
     try {
-      // Validate fitness function for invalid math symbols
-      for (const keyword of INVALID_MATH_SYMBOLS) {
-        if (appData.problem.fitnessFunction.includes(keyword)) {
-          setFavicon("error");
-          return displayPopup(
-            "Invalid Fitness Function",
-            `Fitness function (${appData.problem.fitnessFunction}) contains invalid symbol (${keyword})`,
-            true,
-          );
-        }
-      }
-      
-      // Validate payoff function for invalid math symbols
-      for (const keyword of INVALID_MATH_SYMBOLS) {
-        if (appData.problem.playerPayoffFunction.includes(keyword)) {
-          setFavicon("error");
-          return displayPopup(
-            "Invalid Payoff Function",
-            `Payoff function (${appData.problem.playerPayoffFunction}) contains invalid symbol (${keyword})`,
-            true,
-          );
-        }
-      }
-      
       const body = {
         specialPlayer: appData.problem.specialPlayer,
         normalPlayers: appData.problem.players,

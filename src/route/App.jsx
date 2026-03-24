@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import Navbar from "../module/core/component/Navbar";
-import Footer from "../module/core/component/Footer";
-import HomePage from "../page/home";
+import InputPage from "../page/gameTheory/Input";
 import "../module/core/asset/css/index.scss";
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
@@ -51,28 +50,21 @@ function App() {
       }}
     >
       <PopupContext.Provider value={{ displayPopup }}>
-        <div className="App flex min-h-screen flex-col">
+        <div className="App">
           <Navbar />
-          <main className="flex-1">
-            <Routes>
-              {StableMatchingRouter}
-              {GameTheoryRouter}
-              {DataGeneratorRouter}
-              <Route
-                path    = {AppRoutes.Home}
-                element = {<HomePage />}
-              />
-              <Route
-                path    = {AppRoutes.Insights}
-                element = {<InsightPage />}
-              />
-              <Route
-                path    = {AppRoutes.Fallback}
-                element = {<HomePage />}
-              />
-            </Routes>
-          </main>
-          <Footer />
+          <Routes>
+            {StableMatchingRouter}
+            {GameTheoryRouter}
+            {DataGeneratorRouter}
+            <Route
+              path    = {AppRoutes.Insights}
+              element = {<InsightPage />}
+            />
+            <Route
+              path    = {AppRoutes.Fallback}
+              element = {<InputPage />}
+            />
+          </Routes>
         </div>
 
         <Popup

@@ -1,8 +1,4 @@
 export const validateExcelFile = (file) => {
-  if (!file?.name || !file.name.includes(".")) {
-    return false;
-  }
-
-  const extension = file.name.split(".").pop().toLowerCase();
+  const extension = file.name.split(".").pop();
   return extension === "xlsx" || extension === "xlsm";
 };

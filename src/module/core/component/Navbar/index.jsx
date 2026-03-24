@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./style.scss";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export default function Header() {
   const location = useLocation();
   const [path, setPath] = useState("");
   const navigate = useNavigate();
-
   const backToHome = () => {
     navigate("/");
   };
@@ -14,88 +14,64 @@ export default function Header() {
   useEffect(() => {
     setPath(location.pathname);
   }, [location]);
-
-  const isActive = (to) => path === to;
-
   return (
     <>
       <header className="Navbar">
-        <div className="Navbar__inner">
-          <a
-            href="http://moeaframework.org/"
-            target="_blank"
-            rel="noreferrer"
-            className="Navbar__brand"
-            aria-label="MOEA Framework"
+        <div className="container">
+          <div
+            className="app-name fw-semibold d-flex align-items-center"
+            onClick={backToHome}
           >
-            <img
-              src="/logo.svg"
-              alt="MOEAs Platform"
-              className="Navbar__brand-logo"
-            />
-            <span className="Navbar__brand-text">MOEAs Framework</span>
-          </a>
-
-          <nav className="Navbar__nav" aria-label="Primary">
+            <img src="/logo.svg" className="logo" alt="Logo" />
+            Game Theory & Matching Theory Solver
+          </div>
+          <div className="nav-item-container">
             <Link
               to="/"
-              className={
-                isActive("/")
-                  ? "Navbar__link Navbar__link--active"
-                  : "Navbar__link"
-              }
-              onClick={backToHome}
-            >
-              Home
-            </Link>
-            <span className="Navbar__dot">·</span>
-            <Link
-              to="/input"
-              className={
-                isActive("/input")
-                  ? "Navbar__link Navbar__link--active"
-                  : "Navbar__link"
-              }
+              className={path === "/" ? "nav-item highlight" : "nav-item"}
             >
               Game Theory
             </Link>
-            <span className="Navbar__dot">·</span>
             <Link
               to="/matching-theory/input"
               className={
-                isActive("/matching-theory/input")
-                  ? "Navbar__link Navbar__link--active"
-                  : "Navbar__link"
+                path === "/matching-theory/input"
+                  ? "nav-item highlight"
+                  : "nav-item"
               }
             >
               Matching Problem
             </Link>
-            <span className="Navbar__dot">·</span>
             <Link
               to="/generator"
               className={
-                isActive("/generator")
-                  ? "Navbar__link Navbar__link--active"
-                  : "Navbar__link"
+                path === "/generator" ? "nav-item highlight" : "nav-item"
               }
             >
               Data Generator
             </Link>
-            <span className="Navbar__dot">·</span>
             <Link
               to="/guide"
-              className={
-                isActive("/guide")
-                  ? "Navbar__link Navbar__link--active"
-                  : "Navbar__link"
-              }
+              className={path === "/guide" ? "nav-item highlight" : "nav-item"}
             >
               Guide
             </Link>
-          </nav>
+          </div>
         </div>
       </header>
-
+      <a
+        className="app-info"
+        href="http://moeaframework.org/"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <img
+          className="moea-framework-logo"
+          src="https://th.bing.com/th/id/R.813fc73036588da433a26877f9738f63?rik=QW%2fZfuTteoFJug&riu=http%3a%2f%2fmoeaframework.org%2fimages%2flogo2_small.png&ehk=Yj9EPtTmS%2brN1WGUO7EUHyKgEVdiu9Drs0y9NoLKJXM%3d&risl=&pid=ImgRaw&r=0"
+          alt=""
+        />
+        <p>Powered by MOEA Framework</p>
+      </a>
     </>
   );
 }
