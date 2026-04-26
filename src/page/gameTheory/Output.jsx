@@ -23,6 +23,7 @@ import ExcelJS from "exceljs";
 import { RESULT_WORKBOOK } from "../../const/excel_const";
 import { getBackendAddress } from "../../utils/http_utils";
 import { FaChartLine, FaRegFileExcel } from "react-icons/fa6";
+import Button from "react-bootstrap/Button";
 
 let stompClient = null;
 export default function OutputPage() {
@@ -42,6 +43,7 @@ export default function OutputPage() {
   const [generationParam, setGenerationParam] = useState(100);
   const [maxTimeParam, setMaxTimeParam] = useState(5000);
   const [runCountParam, setRunCountParam] = useState(10);
+  const [isExportPopup, setIsExportPopup] = useState(false);
 
   if (appData == null) {
     return <NothingToShow />;
@@ -49,6 +51,17 @@ export default function OutputPage() {
   useEffect(() => {
     setFavicon("success");
   }, []);
+
+  const getTimestampFileName = () => {
+    const now = new Date();
+    return `game_theory_exp_${now.toISOString().replace(/[:.]/g, "-")}`;
+  };
+
+  const handleOpenDrive = () =>
+    window.open(
+      "https://drive.google.com/drive/folders/1eMQS3nBJeRLoyhQE18VF4jHWmdkzk2BE",
+      "_blank",
+    );
 
   const handleExportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
@@ -75,6 +88,48 @@ export default function OutputPage() {
     const wbout = await workbook.xlsx.writeBuffer();
     const blob = new Blob([wbout], { type: "application/octet-stream" });
     saveAs(blob, appData.problem.name + "_Result.xlsx");
+  };
+
+  const exportJSON = () => {
+    const parameterSet = {
+      timestamp: new Date().toISOString(),
+      problemName: appData.problem.name,
+      parameters: { ...appData.problem },
+      result: appData.result,
+    };
+    saveAs(
+      new Blob([JSON.stringify(parameterSet, null, 2)], {
+        type: "application/json",
+      }),
+      `${getTimestampFileName()}.json`,
+    );
+  };
+
+  const exportCSV = () => {
+    let csv = `Timestamp,${new Date().toISOString()}\nProblem Name,${
+      appData.problem.name
+    }\nAlgorithm,${appData.result.params.usedAlgorithm}\nFitness Value,${
+      appData.result.data.fitnessValue
+    }\n\nPlayer Name,Chosen Strategy,Payoff\n`;
+    appData.result.data.players.forEach((player) => {
+      csv += `"${player.playerName}","${player.strategyName}",${player.payoff}\n`;
+    });
+    saveAs(
+      new Blob([csv], { type: "text/csv;charset=utf-8;" }),
+      `${getTimestampFileName()}.csv`,
+    );
+  };
+
+  const exportLatex = () => {
+    let latex = `\\section*{Result: ${appData.problem.name}}\n\\begin{tabular}{|l|l|c|}\n\\hline\nPlayer Name & Strategy & Payoff \\\\\n\\hline\n`;
+    appData.result.data.players.forEach((player) => {
+      latex += `${player.playerName} & ${player.strategyName} & ${player.payoff} \\\\\n`;
+    });
+    latex += `\\hline\n\\end{tabular}`;
+    saveAs(
+      new Blob([latex], { type: "text/plain" }),
+      `${getTimestampFileName()}.tex`,
+    );
   };
 
   const handleGetMoreInsights = () => {
@@ -214,13 +269,37 @@ export default function OutputPage() {
           </div>
         </div>
       </div>
-      <div
-        className="btn align-self-center mb-3 btn-success d-flex justify-content-center border-1 p-3"
-        onClick={handleExportToExcel}
-      >
-        <FaRegFileExcel className="me-0 fs-4" />
-        Get Excel Template
+
+      <div className="action-buttons-layout mt-4">
+        <div className="d-flex justify-content-center mb-3">
+          <Button
+            variant="success"
+            className="excel-full-btn d-flex align-items-center"
+            onClick={handleExportToExcel}
+            style={{ width: "300px", justifyContent: "center" }}
+          >
+            <FaRegFileExcel className="me-2 fs-5" />
+            <span>Get Excel Template</span>
+          </Button>
+        </div>
+        <div className="d-flex gap-3 justify-content-center">
+          <Button
+            variant="outline-primary"
+            style={{ width: "180px" }}
+            onClick={() => setIsExportPopup(true)}
+          >
+            Save Parameter Set
+          </Button>
+          <Button
+            variant="outline-secondary"
+            style={{ width: "180px" }}
+            onClick={handleOpenDrive}
+          >
+            Open Google Drive
+          </Button>
+        </div>
       </div>
+
       <p className="below-headertext">
         {" "}
         Fitness value: {appData.result.data.fitnessValue}
@@ -239,6 +318,73 @@ export default function OutputPage() {
           <PlayerResult key={index} player={player} index={index + 1} />
         ))}
       </div>
+
+      {isExportPopup && (
+        <div
+          className="export-modal"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1050,
+          }}
+        >
+          <div
+            className="export-popup"
+            style={{
+              backgroundColor: "white",
+              padding: "25px",
+              borderRadius: "10px",
+              width: "320px",
+              textAlign: "center",
+            }}
+          >
+            <h5 className="mb-4">Choose export format</h5>
+            <div className="d-flex flex-column gap-2">
+              <Button
+                onClick={() => {
+                  exportJSON();
+                  setIsExportPopup(false);
+                }}
+              >
+                JSON
+              </Button>
+              <Button
+                variant="info"
+                className="text-white"
+                onClick={() => {
+                  exportCSV();
+                  setIsExportPopup(false);
+                }}
+              >
+                CSV
+              </Button>
+              <Button
+                variant="dark"
+                onClick={() => {
+                  exportLatex();
+                  setIsExportPopup(false);
+                }}
+              >
+                LaTeX
+              </Button>
+              <Button
+                variant="light"
+                className="mt-2"
+                onClick={() => setIsExportPopup(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
