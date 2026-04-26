@@ -480,151 +480,161 @@ export default function InputPage() {
     event.target.value = null;
   };
 
+  const templateGuideText =
+    "Get the Excel file template, input your data, then drag & drop it to the box below";
+
   return (
     <>
       <div className="input-page">
         <Loading isLoading={isLoading} />
-        <p className="header-text">Enter information about your problem</p>
-        <div className="input-container">
-          <div className="row">
-            <Input
-              message="Name of the problem"
-              type="text"
-              error={problemNameError}
-              handleOnChange={(e) => setProblemName(e.target.value)}
-              value={problemName}
-              description="The name should be concise and meaningful, reflecting the nature of the game being analyzed"
-              guideSectionIndex={1}
-            />
-          </div>
-          <div className="row">
-            <SpecialPlayerInput
-              specialPlayerExists={specialPlayerExists}
-              setSpecialPlayerExists={setSpecialPlayerExists}
-              specialPlayerPropsNum={specialPlayerPropsNum}
-              setSpecialPlayerPropsNum={setSpecialPlayerPropsNum}
-              error={specialPlayerPropsNumError}
-            />
+        <h1 className="problem-name">Enter information about your problem</h1>
+        <div className="input-layout">
+          <div className="input-container">
+            <div className="row">
+              <Input
+                message="Problem name"
+                type="text"
+                error={problemNameError}
+                handleOnChange={(e) => setProblemName(e.target.value)}
+                value={problemName}
+                description={
+                  "The name should be concise and meaningful, " +
+                  "reflecting the nature of the game being analyzed"
+                }
+                guideSectionIndex={1}
+              />
+            </div>
+            <div className="row">
+              <SpecialPlayerInput
+                specialPlayerExists={specialPlayerExists}
+                setSpecialPlayerExists={setSpecialPlayerExists}
+                specialPlayerPropsNum={specialPlayerPropsNum}
+                setSpecialPlayerPropsNum={setSpecialPlayerPropsNum}
+                error={specialPlayerPropsNumError}
+              />
+            </div>
+
+            <div className="row">
+              <Input
+                type="number"
+                message="Number of normal players"
+                text="number"
+                error={normalPlayerNumError}
+                handleOnChange={(e) => setNormalPlayerNum(e.target.value)}
+                value={normalPlayerNum}
+                description="A positive number that reflects the number of players involved
+                to ensure that the resulting Nash equilibrium is valid"
+                guideSectionIndex={4}
+              />
+              <Input
+                message="Number of strategies"
+                type="number"
+                error=""
+                handleOnChange={(e) => setDefaultStrategy(e.target.value)}
+                value={defaultStrategy}
+                description={
+                  "This value is only for generating your Excel template. You should use the number of strategies " +
+                  "that most of the players have, then manually edit any further exception. Leave it blank in " +
+                  "case you want an example dataset."
+                }
+                guideSectionIndex={7}
+              />
+            </div>
+
+            <div className="row">
+              <Input
+                message="Number of properties per strategy"
+                type="number"
+                error={normalPlayerPropsNumError}
+                handleOnChange={(e) => setNormalPlayerPropsNum(e.target.value)}
+                value={normalPlayerPropsNum}
+                description="A property is a characteristic or attribute that a player
+                has that affects their actions or outcomes in the game"
+                guideSectionIndex={5}
+              />
+            </div>
+
+            <div className="row">
+              <Input
+                message="Fitness function"
+                type="text"
+                error={fitnessFunctionError}
+                handleOnChange={(e) => setFitnessFunction(e.target.value)}
+                value={fitnessFunction}
+                description="The fitness function is a mathematical function that
+                  represents the payoff that a player receives for a specific
+                  combination of strategies played by all the players in the game"
+                guideSectionIndex={6}
+              />
+            </div>
+
+            <div className="row">
+              <Input
+                message="Player payoff function"
+                type="text"
+                error={playerPayoffFunctionError}
+                handleOnChange={(e) => setPlayerPayoffFunction(e.target.value)}
+                value={playerPayoffFunction}
+                description="The player payoff function is a mathematical function that determines
+                the outcome of the game by assigning a payoff value to each player based on the
+                strategies chosen by all the players in the game"
+                guideSectionIndex={7}
+              />
+            </div>
+
+            <div className="row">
+              <MaxMinCheckbox
+                isMaximizing={isMaximizing}
+                setIsMaximizing={setIsMaximizing}
+              />
+            </div>
+
+            <div className="row">
+              <button
+                type="button"
+                className="btn btn-success d-flex justify-content-center align-items-center gap-2 action-button"
+                onClick={handleGetExcelTemplate}
+              >
+                <FaRegFileExcel className="fs-5" aria-hidden="true" />
+                <span>Get Excel Template</span>
+              </button>
+            </div>
           </div>
 
-          <div className="row">
-            <Input
-              type="number"
-              message="Number of normal players"
-              text="number"
-              error={normalPlayerNumError}
-              handleOnChange={(e) => setNormalPlayerNum(e.target.value)}
-              value={normalPlayerNum}
-              description="A positive number that reflects the number of players involved
-              to ensure that the resulting Nash equilibrium is valid"
-              guideSectionIndex={4}
-            />
-            <Input
-              message="Number of properties each strategy of normal player"
-              text="number"
-              error={normalPlayerPropsNumError}
-              handleOnChange={(e) => setNormalPlayerPropsNum(e.target.value)}
-              value={normalPlayerPropsNum}
-              description="A property is a characteristic or attribute that a player
-              has that affects their actions or outcomes in the game"
-              guideSectionIndex={5}
-            />
-          </div>
+          <aside className="action-panel">
+            <div className="guide-box">
+              <p>{templateGuideText}</p>
+              <Link
+                to="/guide"
+                className="guide-link"
+                onClick={() => setGuideSectionIndex(9)}
+              >
+                Learn more on how to input to file Excel
+              </Link>
+            </div>
 
-          <div className="row">
-            <Input
-              message="Default number of strategies"
-              type="number"
-              error={playerPayoffFunctionError}
-              handleOnChange={(e) => setDefaultStrategy(e.target.value)}
-              value={defaultStrategy}
-              description={
-                "This value is only for generating your Excel template. You should use the number of strategies " +
-                "that most of the players have, then manually edit any further exception. Leave it blank in " +
-                "case you want an example dataset."
-              }
-              guideSectionIndex={7}
-            />
-          </div>
-
-          <div className="row">
-            <Input
-              message="Fitness function"
-              type="text"
-              error={fitnessFunctionError}
-              handleOnChange={(e) => setFitnessFunction(e.target.value)}
-              value={fitnessFunction}
-              description="The fitness function is a mathematical function that
-                represents the payoff that a player receives for a specific
-                combination of strategies played by all the players in the game"
-              guideSectionIndex={6}
-            />
-          </div>
-
-          <div className="row">
-            <Input
-              message="Player payoff function"
-              type="text"
-              error={playerPayoffFunctionError}
-              handleOnChange={(e) => setPlayerPayoffFunction(e.target.value)}
-              value={playerPayoffFunction}
-              description="The player payoff function is a mathematical function that determines
-              the outcome of the game by assigning a payoff value to each player based on the
-              strategies chosen by all the players in the game"
-              guideSectionIndex={7}
-            />
-          </div>
-
-          <div className="row">
-            <MaxMinCheckbox
-              isMaximizing={isMaximizing}
-              setIsMaximizing={setIsMaximizing}
-            />
-          </div>
-        </div>
-        <div
-          className="btn btn-success d-flex justify-content-center border-1 p-3"
-          onClick={handleGetExcelTemplate}
-        >
-          <FaRegFileExcel className="me-0 fs-4" />
-          Get Excel Template
-        </div>
-
-        <div className="guide-box">
-          <p>
-            Get the Excel file template, input your data, then drag & drop it to
-            the box below
-          </p>
-          <Link
-            to="/guide"
-            className="guide-link"
-            onClick={() => setGuideSectionIndex(9)}
-          >
-            {" "}
-            Learn more on how to input to file Excel
-          </Link>
-        </div>
-
-        {excelFileError && <p className="file-error">{excelFileError}</p>}
-        <div
-          className={excelFileError ? "drag-area file-error" : "drag-area"}
-          onDrop={handleDrop}
-          onDragEnter={handleOnDragEnter}
-          onDragLeave={handleOnDragLeave}
-          onDragOver={handleOnDragEnter}
-        >
-          <p className="drag-text">
-            {excelFile ? excelFile.name : "Drag and drop a file here"}
-          </p>
-          <label htmlFor="select-file" id="select-file-label">
-            Choose a file
-          </label>
-          <input
-            accept=".xlsx"
-            type="file"
-            id="select-file"
-            onChange={handleFileInput}
-          />
+            {excelFileError && <p className="file-error">{excelFileError}</p>}
+            <div
+              className={excelFileError ? "drag-area file-error" : "drag-area"}
+              onDrop={handleDrop}
+              onDragEnter={handleOnDragEnter}
+              onDragLeave={handleOnDragLeave}
+              onDragOver={handleOnDragEnter}
+            >
+              <p className="drag-text">
+                {excelFile ? excelFile.name : "Drag and drop a file here"}
+              </p>
+              <label htmlFor="select-file" id="select-file-label">
+                Choose a file
+              </label>
+              <input
+                accept=".xlsx"
+                type="file"
+                id="select-file"
+                onChange={handleFileInput}
+              />
+            </div>
+          </aside>
         </div>
       </div>
     </>

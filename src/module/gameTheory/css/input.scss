@@ -1,120 +1,183 @@
-.input-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 1000px;
-  gap: 20px;
-  max-width: 80%;
-  margin: 0 auto;
-
-  .warning {
-    color: rgb(186, 7, 7);
-    font-size: 14px;
-
-    a {
-      color: black;
-    }
-  }
-  .header-text {
-    font-size: 12px;
-    color: #000;
-    border-bottom: 1px solid black;
-    width: fit-content;
-    margin: 0 auto;
-    padding: 0 10px;
-  }
-
-  .input-container {
-    // margin: 20px 0;
+.game-theory-shell {
+  .input-page {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
+    justify-content: flex-start;
+    flex: 1 1 auto;
     width: 100%;
+    min-height: 0;
+    gap: 12px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 12px 18px 16px;
+    box-sizing: border-box;
 
-    .row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-      width: 100%;
+    .warning {
+      color: rgb(186, 7, 7);
+      font-size: 14px;
+
+      a {
+        color: black;
+      }
     }
-  }
-
-  .guide-box {
-    background: #f0f0f0;
-    font-size: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    max-width: 800px;
-    padding: 10px 20px;
-    border-radius: 10px;
-
-    .guide-link {
-      color: #000000;
+    .problem-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #000;
+      border-bottom: 1px solid black;
+      text-align: center;
       width: fit-content;
       margin: 0 auto;
-      border-radius: 5px;
-      padding: 5px 10px;
-      cursor: pointer;
+      padding: 5px 20px;
+      text-wrap: balance;
+    }
 
-      &:hover {
-        background-color: black;
-        color: white;
+    .input-layout {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: stretch;
+        gap: 12px;
+        width: 100%;
+
+        > * {
+          flex: 1 1 0;
+          min-width: 0;
+        }
       }
     }
-  }
 
-  .drag-area {
-    width: 50%;
-    height: 50%;
-    min-width: 350px;
-    min-height: 300px;
-    border: 2px dashed #0000006c;
-    display: flex;
-    flex-direction: column;
-    border-radius: 10px;
-    justify-content: center;
-    align-items: center;
-
-    .drag-text {
-      font-size: 12px;
-      color: #00000095;
-      margin-bottom: 10px;
-      text-align: center;
+    .action-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      height: 100%;
     }
 
-    #select-file-label {
+    .action-button {
+      width: 100%;
+      padding: 0.85rem 1rem;
+    }
+
+    .guide-box {
+      background: #f0f0f0;
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 100%;
+      max-width: none;
+      padding: 12px 6px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-sizing: border-box;
+
+      p {
+        text-align: center;
+        margin: 0;
+        white-space: nowrap;
+      }
+
+      .guide-link {
+        color: #000000;
+        width: fit-content;
+        margin: 0 auto;
+        border-radius: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        white-space: nowrap;
+
+        &:hover {
+          background-color: black;
+          color: white;
+        }
+      }
+    }
+
+    .drag-area {
+      flex: 1 1 auto;
+      width: 100%;
+      min-width: 0;
+      min-height: 0;
+      height: auto;
+      padding: 16px;
+      border: 2px dashed #0000006c;
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+
+      .drag-text {
+        font-size: 12px;
+        color: #00000095;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
+      #select-file-label {
+        background: var(--grey);
+        color: black;
+        // border: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        font-size: 12px;
+        line-height: 20px;
+        cursor: pointer;
+        border: 1px solid var(--black);
+
+        &:hover {
+          background: black;
+          color: white;
+        }
+      }
+
+      #select-file {
+        display: none;
+      }
+    }
+
+    .dragging {
       background: var(--grey);
-      color: black;
-      // border: none;
-      padding: 5px 15px;
-      border-radius: 5px;
+    }
+
+    .file-error {
+      color: rgb(240, 66, 66);
       font-size: 12px;
-      line-height: 20px;
-      cursor: pointer;
-      border: 1px solid var(--black);
+    }
 
-      &:hover {
-        background: black;
-        color: white;
+    @media (min-width: 1024px) {
+      .input-container {
+        max-width: 690px;
+        justify-self: center;
       }
+
+      .input-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 440px;
+        align-items: stretch;
+        column-gap: 20px;
+      }
+
     }
-
-    #select-file {
-      display: none;
-    }
-  }
-
-  .dragging {
-    background: var(--grey);
-  }
-
-  .file-error {
-    color: rgb(240, 66, 66);
-    font-size: 12px;
   }
 }

@@ -46,6 +46,14 @@ export default function OutputPage() {
   if (appData == null) {
     return <NothingToShow />;
   }
+
+  const players = Array.isArray(appData.result.data.players)
+    ? appData.result.data.players
+    : [];
+  const fitnessValue = appData.result.data.fitnessValue;
+  const usedAlgorithm = appData.result.params.usedAlgorithm;
+  const playerCount = players.length;
+
   useEffect(() => {
     setFavicon("success");
   }, []);
@@ -184,10 +192,9 @@ export default function OutputPage() {
         message={loadingMessage}
       />
       <h1 className="problem-name">{appData.problem.name}</h1>
-      <br />
-      <p className="below-headertext">Solution</p>
-      <div className="output-container">
+      <div className="output-grid">
         <div className="param-box">
+          <div className="panel-label">Controls</div>
           <ParamSettingBox
             distributedCoreParam={distributedCoreParam}
             setDistributedCoreParam={setDistributedCoreParam}
@@ -200,44 +207,64 @@ export default function OutputPage() {
             runCountParam={runCountParam}
             setRunCountParam={setRunCountParam}
           />
-          <div
-            className="align-self-center btn btn-outline-primary d-flex flex-column align-items-center justify-content-center border-1 p-3"
-            onClick={handleGetMoreInsights}
-          >
-            <div className="d-flex align-items-center justify-content-center gap-2">
-              <FaChartLine className="me-0 fs-4" />
-              <span>Insights & Analysis</span>
+
+          <div className="action-stack">
+            <div
+              className="action-card action-card-outline"
+              onClick={handleGetMoreInsights}
+            >
+              <div className="d-flex align-items-center justify-content-center gap-2">
+                <FaChartLine className="me-0 fs-4" />
+                <span>Insights & Analysis</span>
+              </div>
+              <div className="small text-muted mt-1 text-center">
+                Generate comparison charts, convergence plots, stability metrics
+              </div>
             </div>
-            <div className="small text-muted mt-1 text-center">
-              Generate comparison charts, convergence plots, stability metrics
+
+            <div
+              className="action-card action-card-success"
+              onClick={handleExportToExcel}
+            >
+              <FaRegFileExcel className="me-0 fs-4" />
+              <span>Get Excel Template</span>
             </div>
           </div>
         </div>
-      </div>
-      <div
-        className="btn align-self-center mb-3 btn-success d-flex justify-content-center border-1 p-3"
-        onClick={handleExportToExcel}
-      >
-        <FaRegFileExcel className="me-0 fs-4" />
-        Get Excel Template
-      </div>
-      <p className="below-headertext">
-        {" "}
-        Fitness value: {appData.result.data.fitnessValue}
-      </p>
-      <br />
 
-      <div className="table-container">
-        <div className="grid-container">
-          <div className="column head-column">No</div>
-          <div className="column head-column">Player Name</div>
-          <div className="column head-column">Choosen strategy name</div>
-          <div className="column head-column">Payoff value</div>
-        </div>
+        <section className="result-panel">
+          <div className="result-summary-card">
+            <div className="result-summary-kicker">Quick summary</div>
+            <div className="result-summary-title">Result snapshot</div>
+            <div className="result-summary-grid">
+              <div className="result-summary-item">
+                <span>Algorithm</span>
+                <strong>{usedAlgorithm}</strong>
+              </div>
+              <div className="result-summary-item">
+                <span>Fitness value</span>
+                <strong>{fitnessValue}</strong>
+              </div>
+              <div className="result-summary-item">
+                <span>Players</span>
+                <strong>{playerCount}</strong>
+              </div>
+            </div>
+          </div>
 
-        {appData.result.data.players?.map((player, index) => (
-          <PlayerResult key={index} player={player} index={index + 1} />
-        ))}
+          <div className="table-container">
+            <div className="grid-container">
+              <div className="column head-column">No</div>
+              <div className="column head-column">Player Name</div>
+              <div className="column head-column">Chosen strategy</div>
+              <div className="column head-column">Payoff</div>
+            </div>
+
+            {players.map((player, index) => (
+              <PlayerResult key={index} player={player} index={index + 1} />
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
