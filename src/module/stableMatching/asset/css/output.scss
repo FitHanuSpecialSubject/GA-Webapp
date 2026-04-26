@@ -36,14 +36,6 @@
     text-align: center;
   }
 
-  .below-headertext {
-    font-size: 14px;
-    // font-weight: 600;
-    color: #000;
-    width: fit-content;
-    margin: 0 auto;
-    padding: 0 10px;
-  }
   .result-information {
     font-size: 14px;
     // font-weight: 600;
@@ -127,11 +119,6 @@
       margin: 0;
     }
 
-    .below-headertext {
-      font-size: 12px;
-      padding: 0 5px;
-    }
-
     .row {
       flex-wrap: wrap;
       justify-content: center;
@@ -149,11 +136,6 @@
       width: fit-content;
       padding: 0 10px 10px 10px;
       margin: 0 auto;
-    }
-
-    .below-headertext {
-      font-size: 14px;
-      padding: 0 10px;
     }
 
     .row {

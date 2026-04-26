@@ -319,7 +319,6 @@ export default function MatchingOutputPage() {
         message={loadingMessage}
       />
       <br />
-      <p className="below-headertext">Solution</p>
       <div className="output-container">
         <div className="param-box">
           <ParamSettingBox

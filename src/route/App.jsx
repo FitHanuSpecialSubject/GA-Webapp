@@ -3,7 +3,7 @@ import Navbar from "../module/core/component/Navbar";
 import Footer from "../module/core/component/Footer";
 import HomePage from "../page/home";
 import "../module/core/asset/css/index.scss";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { useState } from "react";
 import DataContext from "../module/core/context/DataContext";
 import InsightPage from "../page/Insight";
@@ -15,6 +15,7 @@ import dataGeneratorRouter from "./DataGenerator";
 import AppRoutes from "./route.constants";
 
 function App() {
+  const location = useLocation();
   const [appData, setAppData] = useState(null);
   const [guideSectionIndex, setGuideSectionIndex] = useState(0);
   const [popupError, setPopupError] = useState(false);
@@ -34,6 +35,30 @@ function App() {
   const StableMatchingRouter = stableMatchingRouter();
   const GameTheoryRouter = gameTheoryRouter();
   const DataGeneratorRouter = dataGeneratorRouter();
+  const isGameTheoryInput = location.pathname === AppRoutes.GameTheoryInput;
+  const isGameTheoryResult = location.pathname === AppRoutes.GameTheoryResult;
+  const isGameTheoryRoute = [
+    AppRoutes.GameTheoryInput,
+    AppRoutes.GameTheoryGuide,
+    AppRoutes.GameTheoryProcessing,
+    AppRoutes.GameTheoryResult,
+  ].includes(location.pathname);
+  const isStableMatchingRoute = [
+    AppRoutes.MatchingHome,
+    AppRoutes.MatchingInput,
+    AppRoutes.MatchingProcessing,
+    AppRoutes.MatchingResult,
+  ].includes(location.pathname);
+  const mainClassName = isGameTheoryResult
+    ? "game-theory-shell flex flex-1 min-h-0 flex-col overflow-hidden"
+    : isGameTheoryInput
+      ? "game-theory-shell flex flex-1"
+      : isGameTheoryRoute
+        ? "game-theory-shell flex-1"
+        : isStableMatchingRoute
+          ? "matching-shell flex-1"
+          : "flex-1";
+
   useEffect(() => {
     document.querySelector("link[rel~='icon']").href = `/${favicon}.svg`;
   }, [favicon]);
@@ -51,25 +76,22 @@ function App() {
       }}
     >
       <PopupContext.Provider value={{ displayPopup }}>
-        <div className="App flex min-h-screen flex-col">
+        <div
+          className={
+            isGameTheoryResult
+              ? "App flex h-full flex-col overflow-hidden"
+              : "App flex min-h-screen flex-col"
+          }
+        >
           <Navbar />
-          <main className="flex-1">
+          <main className={mainClassName}>
             <Routes>
               {StableMatchingRouter}
               {GameTheoryRouter}
               {DataGeneratorRouter}
-              <Route
-                path    = {AppRoutes.Home}
-                element = {<HomePage />}
-              />
-              <Route
-                path    = {AppRoutes.Insights}
-                element = {<InsightPage />}
-              />
-              <Route
-                path    = {AppRoutes.Fallback}
-                element = {<HomePage />}
-              />
+              <Route path={AppRoutes.Home} element={<HomePage />} />
+              <Route path={AppRoutes.Insights} element={<InsightPage />} />
+              <Route path={AppRoutes.Fallback} element={<HomePage />} />
             </Routes>
           </main>
           <Footer />

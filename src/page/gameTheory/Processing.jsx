@@ -11,6 +11,7 @@ import AlgorithmConfigurationPanel from "../../module/core/component/AlgorithmCo
 import PopupContext from "../../module/core/context/PopupContext";
 import { GT_ALGORITHMS } from "../../const/game_theory_const";
 import { axiosErrorHandler, getBackendAddress } from "../../utils/http_utils";
+
 export default function InputProcessingPage() {
   const navigate = useNavigate();
   const { appData, setAppData, setFavicon } = useContext(DataContext);
@@ -25,13 +26,16 @@ export default function InputProcessingPage() {
       document.title = appData.problem.name;
     }
   }, [appData]);
+
   const handleChange = (event) => {
     setAlgorithm(event.target.value);
   };
-  // navigate to home page if there is no problem data
+
   if (!appData || !appData.problem) {
     return <NothingToShow />;
   }
+
+  const playerCount = appData.problem.players.length;
 
   const handleSolveNow = async () => {
     try {
@@ -78,54 +82,64 @@ export default function InputProcessingPage() {
       />
       <h1 className="problem-name">{appData.problem.name}</h1>
 
+      <div className="processing-layout">
+        <section className="processing-control-panel">
+          {algorithm === "PAES" && (
+            <p className="algorithm-warning">
+              Population size takes no effect for PAES algorithm
+            </p>
+          )}
 
-      {algorithm === "PAES" && (
-        <p style={{ color: "red", textAlign: "center" }}>
-          Population size takes no effect for PAES algorithm
-        </p>
-      )}
+          <div className="algo-chooser">
+            <p className="algorithm-text bold">Choose an algorithm: </p>
 
-      <div className="algo-chooser">
-        <p className="algorithm-text bold">Choose an algorithm: </p>
-
-        <select
-          name=""
-          id=""
-          value={algorithm}
-          onChange={handleChange}
-          className="algorithm-select"
-        >
-          {GT_ALGORITHMS.map(({ displayName, value }) => (
-            <option key={value} value={value}>
-              {displayName}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <AlgorithmConfigurationPanel
-        algorithm={algorithm}
-        onParamsChange={setAlgorithmParams}
-      />
-
-      <p className="solve-now-btn" onClick={handleSolveNow}>
-        Solve now
-      </p>
-      <p className="playerNum bold">
-        {appData.problem.players.length}{" "}
-        {appData.problem.players.length < 2 ? "Player" : "Players"}{" "}
-      </p>
-
-      <div className="player-container">
-        {appData.problem.players.map((player, index) => (
-          <div key={index}>
-            <Player
-              index={index}
-              name={player.name}
-              strategies={player.strategies}
-            />
+            <select
+              name=""
+              id=""
+              value={algorithm}
+              onChange={handleChange}
+              className="algorithm-select"
+            >
+              {GT_ALGORITHMS.map(({ displayName, value }) => (
+                <option key={value} value={value}>
+                  {displayName}
+                </option>
+              ))}
+            </select>
           </div>
-        ))}
+
+          <AlgorithmConfigurationPanel
+            algorithm={algorithm}
+            onParamsChange={setAlgorithmParams}
+          />
+
+          <p className="solve-now-btn" onClick={handleSolveNow}>
+            Solve now
+          </p>
+        </section>
+
+        <section className="processing-player-panel">
+          <div className="player-panel-summary">
+            <p className="playerNum bold">
+              {playerCount} {playerCount < 2 ? "Player" : "Players"}
+            </p>
+            <p className="player-panel-note">
+              Click a card to expand its strategies.
+            </p>
+          </div>
+
+          <div className="player-container">
+            {appData.problem.players.map((player, index) => (
+              <div key={index}>
+                <Player
+                  index={index}
+                  name={player.name}
+                  strategies={player.strategies}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

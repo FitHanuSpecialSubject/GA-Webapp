@@ -1,73 +1,69 @@
-.special-player-input {
-  display: flex;
-  flex-direction: column;
-  width: 49%;
-  min-width: 300px;
-  // background: red;
-  gap: 10px;
-  // width: fit-content  ;
-  margin: 0;
-  height: fit-content;
-
-  transition: all 1s ease-in-out;
-
-  .special-player-label {
+.game-theory-shell {
+  .special-player-input {
     display: flex;
-    align-items: center;
-    gap: 15px;
-    font-size: 12px;
-  }
-
-  .input {
+    flex-direction: column;
     width: 100%;
-    box-sizing: border-box;
-  }
-
-  .input-hidden {
-    height: 0;
-    opacity: 0;
-    transition:
-      height 1s ease-out,
-      opacity 1s ease-out;
-  }
-
-  p {
+    min-width: 0;
+    gap: 10px;
     margin: 0;
-  }
-}
+    height: fit-content;
 
-.showing {
-  // background: red;
-  // transition: all 0.5s ease-out;
-  animation: slideDown 0.5s ease-out;
-}
+    .special-player-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+    }
 
-@keyframes slideDown {
-  0% {
-    transform: translateY(-50%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
+    .input {
+      width: 100%;
+      box-sizing: border-box;
+    }
 
-.hiding {
-  animation: slideUp 0.5s ease-out;
-}
+    .input-hidden {
+      height: 0;
+      opacity: 0;
+      transition:
+        height 1s ease-out,
+        opacity 1s ease-out;
+    }
 
-@keyframes slideUp {
-  0% {
-    transform: translateY(0);
-    opacity: 1;
+    p {
+      margin: 0;
+    }
   }
-  100% {
-    transform: translateY(-50%);
-    opacity: 0;
-  }
-}
 
-.hidden {
-  display: none;
+  .showing {
+    animation: slideDown 0.35s ease-out;
+  }
+
+  @keyframes slideDown {
+    0% {
+      transform: translateY(-50%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .hiding {
+    animation: slideUp 0.35s ease-out;
+  }
+
+  @keyframes slideUp {
+    0% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-50%);
+      opacity: 0;
+    }
+  }
+
+  .hidden {
+    display: none;
+  }
 }

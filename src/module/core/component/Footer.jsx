@@ -9,9 +9,9 @@ export default function Footer() {
         <div className="flex flex-col gap-2">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <img src="/logo.svg" className="h-9 w-9" alt="MOEAs Platform" />
+              <img src="/logo.svg" className="h-9 w-9" alt="MOEAs Framework" />
               <span className="text-base sm:text-lg font-semibold text-white leading-tight">
-                MOEAs Platform
+                MOEAs Framework
               </span>
             </div>
             <div className="text-sm text-white/75 leading-tight">
@@ -29,7 +29,7 @@ export default function Footer() {
           </div>
           <div className="h-px bg-white/20" />
           <div className="text-center text-xs sm:text-sm text-white/70 leading-tight">
-            &copy; {new Date().getFullYear()} MOEAs Platform. All rights reserved.
+            &copy; {new Date().getFullYear()} MOEAs Framework. All rights reserved.
           </div>
         </div>
       </div>

@@ -1,102 +1,414 @@
-.input-processing-page {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.problem-name {
-  font-size: 20px;
-  color: #000;
-  border-bottom: 1px solid black;
-  text-align: center;
-  width: fit-content;
-  margin: 0 auto;
-  padding: 5px 20px;
-}
-
-.solve-now-btn {
-  font-size: 15px;
-  border-radius: 5px;
-  background-color: rgba(49, 49, 49, 0.932);
-  color: white;
-  width: fit-content;
-  margin: 0 auto;
-  padding: 5px 10px;
-  cursor: pointer;
-  border: none;
-  transition: all 0.3s ease-in-out;
-
-  &:hover {
-    background-color: black;
-    transform: scale(1.1);
-  }
-}
-
-.algo-chooser {
-  background: var(--grey);
-  padding: 20px;
-  border-radius: 10px;
-  .bold {
-    font-size: 13px;
-  }
-  margin: 0 auto;
-  display: flex;
-  gap: 20px;
-  align-items: center;
-}
-
-select,
-option {
-  height: 40px;
-  padding: 5px 15px;
-  border-radius: 5px;
-}
-.playerNum {
-  font-size: 18px;
-  text-align: center;
-  margin: 0;
-}
-
-.player-container {
-  padding: 20px;
-  max-width: 1000px;
-  margin: 0 auto;
-  width: 60%;
-  height: 100px;
-  height: fit-content;
-  max-height: 80vh;
-  overflow-y: scroll;
-}
-du
-.extra-params {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  .extra-param-row {
+.game-theory-shell {
+  .input-processing-page {
     display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .problem-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #000;
+    border-bottom: 1px solid black;
+    text-align: center;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 5px 20px;
+    text-wrap: balance;
+  }
+
+  .processing-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .processing-control-panel,
+  .processing-player-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+
+  .algorithm-warning {
+    margin: 0;
+    color: #b91c1c;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .algo-chooser {
+    background: var(--grey);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 0 auto;
+    display: flex;
+    gap: 20px;
     align-items: center;
-    gap: 12px;
+
+    .bold {
+      font-size: 13px;
+    }
   }
 
-  .extra-param-label {
-    font-size: 13px;
-    white-space: nowrap;
-  }
-
-  .extra-param-input {
-    height: 36px;
-    padding: 5px 12px;
+  select,
+  option {
+    height: 40px;
+    padding: 5px 15px;
     border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 13px;
-    width: 220px;
+  }
 
-    &::placeholder {
-      color: #999;
-      font-size: 12px;
+  .solve-now-btn {
+    font-size: 15px;
+    border-radius: 5px;
+    background-color: rgba(49, 49, 49, 0.932);
+    color: white;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 5px 10px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+      background-color: black;
+      transform: scale(1.1);
+    }
+  }
+
+  .player-panel-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .playerNum {
+    font-size: 18px;
+    text-align: center;
+    margin: 0;
+  }
+
+  .player-panel-note {
+    display: none;
+    margin: 0;
+  }
+
+  .player-container {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 60%;
+    height: 100px;
+    height: fit-content;
+    max-height: 80vh;
+    overflow-y: scroll;
+  }
+
+  .labelName {
+    margin-left: 300px;
+  }
+
+  .individuals-table-container {
+    margin: 20px;
+  }
+
+  .individuals-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .individuals-table th,
+  .individuals-table td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .individuals-table th {
+    background-color: #f2f2f2;
+  }
+
+  .individuals-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .individuals-table tr:hover {
+    background-color: #e0e0e0;
+  }
+
+  .info-display {
+    margin: 20px;
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .info-table td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .info-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .info-table tr:hover {
+    background-color: #e0e0e0;
+  }
+
+  .problem-type-chooser {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+  }
+
+  .problem-type-text {
+    margin-bottom: 10px;
+  }
+
+  .extra-params {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .extra-param-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .extra-param-label {
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .extra-param-input {
+      height: 36px;
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+      width: 220px;
+
+      &::placeholder {
+        color: #999;
+        font-size: 12px;
+      }
+    }
+  }
+
+  @media (min-width: 992px) {
+    .input-processing-page {
+      width: min(100%, 1440px);
+      margin: 0 auto;
+      padding: 16px 24px 24px;
+      box-sizing: border-box;
+      gap: 24px;
+    }
+
+    .processing-layout {
+      display: grid;
+      grid-template-columns: 540px minmax(0, 1fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .processing-control-panel {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      gap: 16px;
+    }
+
+    .processing-player-panel {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid #e2e8f0;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
+      min-height: 0;
+    }
+
+    .player-panel-summary {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .playerNum {
+      text-align: left;
+      font-size: 1.15rem;
+    }
+
+    .player-panel-note {
+      display: block;
+      margin: 0;
+      color: #64748b;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .player-container {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0 4px 0 0;
+      max-height: min(68vh, 760px);
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+      box-sizing: border-box;
+    }
+
+    .input-processing-page .algo-chooser {
+      width: 100%;
+      justify-content: space-between;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-sizing: border-box;
+      margin: 0;
+      gap: 12px;
+    }
+
+    .input-processing-page .algo-chooser .algorithm-select {
+      min-width: 190px;
+      padding: 6px 10px;
+      text-align: left;
+      text-align-last: left;
+    }
+
+    .input-processing-page .algorithm-warning {
+      text-align: left;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: #fff1f2;
+      color: #be123c;
+      border: 1px solid #fecdd3;
+      font-size: 0.9rem;
+    }
+
+    .input-processing-page .solve-now-btn {
+      width: 100%;
+      margin: 0;
+      text-align: center;
+      padding: 12px 16px;
+      font-weight: 600;
+      border-radius: 14px;
+    }
+
+    .input-processing-page .acp-container {
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      margin: 0;
+      box-sizing: border-box;
+      box-shadow: none;
+      border-color: #e2e8f0;
+    }
+
+    .input-processing-page .acp-header {
+      margin-bottom: 14px;
+    }
+
+    .input-processing-page .acp-params-grid {
+      gap: 12px;
+    }
+
+    .input-processing-page .acp-param-row {
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .input-processing-page .acp-param-row .acp-param-label {
+      min-width: 160px;
+    }
+
+    .input-processing-page .acp-slider-group,
+    .input-processing-page .acp-dropdown {
+      flex: 0 0 230px;
+      width: 230px;
+      max-width: 230px;
+    }
+
+    .input-processing-page .acp-dropdown,
+    .input-processing-page .acp-number-input,
+    .input-processing-page .acp-slider-value {
+      height: 40px;
+    }
+
+    .input-processing-page .acp-number-input {
+      width: 92px;
+      padding: 6px 10px;
+      text-align: left;
+    }
+
+    .input-processing-page .acp-number-input[placeholder="Leave empty for default"] {
+      width: 180px;
+    }
+
+    .input-processing-page .acp-slider-value {
+      text-align: left;
+    }
+
+    .input-processing-page .player-container .Player {
+      background-color: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      margin-top: 10px;
+      padding: 10px 14px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+
+      &:hover {
+        background-color: #f8fafc;
+      }
+
+      .info {
+        justify-content: flex-start;
+        align-items: center;
+        gap: 14px;
+        padding: 0;
+      }
+
+      .name {
+        min-width: 0;
+        flex: 1 1 auto;
+      }
+
+      .strategyNum {
+        margin-left: auto;
+        color: #475569;
+        white-space: nowrap;
+      }
+
+      .show-more-btn {
+        margin-left: 0;
+      }
+
+      .menubar {
+        margin-top: 10px;
+      }
+
+      .strategy-name {
+        margin: 10px 0 0;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 10px 12px;
+      }
     }
   }
 }
