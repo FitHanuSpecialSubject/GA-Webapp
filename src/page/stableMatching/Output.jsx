@@ -22,13 +22,18 @@ import {
 } from "../../utils/excel_utils.js";
 import ExcelJS from "exceljs";
 import { RESULT_WORKBOOK } from "../../const/excel_const";
-import { FaChartLine } from "react-icons/fa6";
+import { FaChartLine, FaRegFileExcel } from "react-icons/fa6";  
 import { SMT } from "../../consts.js";
 
 let stompClient = null;
 export default function MatchingOutputPage() {
   const navigate = useNavigate();
   const { appData, setAppData, setFavicon } = useContext(DataContext);
+
+  if (!appData || !appData.result) {
+    return <NothingToShow />;
+  }
+
   const [isLoading, setIsLoading] = useState(false);
   const [isShowPopup, setIsShowPopup] = useState(false);
   const { displayPopup } = useContext(PopupContext);
@@ -44,64 +49,94 @@ export default function MatchingOutputPage() {
   const [maxTimeParam, setMaxTimeParam] = useState(5000);
   const [selectedSet, setSelectedSet] = useState("all");
   const [runCountParam, setRunCountParam] = useState(SMT.DEFAULT_RUN_COUNT_PARAM);
+  const [isExportPopup, setIsExportPopup] = useState(false);
 
   useEffect(() => {
-    if (appData == null) {
-      return <NothingToShow />;
-    }
+    setFavicon("success");
   }, []);
+
   const problemType = appData.problemType ?? SMT.DEFAULT_PROBLEM_TYPE;
   const matchesArray = appData.result.data.matches.matches;
   const leftOversArray = appData.result.data.matches.leftOvers;
   const problemData = appData.problem;
-  // Handle filter change
   const handleSetFilterChange = (event) => {
-    setSelectedSet(event.target.value); // Cập nhật giá trị đã chọn
+    setSelectedSet(event.target.value); 
   };
 
-  // Lọc dữ liệu theo giá trị selectedSet
 
   const scroll = (pos) => {
-    document.body.scrollTop = pos; // For Safari
+    document.body.scrollTop = pos; 
     document.documentElement.scrollTop = pos;
   };
+  const getTimestampFileName = () => {
+    const now = new Date();
+    return `matching_exp_${now.toISOString().replace(/[:.]/g, "-")}`;
+  };
+  const handleOpenDrive = () => window.open("https://drive.google.com/drive/folders/1eMQS3nBJeRLoyhQE18VF4jHWmdkzk2BE", "_blank");
 
   const handleExportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
-    // write result data to sheet 1
     const sheet1 = workbook.addWorksheet(RESULT_WORKBOOK.SOLUTION_SHEET_NAME);
 
     sheet1.addRows([
-      ["Fitness value", appData.result.data.fitnessValue],
-      ["Used algorithm", appData.result.params.usedAlgorithm],
-      ["Runtime (in seconds)", appData.result.data.runtime],
-      ["Individual Name", "Individual Matches", "Satisfaction value"],
+      ["Problem Name:", problemData.nameOfProblem],
+      ["Fitness Value:", appData.result.data.fitnessValue.toFixed(3)],
+      ["Used Algorithm:", appData.result.params.usedAlgorithm],
+      ["Runtime:", `${appData.result.data.runtime.toFixed(3)} ms`],
+      ["Exported At:", new Date().toLocaleString()],
+      []
     ]);
 
-    // append players data to sheet 1
-    // matchesArray.forEach((match,index) => {
-    //   const row = [match.individualName, match.individualMatches, match.setSatisfactions];
-    //   XLSX.utils.sheet_add_aoa(sheet1, [row], { origin: -1 });
-    // });
-    matchesArray.forEach((match, index) => {
-      const individualName = problemData.individualNames[index];
+    const headerRow = sheet1.addRow([
+      "No",
+      "First Partner",
+      "Second Partner",
+      "Couple Satisfaction",
+      "Set Info"
+    ]);
 
-      let individualMatches = "";
-      if (Object.values(match).length !== 0) {
-        for (let i = 0; i < Object.values(match).length; i++) {
-          const name = problemData.individualNames[Object.values(match)[i]];
-          if (i === Object.values(match).length - 1) {
-            individualMatches += name;
-          } else individualMatches += name + ", ";
-        }
-        const row = [
-          individualName,
-          individualMatches,
-          appData.result.data.setSatisfactions[index].toFixed(3),
-        ];
-        sheet1.addRow(row);
-      }
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF2E75B6' }
+      };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
     });
+
+    matchesArray.forEach((match, index) => {
+      const p1Name = problemData.individualNames[index];
+      let p2Names = "No match";
+      const matchValues = Object.values(match);
+
+      if (matchValues.length > 0) {
+        p2Names = matchValues
+          .map(mIdx => problemData.individualNames[mIdx])
+          .join(", ");
+      }
+
+      const satisfaction = appData.result.data.setSatisfactions[index] || 0;
+      const setIdx = (problemData.individualSetIndices?.[index] ?? 0) + 1;
+
+      sheet1.addRow([
+        index + 1,
+        p1Name,
+        p2Names,
+        satisfaction.toFixed(3),
+        `Set ${setIdx}`
+      ]);
+    });
+
+    sheet1.columns.forEach((column) => {
+      let maxColumnLength = 0;
+      column.eachCell({ includeEmpty: true }, (cell) => {
+        const length = cell.value ? cell.value.toString().length : 10;
+        if (length > maxColumnLength) maxColumnLength = length;
+      });
+      column.width = maxColumnLength < 12 ? 12 : maxColumnLength + 5;
+    });
+
     // write parameter configurations to sheet 2
     createParameterConfigSheet(workbook, appData);
     // write computer specs to sheet 3
@@ -112,6 +147,40 @@ export default function MatchingOutputPage() {
     saveAs(blob, appData.problem.nameOfProblem + "_Result.xlsx");
   };
 
+  const exportJSON = () => {
+    const parameterSet = {
+      timestamp: new Date().toISOString(),
+      problemName: appData.problem.nameOfProblem,
+      parameters: { ...appData.problem },
+      result: appData.result,
+    };
+    saveAs(new Blob([JSON.stringify(parameterSet, null, 2)], { type: "application/json" }), `${getTimestampFileName()}.json`);
+  };
+
+  const exportCSV = () => {
+    let csv = `Timestamp,${new Date().toISOString()}\nProblem Name,${appData.problem.nameOfProblem}\nAlgorithm,${appData.result.data.algorithm}\nFitness Value,${appData.result.data.fitnessValue}\n\nPartner 1,Partner 2,Satisfaction,Set\n`;
+    matchesArray.forEach((match, index) => {
+      const p1 = problemData.individualNames[index];
+      const p2 = Object.values(match).map(mIdx => problemData.individualNames[mIdx]).join("; ");
+      const sat = appData.result.data.setSatisfactions[index].toFixed(3);
+      const setIdx = (problemData.individualSetIndices?.[index] ?? 0) + 1;
+      csv += `"${p1}","${p2}",${sat},Set ${setIdx}\n`;
+    });
+    saveAs(new Blob([csv], { type: "text/csv;charset=utf-8;" }), `${getTimestampFileName()}.csv`);
+  };
+
+  const exportLatex = () => {
+    let latex = `\\section*{Result: ${problemData.nameOfProblem}}\n\\begin{tabular}{|l|l|c|c|}\n\\hline\nPartner 1 & Partner 2 & Sat & Set \\\\\n\\hline\n`;
+    matchesArray.forEach((match, index) => {
+      const p1 = problemData.individualNames[index];
+      const p2 = Object.values(match).map(mIdx => problemData.individualNames[mIdx]).join(", ");
+      const sat = appData.result.data.setSatisfactions[index].toFixed(3);
+      const setIdx = (problemData.individualSetIndices?.[index] ?? 0) + 1;
+      latex += `${p1} & ${p2} & ${sat} & Set ${setIdx} \\\\\n`;
+    });
+    latex += `\\hline\n\\end{tabular}`;
+    saveAs(new Blob([latex], { type: "text/plain" }), `${getTimestampFileName()}.tex`);
+  };
   const handleGetMoreInsights = () => {
     setIsShowPopup(true);
   };
@@ -147,7 +216,7 @@ export default function MatchingOutputPage() {
       const endpoint = `${getBackendAddress()}${serviceEndpoint}/${sessionCode}`;
 
       setIsLoading(true);
-      await connectWebSocket(); // connect to websocket to get the progress percentage
+      await connectWebSocket();
       const res = await axios.post(endpoint, body);
       setIsLoading(false);
       setFavicon("success");
@@ -232,7 +301,6 @@ export default function MatchingOutputPage() {
       return; // Bỏ qua phần tử không thuộc set đã chọn
     }
 
-    // Lấy tên cá nhân
     const individualName = problemData.individualNames?.[index] || "Unknown";
 
     let individualMatches = "";
@@ -248,10 +316,8 @@ export default function MatchingOutputPage() {
       });
     }
 
-    // Thêm thông tin vào fileContent
     fileContent += `${individualName} -> ${individualMatches}\n`;
 
-    // Đẩy dữ liệu vào htmlOutput
     htmlOutput.push(
       <tr className="table-success" key={`C${index + 1}`}>
         <td>{individualName}</td>
@@ -283,11 +349,6 @@ export default function MatchingOutputPage() {
   fileContent += `Runtime: ${appData.result.data.runtime}`;
   // Create a Blob with the content
   const blob = new Blob([fileContent], { type: "text/plain" });
-
-  // Create a download link
-  const downloadLink = document.createElement("a");
-  downloadLink.href = URL.createObjectURL(blob);
-  downloadLink.download = "output.txt";
 
   // Define your state variables here
   return (
@@ -356,68 +417,87 @@ export default function MatchingOutputPage() {
           <p>Runtime: {runtime} ms</p>
         </div>
       </div>
-      <div className="view-1" style={{ display: "block" }}>
-        <div className="d-flex">
-          <Button
-            variant="success"
-            size="md"
-            style={{ justifyContent: "center", margin: "auto", width: 150 }}
-            onClick={handleExportToExcel}
-          >
-            Export result
+      <div className="action-buttons-layout mt-4">
+        <div className="d-flex justify-content-center mb-3">
+          <Button variant="success" className="excel-full-btn d-flex align-items-center" onClick={handleExportToExcel} style={{ width: "300px", justifyContent: "center" }}>
+            <FaRegFileExcel className="me-2 fs-5" />
+            <span>Get Excel Template</span>
           </Button>
         </div>
-        <h3 style={{ marginBottom: 20, marginTop: 40 }}>
-          THE COUPLES AFTER GALE-SHAPLEY ALGORITHM s
-        </h3>
-        <div className="filter-container">
-          <label htmlFor="setFilter">Filter by set: </label>
-          <select
-            id="setFilter"
-            value={selectedSet}
-            onChange={handleSetFilterChange}
-            style={{ marginLeft: 10, marginBottom: 20 }}
-          >
-            <option value="all">All</option>
-            <option value="leftovers">LEFTOVERS</option>
-            {Array.from({ length: appData.problem.numberOfSets }, (_, i) => (
-              <option key={`set-${i + 1}`} value={i + 1}>
-                Set {i + 1}
-              </option>
-            ))}
-          </select>
+        <div className="d-flex gap-3 justify-content-center">
+          <Button variant="outline-primary" style={{ width: "180px" }} onClick={() => setIsExportPopup(true)}>
+            Save Parameter Set
+          </Button>
+          <Button variant="outline-secondary" style={{ width: "180px" }} onClick={handleOpenDrive}>
+            Open Google Drive
+          </Button>
         </div>
-
-        <Table striped bordered hover responsive>
-          <thead>
-            <tr className="table-success">
-              {/* <th>#</th> */}
-              <th>First Partner</th>
-              <th>Second Partner</th>
-              <th>Couple fitness</th>
-              <th>First Partner Set</th>
-              {/* Thêm cột mới */}
-            </tr>
-          </thead>
-
-          <tbody>{htmlOutput}</tbody>
-        </Table>
-
-        <h3 style={{ marginBottom: 20, marginTop: 40, textAlign: "center" }}>
-          THE LEFTOVERS AFTER GALE-SHAPLEY ALGORITHM
-        </h3>
-        <Table striped bordered hover responsive>
-          <thead>
-            <tr className="table-danger">
-              <th>No.</th>
-              <th>Name</th>
-              <th>Set</th>
-            </tr>
-          </thead>
-          <tbody>{htmlLeftOvers}</tbody>
-        </Table>
-        {/* {console.log(appData.result.data.individuals)} */}
       </div>
+
+      <h3 style={{ marginBottom: 20, marginTop: 40 }}>
+        THE COUPLES AFTER GALE-SHAPLEY ALGORITHM s
+      </h3>
+      <div className="filter-container">
+        <label htmlFor="setFilter">Filter by set: </label>
+        <select
+          id="setFilter"
+          value={selectedSet}
+          onChange={handleSetFilterChange}
+          style={{ marginLeft: 10, marginBottom: 20 }}
+        >
+          <option value="all">All</option>
+          <option value="leftovers">LEFTOVERS</option>
+          {Array.from({ length: appData.problem.numberOfSets }, (_, i) => (
+            <option key={`set-${i + 1}`} value={i + 1}>
+              Set {i + 1}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <Table striped bordered hover responsive>
+        <thead>
+          <tr className="table-success">
+            {/* <th>#</th> */}
+            <th>First Partner</th>
+            <th>Second Partner</th>
+            <th>Couple fitness</th>
+            <th>First Partner Set</th>
+            {/* Thêm cột mới */}
+          </tr>
+        </thead>
+
+        <tbody>{htmlOutput}</tbody>
+      </Table>
+
+      <h3 style={{ marginBottom: 20, marginTop: 40, textAlign: "center" }}>
+        THE LEFTOVERS AFTER GALE-SHAPLEY ALGORITHM
+      </h3>
+      <Table striped bordered hover responsive>
+        <thead>
+          <tr className="table-danger">
+            <th>No.</th>
+            <th>Name</th>
+            <th>Set</th>
+          </tr>
+        </thead>
+        <tbody>{htmlLeftOvers}</tbody>
+      </Table>
+      {/* {console.log(appData.result.data.individuals)} */}
+
+      {isExportPopup && (
+        <div className="export-modal" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1050 }}>
+          <div className="export-popup" style={{ backgroundColor: 'white', padding: '25px', borderRadius: '10px', width: '320px', textAlign: 'center' }}>
+            <h5 className="mb-4">Choose export format</h5>
+            <div className="d-flex flex-column gap-2">
+              <Button onClick={() => { exportJSON(); setIsExportPopup(false); }}>JSON</Button>
+              <Button variant="info" className="text-white" onClick={() => { exportCSV(); setIsExportPopup(false); }}>CSV</Button>
+              <Button variant="dark" onClick={() => { exportLatex(); setIsExportPopup(false); }}>LaTeX</Button>
+              <Button variant="light" className="mt-2" onClick={() => setIsExportPopup(false)}>Cancel</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

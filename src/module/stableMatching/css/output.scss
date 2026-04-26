@@ -1,11 +1,23 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
 
 .matching-output-page {
-  width: auto;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 100px;
+  padding: 0 30px;
+  width: auto;
+  margin: 0 auto;
+
+  // --- Header Section ---
+  #head-title {
+    font-size: 20px;
+    color: #000;
+    text-align: center;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 5px 20px;
+  }
 
   .problem-name {
     font-size: 20px;
@@ -16,59 +28,172 @@
     margin: 0 auto;
     padding: 5px 20px;
   }
-  #head-title {
-    font-size: 20px;
-    color: #000;
-    text-align: center;
-    width: fit-content;
-    margin: 0 auto;
-    padding: 5px 20px;
-  }
-  .header-text {
-    font-size: 16px;
-    // font-weight: 600;
-    color: #000;
-    border-bottom: 1px solid black;
-    width: fit-content;
-    margin: 0;
-    padding: 0 10px 10px 10px;
-    width: 300px;
-    text-align: center;
-  }
 
   .below-headertext {
     font-size: 14px;
-    // font-weight: 600;
-    color: #000;
+    color: #666;
     width: fit-content;
-    margin: 0 auto;
+    margin: 10px auto;
     padding: 0 10px;
   }
+
   .result-information {
     font-size: 14px;
-    // font-weight: 600;
     color: #000;
     width: fit-content;
     margin: 0 auto;
     padding: 0 10px;
     text-align: center;
   }
+
+  // --- Parameter Box ---
   .output-container {
     margin: 20px 0;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 10px;
+
+    .param-box {
+      background: #f8f9fa; // Giả định var(--grey)
+      display: flex;
+      flex-direction: column;
+      width: fit-content;
+      padding: 25px;
+      border-radius: 12px;
+      gap: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+
+      .estimated-time {
+        min-width: 280px;
+        font-size: 13px;
+        text-align: center;
+      }
+    }
   }
 
-  .row {
+  // --- ACTION BUTTONS LAYOUT (2 ROWS) ---
+  .action-buttons-layout {
+    width: 100%;
+    max-width: 615px; // Cố định chiều rộng để hàng 1 và hàng 2 thẳng hàng
+    margin: 20px auto;
+
+    .excel-full-btn {
+      width: 100%;
+      padding: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+      }
+    }
+
+    .d-flex.gap-3 {
+      margin-top: 15px;
+
+      .btn-outline-primary, .btn-outline-secondary {
+        flex: 1; // Chia đều 50/50
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        transition: all 0.2s;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+      }
+    }
+  }
+
+  // --- EXPORT MODAL (POPUP) ---
+  .export-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 20px;
+    justify-content: center;
+    z-index: 9999;
+
+    .export-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5); 
+      backdrop-filter: blur(2px);     
+    }
+
+    .export-popup {
+      position: relative;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 300px;
+      width: fit-content;
+      max-width: 90%;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      z-index: 10000;
+      animation: popupScale 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+      h5 {
+        font-size: 18px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 10px;
+        color: #222;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 500;
+      }
+    }
   }
 
+  // --- Table Section ---
+  .table {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: 10% 30% 30% 30%;
+    font-weight: bold;
+    padding: 0 30px;
+    max-width: 1200px;
+    background: #eee;
+    border-radius: 8px 8px 0 0;
+
+    .head-column {
+      padding: 15px;
+      text-align: left;
+    }
+  }
+
+  // --- Scroll Panel ---
   .scrollPanel {
     display: inline-flex;
     flex-direction: column;
@@ -85,108 +210,40 @@
     opacity: 0.5;
     border: none;
     border-radius: 6px;
+    transition: opacity 0.2s;
+    &:hover {
+      opacity: 0.8;
+    }
   }
 
-  .param-box {
-    background: var(--grey);
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    margin: 0 auto;
-    padding: 20px;
-    border-radius: 10px;
-    gap: 20px;
+  // --- Animations ---
+  @keyframes popupScale {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
 
-    .estimated-time {
-      min-width: 280px;
-      font-size: 13px;
-      text-align: center;
-      // background: red;
-    }
+  // --- RESPONSIVE DESIGN ---
+  @media only screen and (max-width: 768px) {
+    padding: 0 15px;
 
-    .insight-btn {
-      background: rgb(93, 90, 90);
-      color: white;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      padding: 1rem 2rem;
-      gap: 0;
-      &:hover {
-        background: black;
-        color: white;
+    .action-buttons-layout {
+      .d-flex.gap-3 {
+        flex-direction: column; 
+        gap: 10px !important;
       }
     }
-  }
 
-  .grid-container {
-    display: grid;
-    grid-template-columns: 10% 30% 30% 30%;
-    /* The first column is half the width of the others */
-    font-weight: bold;
-    padding: 0 30px;
-    max-width: 1200px;
-
-    .head-column {
-      text-align: left;
-    }
-  }
-
-  .column {
-    padding: 10px;
-  }
-
-  /* For screen sizes less than or equal to 768px */
-  @media only screen and (max-width: 768px) {
-    .matching-output-page {
-      padding: 0 10px;
-    }
-
-    .header-text {
-      font-size: 14px;
-      width: 100%;
-      padding: 0 5px 5px 5px;
-      margin: 0;
-    }
-
-    .below-headertext {
-      font-size: 12px;
-      padding: 0 5px;
-    }
-
-    .row {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-  }
-
-  /* For screen sizes greater than 768px */
-  @media only screen and (min-width: 769px) {
-    .matching-output-page {
-      padding: 0 30px;
-    }
-
-    .header-text {
-      font-size: 16px;
-      width: fit-content;
-      padding: 0 10px 10px 10px;
-      margin: 0 auto;
-    }
-
-    .below-headertext {
-      font-size: 14px;
-      padding: 0 10px;
-    }
-
-    .row {
-      justify-content: center;
+    #head-title {
+      font-size: 18px;
     }
 
     .grid-container {
-      grid-template-columns: 10% 30% 30% 30%;
-      width: 1200px;
+      font-size: 12px;
+      grid-template-columns: 50px 1fr 1fr 1fr;
     }
+  }
 
+  @media only screen and (min-width: 769px) {
     .grid-item-container {
       margin-top: 10px;
       padding: 0 20px;
