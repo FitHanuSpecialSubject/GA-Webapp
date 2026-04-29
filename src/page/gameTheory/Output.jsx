@@ -26,6 +26,19 @@ import { FaChartLine, FaRegFileExcel } from "react-icons/fa6";
 import Button from "react-bootstrap/Button";
 
 let stompClient = null;
+const insightButtonClassName =
+  "align-self-center btn btn-outline-primary d-flex flex-column " +
+  "align-items-center justify-content-center border-1 p-3";
+
+function getRequestedAlgorithm(appData) {
+  return (
+    appData?.result?.params?.requestedAlgorithm ||
+    appData?.problem?.requestedAlgorithm ||
+    appData?.result?.params?.usedAlgorithm ||
+    appData?.result?.data?.algorithm
+  );
+}
+
 export default function OutputPage() {
   const navigate = useNavigate();
   const { appData, setAppData, setFavicon } = useContext(DataContext);
@@ -146,6 +159,7 @@ export default function OutputPage() {
         fitnessFunction: appData.problem.fitnessFunction,
         defaultPayoffFunction: appData.problem.playerPayoffFunction,
         conflictSet: appData.problem.conflictSet,
+        algorithm: getRequestedAlgorithm(appData),
         distributedCores: distributedCoreParam,
         populationSize: populationSizeParam,
         generation: generationParam,
@@ -168,6 +182,7 @@ export default function OutputPage() {
           populationSizeParam: populationSizeParam,
           generationParam: generationParam,
           maxTimeParam: maxTimeParam,
+          algorithm: getRequestedAlgorithm(appData),
         },
       };
       setAppData({ ...appData, insights });
@@ -256,7 +271,7 @@ export default function OutputPage() {
             setRunCountParam={setRunCountParam}
           />
           <div
-            className="align-self-center btn btn-outline-primary d-flex flex-column align-items-center justify-content-center border-1 p-3"
+            className={insightButtonClassName}
             onClick={handleGetMoreInsights}
           >
             <div className="d-flex align-items-center justify-content-center gap-2">

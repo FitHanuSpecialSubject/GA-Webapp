@@ -55,11 +55,19 @@ export default function InputProcessingPage() {
       const result = {
         data: res.data.data,
         params: {
+          requestedAlgorithm: algorithm,
           usedAlgorithm: usedAlgorithm,
           ...algorithmParams,
         },
       };
-      setAppData({ ...appData, result });
+      setAppData({
+        ...appData,
+        problem: {
+          ...appData.problem,
+          requestedAlgorithm: algorithm,
+        },
+        result,
+      });
       setIsLoading(false);
       navigate("/result");
     } catch (err) {
@@ -77,7 +85,6 @@ export default function InputProcessingPage() {
         message="Solve your problem, please do not close this window..."
       />
       <h1 className="problem-name">{appData.problem.name}</h1>
-
 
       {algorithm === "PAES" && (
         <p style={{ color: "red", textAlign: "center" }}>

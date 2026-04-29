@@ -11,12 +11,25 @@ import { SMT, SMT_VALIDATE } from "../../consts";
 import { axiosErrorHandler, getBackendAddress } from "../../utils/http_utils";
 import { SMT_ALGORITHMS, SMT_PSO_ALGORITHMS } from "../../const/matching_const";
 
+function hasAlgorithmOption(algorithmList, algorithm) {
+  return algorithmList.some((option) => option.value === algorithm);
+}
+
+function getInitialAlgorithm(problem) {
+  const requestedAlgorithm = problem?.requestedAlgorithm;
+  return hasAlgorithmOption(SMT_ALGORITHMS, requestedAlgorithm)
+    ? requestedAlgorithm
+    : SMT.DEFAULT_ALGORITHM;
+}
+
 export default function InputProcessingPage() {
   const navigate = useNavigate();
   const { appData, setAppData, setFavicon } = useContext(DataContext);
   const [isLoading, setIsLoading] = useState(false);
   const [algorithmList, setAlgorithmList] = useState(SMT_ALGORITHMS);
-  const [algorithm, setAlgorithm] = useState(SMT.DEFAULT_ALGORITHM);
+  const [algorithm, setAlgorithm] = useState(() =>
+    getInitialAlgorithm(appData?.problem),
+  );
   const [algorithmParams, setAlgorithmParams] = useState({});
   const [problemType, setProblemType] = useState(SMT.PROBLEM_TYPES.MTM);
   const [problemTypeOrdinal, setProblemTypeOrdinal] = useState(
@@ -31,8 +44,27 @@ export default function InputProcessingPage() {
     }
   }, [appData?.problem]);
 
+  useEffect(() => {
+    const requestedAlgorithm = appData?.problem?.requestedAlgorithm;
+    if (
+      requestedAlgorithm &&
+      requestedAlgorithm !== algorithm &&
+      hasAlgorithmOption(algorithmList, requestedAlgorithm)
+    ) {
+      setAlgorithm(requestedAlgorithm);
+    }
+  }, [algorithm, algorithmList, appData?.problem?.requestedAlgorithm]);
+
   const handleChange = (event) => {
-    setAlgorithm(event.target.value);
+    const nextAlgorithm = event.target.value;
+    setAlgorithm(nextAlgorithm);
+    setAppData((prevData) => ({
+      ...prevData,
+      problem: {
+        ...prevData.problem,
+        requestedAlgorithm: nextAlgorithm,
+      },
+    }));
   };
 
   // Hàm thay đổi problemType
@@ -47,17 +79,31 @@ export default function InputProcessingPage() {
         setProblemType(SMT.PROBLEM_TYPES[key]);
 
         // Handle PSO compatible problem type exclusively
+        const nextAlgorithm =
+          ordinal == PSO_COMPAT_TYPE
+            ? SMT_PSO_ALGORITHMS[0].value
+            : appData?.problem?.requestedAlgorithm &&
+                hasAlgorithmOption(
+                  SMT_ALGORITHMS,
+                  appData.problem.requestedAlgorithm,
+                )
+              ? appData.problem.requestedAlgorithm
+              : SMT.DEFAULT_ALGORITHM;
+
         if (ordinal == PSO_COMPAT_TYPE) {
           setAlgorithmList(SMT_PSO_ALGORITHMS);
-          setAlgorithm(SMT_PSO_ALGORITHMS[0].value);
         } else {
           setAlgorithmList(SMT_ALGORITHMS);
-          setAlgorithm(SMT.DEFAULT_ALGORITHM);
         }
+        setAlgorithm(nextAlgorithm);
 
         // Cập nhật appData để lưu lại thông tin problemType
         setAppData((prevData) => ({
           ...prevData,
+          problem: {
+            ...prevData.problem,
+            requestedAlgorithm: nextAlgorithm,
+          },
           problemTypeOrdinal: ordinal,
           problemType: SMT.PROBLEM_TYPES[key], // Lưu loại bài toán vào appData
         }));
@@ -130,6 +176,7 @@ export default function InputProcessingPage() {
         data: res.data.data,
         params: {
           runtime: runtime,
+          requestedAlgorithm: algorithm,
           usedAlgorithm: usedAlgorithm,
           ...algorithmParams,
         },
@@ -137,6 +184,11 @@ export default function InputProcessingPage() {
 
       setAppData({
         ...appData,
+        problem: {
+          ...appData.problem,
+          requestedAlgorithm: algorithm,
+          inputAlgorithm: appData.problem.inputAlgorithm,
+        },
         result,
         problemType: problemType,
       });
@@ -181,8 +233,6 @@ export default function InputProcessingPage() {
         message="Solve your problem, please do not close this window..."
       />
       <h1 className="problem-name">{appData.problem.name}</h1>
-
-
 
       {algorithm === "PAES" && (
         <p style={{ color: "red", textAlign: "center" }}>

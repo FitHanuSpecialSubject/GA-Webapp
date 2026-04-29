@@ -133,6 +133,8 @@ export default function InputPage() {
             individualRequirements: dataset.individualRequirements,
             individualWeights: dataset.individualWeights,
             excludePairs,
+            requestedAlgorithm: problemInfo.requestedAlgorithm,
+            inputAlgorithm: problemInfo.requestedAlgorithm,
           },
         });
         navigate("/matching-theory/input-processing");
@@ -321,6 +323,7 @@ export default function InputPage() {
         evaluateFunction,
       ]);
     });
+    problemWorksheet.addRow(["Algorithm (optional)", ""]);
     for (let i = 0; i < Number(setNum); i++) {
       const numberSetIndividuals = Number(setIndividuals[i]);
       if (i === 0) {

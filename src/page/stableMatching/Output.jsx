@@ -26,6 +26,20 @@ import { FaChartLine, FaRegFileExcel } from "react-icons/fa6";
 import { SMT } from "../../consts.js";
 
 let stompClient = null;
+const insightButtonClassName =
+  "align-self-center btn btn-outline-primary d-flex flex-column " +
+  "align-items-center justify-content-center border-1 p-3";
+
+function getRequestedAlgorithm(appData) {
+  return (
+    appData?.result?.params?.requestedAlgorithm ||
+    appData?.problem?.requestedAlgorithm ||
+    appData?.problem?.inputAlgorithm ||
+    appData?.result?.params?.usedAlgorithm ||
+    appData?.result?.data?.algorithm
+  );
+}
+
 export default function MatchingOutputPage() {
   const navigate = useNavigate();
   const { appData, setAppData, setFavicon } = useContext(DataContext);
@@ -48,7 +62,9 @@ export default function MatchingOutputPage() {
   const [generationParam, setGenerationParam] = useState(100);
   const [maxTimeParam, setMaxTimeParam] = useState(5000);
   const [selectedSet, setSelectedSet] = useState("all");
-  const [runCountParam, setRunCountParam] = useState(SMT.DEFAULT_RUN_COUNT_PARAM);
+  const [runCountParam, setRunCountParam] = useState(
+    SMT.DEFAULT_RUN_COUNT_PARAM,
+  );
   const [isExportPopup, setIsExportPopup] = useState(false);
 
   useEffect(() => {
@@ -203,12 +219,13 @@ export default function MatchingOutputPage() {
         individualWeights: appData.problem.individualWeights,
         fitnessFunction: appData.problem.fitnessFunction,
         evaluateFunctions: evaluateFunctions,
+        algorithm: getRequestedAlgorithm(appData),
 
         distributedCores: distributedCoreParam,
         populationSize: populationSizeParam,
         generation: generationParam,
         maxTime: maxTimeParam,
-        runCountPerAlgorithm: runCountParam
+        runCountPerAlgorithm: runCountParam,
       };
 
       const problemType = appData.problemType;
@@ -227,6 +244,8 @@ export default function MatchingOutputPage() {
           populationSizeParam: populationSizeParam,
           generationParam: generationParam,
           maxTimeParam: maxTimeParam,
+          algorithm: getRequestedAlgorithm(appData),
+          inputAlgorithm: appData?.problem?.inputAlgorithm,
         },
       };
       setAppData({ ...appData, insights });
@@ -283,6 +302,7 @@ export default function MatchingOutputPage() {
   // Get data from sever
 
   const fitnessValue = appData.result.data.fitnessValue.toFixed(3);
+  const requestedAlgorithm = getRequestedAlgorithm(appData);
   const usedAlgorithm = appData.result.data.algorithm;
   const runtime = appData.result.data.runtime.toFixed(3);
   const htmlOutput = [];
@@ -396,7 +416,7 @@ export default function MatchingOutputPage() {
             setRunCountParam={setRunCountParam}
           />
           <div
-            className="align-self-center btn btn-outline-primary d-flex flex-column align-items-center justify-content-center border-1 p-3"
+            className={insightButtonClassName}
             onClick={handleGetMoreInsights}
           >
             <div className="d-flex align-items-center justify-content-center gap-2">
@@ -413,6 +433,7 @@ export default function MatchingOutputPage() {
         <div className="result-information">
           <p>Problem Type: {problemType.displayName}</p>
           <p>Fitness Value: {fitnessValue}</p>
+          <p>Requested Algorithm: {requestedAlgorithm}</p>
           <p>Used Algorithm: {usedAlgorithm}</p>
           <p>Runtime: {runtime} ms</p>
         </div>

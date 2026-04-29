@@ -7,6 +7,48 @@ import ExcelJS from "exceljs";
 import colCache from "exceljs/lib/utils/col-cache";
 import { RESULT_WORKBOOK } from "../const/excel_const";
 import { genRandom } from "./common_utils";
+import { ALGORITHMS } from "../const/algorithm_const";
+
+const SUPPORTED_ALGORITHMS = Object.values(ALGORITHMS);
+
+function normalizeAlgorithmValue(value) {
+  const normalizedValue = value
+    ?.toString()
+    .replace(/[^a-z0-9]/gi, "")
+    .toUpperCase();
+
+  if (!normalizedValue) {
+    return null;
+  }
+
+  const matchedAlgorithm = SUPPORTED_ALGORITHMS.find((algorithm) => {
+    const displayName = algorithm.displayName
+      .replace(/[^a-z0-9]/gi, "")
+      .toUpperCase();
+    const requestValue = algorithm.value
+      .replace(/[^a-z0-9]/gi, "")
+      .toUpperCase();
+    return normalizedValue === displayName || normalizedValue === requestValue;
+  });
+
+  return matchedAlgorithm?.value || null;
+}
+
+function loadRequestedAlgorithm(problemSheet) {
+  for (let row = 1; row <= problemSheet.rowCount; row++) {
+    const label = problemSheet
+      .getCell(row, 1)
+      ?.value?.toString()
+      .trim()
+      .toLowerCase();
+
+    if (label?.includes("algorithm")) {
+      return normalizeAlgorithmValue(problemSheet.getCell(row, 2).value);
+    }
+  }
+
+  return null;
+}
 
 /**
  * Tạo một sheet từ thông tin cấu hình máy tính.
@@ -72,6 +114,7 @@ export const loadProblemInfoSMT = async (workbook) => {
   const totalNumberOfIndividuals = getCellValueNum(problemSheet, 3, 2);
   const characteristicNum = getCellValueNum(problemSheet, 4, 2);
   const fitnessFunction = getCellValueStr(problemSheet, "B5");
+  const requestedAlgorithm = loadRequestedAlgorithm(problemSheet);
   const setEvaluateFunction = [];
   for (let i = 0; i < setNum; i++) {
     setEvaluateFunction.push(problemSheet.getCell(`B${i + 6}`).value);
@@ -83,6 +126,7 @@ export const loadProblemInfoSMT = async (workbook) => {
     characteristicNum,
     fitnessFunction,
     setEvaluateFunction,
+    requestedAlgorithm,
   };
 };
 
