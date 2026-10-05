@@ -21,7 +21,7 @@ import {
 } from "../../utils/excel_utils";
 import { GAME_THEORY_WORKBOOK } from "../../const/excel_const";
 import GT_GUIDELINE from "../../module/core/asset/workbook/gtguidelines.xlsx";
-import { FaRegFileExcel } from "react-icons/fa6";
+import { FaRegFileExcel, FaFlask } from "react-icons/fa6";
 
 export default function InputPage() {
   // initialize form data
@@ -582,12 +582,22 @@ export default function InputPage() {
             />
           </div>
         </div>
-        <div
-          className="btn btn-success d-flex justify-content-center border-1 p-3"
-          onClick={handleGetExcelTemplate}
-        >
-          <FaRegFileExcel className="me-0 fs-4" />
-          Get Excel Template
+        <div className="d-flex gap-2 w-100 justify-content-center">
+          <div
+            className="btn btn-success d-flex justify-content-center border-1 p-3 flex-grow-1"
+            onClick={handleGetExcelTemplate}
+          >
+            <FaRegFileExcel className="me-0 fs-4" />
+            Get Excel Template
+          </div>
+          <Link
+            to="/function-testing"
+            className="btn btn-primary d-flex justify-content-center border-1 p-3 text-white text-decoration-none"
+            style={{ backgroundColor: "#2563eb", borderColor: "#2563eb" }}
+          >
+            <FaFlask className="me-0 fs-4" />
+            Function Testing
+          </Link>
         </div>
 
         <div className="guide-box">

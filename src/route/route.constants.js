@@ -1,25 +1,29 @@
 const AppRoutes = {
   // Matching Theory
-  MatchingHome:         '/matching-theory/',
-  MatchingInput:        '/matching-theory/input',
-  MatchingProcessing:   '/matching-theory/input-processing',
-  MatchingResult:       '/matching-theory/result',
+  MatchingHome: "/matching-theory/",
+  MatchingInput: "/matching-theory/input",
+  MatchingProcessing: "/matching-theory/input-processing",
+  MatchingResult: "/matching-theory/result",
 
   // Game Theory
-  GameTheoryHome:       '/',
-  GameTheoryInput:      '/input',
-  GameTheoryGuide:      '/guide',
-  GameTheoryProcessing: '/input-processing',
-  GameTheoryResult:     '/result',
+  GameTheoryHome: "/",
+  GameTheoryInput: "/input",
+  GameTheoryGuide: "/guide",
+  GameTheoryProcessing: "/input-processing",
+  GameTheoryResult: "/result",
 
   // Data Generator
-  GeneratorHome:        '/generator/',
+  GeneratorHome: "/generator/",
+
+  // Function Testing
+  FunctionTesting: "/function-testing",
+  FunctionCheck: "/function-testing",
 
   // Insights
-  Insights:            '/insights',
+  Insights: "/insights",
 
   // Fallback
-  Fallback:            '*',
+  Fallback: "*",
 };
 
 export default AppRoutes;

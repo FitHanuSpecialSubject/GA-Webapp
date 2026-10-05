@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import DataContext from "../module/core/context/DataContext";
 import InsightPage from "../page/Insight";
+import FunctionCheckPage from "../page/functionCheck/FunctionCheck";
 import PopupContext from "../module/core/context/PopupContext";
 import Popup from "../module/core/component/Popup";
 import stableMatchingRouter from "./StableMatchingRoutes";
@@ -57,13 +58,15 @@ function App() {
             {GameTheoryRouter}
             {DataGeneratorRouter}
             <Route
-              path    = {AppRoutes.Insights}
-              element = {<InsightPage />}
+              path={AppRoutes.FunctionTesting || "/function-testing"}
+              element={<FunctionCheckPage />}
             />
             <Route
-              path    = {AppRoutes.Fallback}
-              element = {<InputPage />}
+              path="/function-check"
+              element={<FunctionCheckPage />}
             />
+            <Route path={AppRoutes.Insights} element={<InsightPage />} />
+            <Route path={AppRoutes.Fallback} element={<InputPage />} />
           </Routes>
         </div>
 

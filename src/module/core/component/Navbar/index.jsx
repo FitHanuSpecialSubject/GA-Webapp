@@ -51,6 +51,14 @@ export default function Header() {
               Data Generator
             </Link>
             <Link
+              to="/function-testing"
+              className={
+                path === "/function-testing" || path === "/function-check" ? "nav-item highlight" : "nav-item"
+              }
+            >
+              Function Testing
+            </Link>
+            <Link
               to="/guide"
               className={path === "/guide" ? "nav-item highlight" : "nav-item"}
             >
