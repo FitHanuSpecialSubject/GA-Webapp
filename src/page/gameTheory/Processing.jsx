@@ -3,14 +3,13 @@ import "../../module/gameTheory/css/processing.scss";
 import { useNavigate } from "react-router-dom";
 
 import Player from "../../module/gameTheory/component/Player";
-import axios from "axios";
 import DataContext from "../../module/core/context/DataContext";
 import NothingToShow from "../../module/core/component/NothingToShow";
 import Loading from "../../module/core/component/Loading";
 import ParamSettingBox from "../../module/core/component/ParamSettingBox";
 import PopupContext from "../../module/core/context/PopupContext";
 import { GT_ALGORITHMS } from "../../const/game_theory_const";
-import { axiosErrorHandler, getBackendAddress } from "../../utils/http_utils";
+import { axiosErrorHandler, solveAsync } from "../../utils/http_utils";
 export default function InputProcessingPage() {
   const navigate = useNavigate();
   const { appData, setAppData, setFavicon } = useContext(DataContext);
@@ -52,10 +51,7 @@ export default function InputProcessingPage() {
       };
       setFavicon("running");
       setIsLoading(true);
-      const res = await axios.post(
-        `${getBackendAddress()}/api/game-theory-solver`,
-        body,
-      );
+      const res = await solveAsync("/api/game-theory-solver", body);
       const usedAlgorithm = res.data.data.algorithm;
 
       const result = {

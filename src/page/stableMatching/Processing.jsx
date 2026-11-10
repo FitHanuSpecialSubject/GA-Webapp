@@ -1,14 +1,13 @@
 import React, { useContext, useState, useEffect } from "react";
 import "../../module/stableMatching/css/processing.scss";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import DataContext from "../../module/core/context/DataContext";
 import NothingToShow from "../../module/core/component/NothingToShow";
 import Loading from "../../module/core/component/Loading";
 import ParamSettingBox from "../../module/core/component/ParamSettingBox";
 import PopupContext from "../../module/core/context/PopupContext";
 import { SMT, SMT_VALIDATE } from "../../consts";
-import { axiosErrorHandler, getBackendAddress } from "../../utils/http_utils";
+import { axiosErrorHandler, solveAsync } from "../../utils/http_utils";
 import { SMT_ALGORITHMS, SMT_PSO_ALGORITHMS } from "../../const/matching_const";
 
 export default function InputProcessingPage() {
@@ -132,10 +131,8 @@ export default function InputProcessingPage() {
         generation: generationParam,
         maxTime: maxTimeParam,
       };
-      const serviceEndpoint = problemType.endpoint;
-      const endpoint = `${getBackendAddress()}${serviceEndpoint}`;
       setIsLoading(true);
-      const res = await axios.post(endpoint, requestBody);
+      const res = await solveAsync(problemType.endpoint, requestBody);
       const runtime = res.data.data.runtime;
       const usedAlgorithm = res.data.data.algorithm;
 

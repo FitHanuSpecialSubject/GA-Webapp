@@ -1,7 +1,10 @@
 import { isStringNullOrEmpty } from "./string_utils";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import { ERROR } from "../const/error_const";
 import React from "react";
+
+const JOB_POLL_INTERVAL_MS = 3000;
+const JOB_POLL_MAX_FAILURES = 5;
 
 export function getBackendAddress() {
   const protocol = import.meta.env.VITE_BACKEND_PROTOCOL;
@@ -10,6 +13,43 @@ export function getBackendAddress() {
     ? ""
     : `:${import.meta.env.VITE_BACKEND_PORT}`;
   return `${protocol}://${url}${port}`;
+}
+
+/**
+ * Solve a problem as a background job, so no single HTTP request has to stay
+ * open until the computation finishes (proxies like Cloudflare cut requests
+ * after ~120s). Submits to /api/jobs/<solver> then polls until it is done.
+ *
+ * @param {string} path synchronous endpoint, e.g. "/api/game-theory-solver".
+ * @param {object} body request body of that endpoint.
+ * @returns {Promise<{data: object}>} same shape as `axios.post(path, body)`.
+ */
+export async function solveAsync(path, body) {
+  const base = getBackendAddress();
+  const submitted = await axios.post(
+    `${base}${path.replace(/^\/api\//, "/api/jobs/")}`,
+    body,
+  );
+  const jobId = submitted.data.data.jobId;
+
+  let failures = 0;
+  for (;;) {
+    await new Promise((resolve) => setTimeout(resolve, JOB_POLL_INTERVAL_MS));
+    try {
+      const poll = await axios.get(`${base}/api/jobs/${jobId}`);
+      failures = 0;
+      const { status, result } = poll.data.data;
+      if (status === "DONE" || status === "ERROR") {
+        return { data: result };
+      }
+    } catch (err) {
+      // Tolerate short network / proxy hiccups, give up on real client errors.
+      const transient = !err.response || err.response.status >= 500;
+      if (!transient || ++failures >= JOB_POLL_MAX_FAILURES) {
+        throw err;
+      }
+    }
+  }
 }
 
 export function axiosErrorHandler(err) {
