@@ -26,10 +26,10 @@ export function getBackendAddress() {
  */
 export async function solveAsync(path, body) {
   const base = getBackendAddress();
-  const submitted = await axios.post(
-    `${base}${path.replace(/^\/api\//, "/api/jobs/")}`,
-    body,
-  );
+  const jobPath = path
+    .replace(/^\/api\//, "/api/jobs/")
+    .replace(/\/{2,}/g, "/");
+  const submitted = await axios.post(`${base}${jobPath}`, body);
   const jobId = submitted.data.data.jobId;
 
   let failures = 0;

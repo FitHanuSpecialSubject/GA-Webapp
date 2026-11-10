@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import NothingToShow from "../../module/core/component/NothingToShow";
 import Loading from "../../module/core/component/Loading";
 import Popup from "../../module/core/component/Popup";
-import axios from "axios";
 import ParamSettingBox from "../../module/core/component/ParamSettingBox";
 import PopupContext from "../../module/core/context/PopupContext";
 import SockJS from "sockjs-client";
@@ -15,7 +14,7 @@ import { over } from "stompjs";
 import { saveAs } from "file-saver";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
-import { getBackendAddress } from "../../utils/http_utils";
+import { getBackendAddress, solveAsync } from "../../utils/http_utils";
 import {
   createSystemInfoSheet,
   createParameterConfigSheet,
@@ -144,11 +143,11 @@ export default function MatchingOutputPage() {
 
       const problemType = appData.problemType;
       const serviceEndpoint = problemType.insightEndpoint;
-      const endpoint = `${getBackendAddress()}${serviceEndpoint}/${sessionCode}`;
+      const endpoint = `${serviceEndpoint}/${sessionCode}`;
 
       setIsLoading(true);
       await connectWebSocket(); // connect to websocket to get the progress percentage
-      const res = await axios.post(endpoint, body);
+      const res = await solveAsync(endpoint, body);
       setIsLoading(false);
       setFavicon("success");
       const insights = {

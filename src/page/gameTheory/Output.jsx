@@ -8,7 +8,6 @@ import NothingToShow from "../../module/core/component/NothingToShow";
 import Loading from "../../module/core/component/Loading";
 import { saveAs } from "file-saver";
 import Popup from "../../module/core/component/Popup";
-import axios from "axios";
 import ParamSettingBox from "../../module/core/component/ParamSettingBox";
 import PopupContext from "../../module/core/context/PopupContext";
 import {
@@ -21,7 +20,7 @@ import { v4 } from "uuid";
 import { over } from "stompjs";
 import ExcelJS from "exceljs";
 import { RESULT_WORKBOOK } from "../../const/excel_const";
-import { getBackendAddress } from "../../utils/http_utils";
+import { getBackendAddress, solveAsync } from "../../utils/http_utils";
 import { FaChartLine, FaRegFileExcel } from "react-icons/fa6";
 
 let stompClient = null;
@@ -100,8 +99,8 @@ export default function OutputPage() {
 
       setIsLoading(true);
       await connectWebSocket(); // connect to websocket to get the progress percentage
-      const res = await axios.post(
-        `${getBackendAddress()}/api/problem-result-insights/${sessionCode}`,
+      const res = await solveAsync(
+        `/api/problem-result-insights/${sessionCode}`,
         body,
       );
       setIsLoading(false);
